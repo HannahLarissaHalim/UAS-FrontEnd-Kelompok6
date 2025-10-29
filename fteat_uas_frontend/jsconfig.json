@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es2020",
+    "module": "esnext",
+    "jsx": "react-jsx",
+    "lib": ["dom","dom.iterable","esnext"],
+
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+"include": ["next-env.d.ts", "**/*.js", "**/*.jsx"],
+"exclude": ["node_modules"]}

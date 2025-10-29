@@ -1,0 +1,21 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer circle -->
+  <circle cx="200" cy="200" r="195" fill="#FDF8F2" stroke="#0A4988" stroke-width="3"/>
+  
+  <!-- Inner basket -->
+  <ellipse cx="200" cy="250" rx="120" ry="80" fill="#D2691E" opacity="0.6"/>
+  
+  <!-- Food items (simplified) -->
+  <circle cx="180" cy="180" r="30" fill="#FFB347" stroke="#000" stroke-width="2"/>
+  <circle cx="220" cy="170" r="35" fill="#FF6B6B" stroke="#000" stroke-width="2"/>
+  <circle cx="160" cy="220" r="25" fill="#4ECDC4" stroke="#000" stroke-width="2"/>
+  <circle cx="240" cy="210" r="28" fill="#FFE66D" stroke="#000" stroke-width="2"/>
+  
+  <!-- Ribbon at top -->
+  <path d="M 100 80 Q 200 60 300 80" fill="#0A4988"/>
+  <text x="200" y="75" font-family="Arial" font-size="16" fill="#FFF" text-anchor="middle">FTEAT</text>
+  
+  <!-- Fork and spoon -->
+  <line x1="80" y1="250" x2="80" y2="350" stroke="#000" stroke-width="4"/>
+  <line x1="320" y1="250" x2="320" y2="350" stroke="#000" stroke-width="4"/>
+</svg>
