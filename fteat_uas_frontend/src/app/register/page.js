@@ -7,6 +7,7 @@ import HomeNavbar from '../components/HomeNavbar';
 import { mockFaculties, mockMajors } from '../../utils/mockData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
+import { api } from '../../utils/api';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,7 +18,8 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    facultyCode: '',
+    faculty: '',
+    major: '',
     majorCode: '',
     yearEntry: '',
     npmLast3Digits: '',
@@ -31,19 +33,19 @@ export default function RegisterPage() {
 
   // Update available majors when faculty changes
   useEffect(() => {
-    if (formData.facultyCode) {
-      const majors = mockMajors[formData.facultyCode] || [];
+    if (formData.faculty) {
+      const majors = mockMajors[formData.faculty] || [];
       setAvailableMajors(majors);
     } else {
       setAvailableMajors([]);
     }
-  }, [formData.facultyCode]);
+  }, [formData.faculty]);
 
   // Auto-generate NPM and Email when dependencies change
   useEffect(() => {
-    const { facultyCode, majorCode, yearEntry, npmLast3Digits, firstName } = formData;
+    const { faculty, majorCode, yearEntry, npmLast3Digits, firstName } = formData;
 
-    if (facultyCode && majorCode && yearEntry) {
+    if (faculty && majorCode && yearEntry) {
       // Get last 2 digits of year
       const yearShort = yearEntry.toString().slice(-2);
 
@@ -78,7 +80,7 @@ export default function RegisterPage() {
         }
       }
     }
-  }, [formData.facultyCode, formData.majorCode, formData.yearEntry, formData.npmLast3Digits, formData.firstName]);
+  }, [formData.faculty, formData.majorCode, formData.yearEntry, formData.npmLast3Digits, formData.firstName]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -91,10 +93,10 @@ export default function RegisterPage() {
     }
 
     // Reset major when faculty changes
-    if (name === 'facultyCode') {
+    if (name === 'faculty') {
       setFormData(prev => ({
         ...prev,
-        facultyCode: value,
+        faculty: value,
         majorCode: ''
       }));
       return;
@@ -113,7 +115,7 @@ export default function RegisterPage() {
         return;
       }
 
-      if (!formData.facultyCode) {
+      if (!formData.faculty) {
         setError('Fakultas harus dipilih');
         return;
       }
@@ -159,6 +161,13 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      const data = await api.register(formData);
+
+      if (!data.success) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      /*
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
@@ -166,13 +175,16 @@ export default function RegisterPage() {
         },
         body: JSON.stringify(formData)
       });
+      */
 
+      /*
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Registration failed');
       }
+      */
 
-      const data = await response.json();
+      //const data = await response.json();
       router.push('/login');
     } catch (err) {
       setError(err.message || 'Connection failed');
@@ -239,14 +251,22 @@ export default function RegisterPage() {
                   <Form.Group className="mb-3">
                     <Form.Label>Fakultas</Form.Label>
                     <Form.Select
-                      name="facultyCode"
-                      value={formData.facultyCode}
-                      onChange={handleChange}
+                      name="faculty"
+                      value={formData.faculty}
+                          onChange={(e) => {
+                            const facultyName = e.target.value;
+                            setFormData(prev => ({
+                              ...prev,
+                              faculty: facultyName,
+                              major: '',
+                              majorCode: ''
+                            }));
+                          }}
                       required
                     >
                       <option value="">Pilih Fakultas</option>
                       {mockFaculties.map((faculty, index) => (
-                        <option key={`faculty-${faculty.code}-${index}`} value={faculty.code}>
+                        <option key={`faculty-${faculty.name}-${index}`} value={faculty.name}>
                           {faculty.name}
                         </option>
                       ))}
@@ -258,8 +278,17 @@ export default function RegisterPage() {
                     <Form.Select
                       name="majorCode"
                       value={formData.majorCode}
-                      onChange={handleChange}
-                      disabled={!formData.facultyCode}
+                      onChange={(e) => {
+                        const selectedMajor = availableMajors.find(  // 🔹 cari object berdasarkan kode
+                          (m) => m.code === e.target.value
+                        );
+                        setFormData(prev => ({
+                          ...prev,
+                          major: selectedMajor ? selectedMajor.name : '',     // 🔹 simpan nama prodi
+                          majorCode: selectedMajor ? selectedMajor.code : ''  // 🔹 simpan kode prodi
+                        }));
+                      }}
+                      disabled={!formData.faculty}
                       required
                     >
                       <option value="">Pilih Program Studi</option>
@@ -269,7 +298,7 @@ export default function RegisterPage() {
                         </option>
                       ))}
                     </Form.Select>
-                    {!formData.facultyCode && (
+                    {!formData.faculty && (
                       <Form.Text className="text-muted">
                         Pilih fakultas terlebih dahulu
                       </Form.Text>
@@ -316,7 +345,7 @@ export default function RegisterPage() {
                   </Row>
 
                   {/* NPM Preview */}
-                  {formData.facultyCode && formData.majorCode && formData.yearEntry && (
+                  {formData.faculty && formData.majorCode && formData.yearEntry && (
                     <div className="npm-preview mb-4 p-3 bg-light rounded">
                       <Row>
                         <Col md={6}>
