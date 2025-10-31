@@ -24,6 +24,8 @@ app.use(cors({
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
+// Users routes (protected)
+app.use('/api/users', require('./routes/usersRoutes'));
 
 // Welcome route
 app.get('/', (req, res) => {
