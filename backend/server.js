@@ -2,6 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/database');
+const menuRoutes = require('./routes/menuRoutes');
+const vendorRoutes = require('./routes/vendorRoutes');
+const kantinBursaRoutes = require('./routes/KantinBursaRoutes');
+const indomieRoutes = require('./routes/IndomieRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -15,6 +19,9 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/api/vendors', vendorRoutes);
+app.use('/api/kantinbursa', kantinBursaRoutes);
+app.use('/api/indomie', indomieRoutes);
 
 // CORS configuration
 app.use(cors({
@@ -26,6 +33,7 @@ app.use(cors({
 app.use('/api/auth', require('./routes/authRoutes'));
 // Users routes (protected)
 app.use('/api/users', require('./routes/usersRoutes'));
+app.use('/api/menus', menuRoutes);
 
 // Welcome route
 app.get('/', (req, res) => {
@@ -71,3 +79,4 @@ process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err);
   process.exit(1);
 });
+
