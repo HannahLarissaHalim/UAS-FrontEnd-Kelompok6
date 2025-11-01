@@ -12,9 +12,9 @@ const userSchema = new mongoose.Schema({
     trim: true,
     default: ''
   },
-  facultyCode: {
+  faculty: {
     type: String,
-    required: [true, 'Kode fakultas harus diisi']
+    required: [true, 'Fakultas harus diisi']
   },
   majorCode: {
     type: String,

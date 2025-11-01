@@ -19,15 +19,22 @@ const registerValidation = [
   
   body('faculty')
     .notEmpty()
-    .withMessage('Fakultas harus diisi')
-    .isLength({ min: 2, max: 2 })
-    .withMessage('Kode fakultas harus 2 digit'),
+    .withMessage('Fakultas harus diisi'),
+    // .isLength({ min: 2, max: 2 })
+    // .withMessage('Kode fakultas harus 2 digit'),
   
   body('major')
     .notEmpty()
-    .withMessage('Program studi harus diisi')
-    .isLength({ min: 2, max: 2 })
-    .withMessage('Kode program studi harus 2 digit'),
+    .withMessage('Program studi harus diisi'),
+    // .isLength({ min: 2, max: 2 })
+    // .withMessage('Kode program studi harus 2 digit'),
+
+  body('majorCode')
+    .notEmpty()
+    .withMessage('Kode program studi harus diisi')      
+    .isLength({ min: 3, max: 3 })
+    .isNumeric()
+    .withMessage('Kode program studi harus 3 digit angka'),  
   
   body('yearEntry')
     .notEmpty()

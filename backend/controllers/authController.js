@@ -28,6 +28,7 @@ exports.register = async (req, res) => {
       lastName, 
       faculty, 
       major, 
+      majorCode,  
       yearEntry, 
       npmLast3Digits,
       password 
@@ -39,7 +40,7 @@ exports.register = async (req, res) => {
     const yearShort = yearEntry.toString().slice(-2); // Last 2 digits of year (e.g., '24')
     
     // Generate NPM: MajorCode(3) + Year(2) + 0 + Last3Digits(3)
-    const npmPrefix = `${major}${yearShort}0`; // e.g., '53524'
+    const npmPrefix = `${majorCode}${yearShort}0`; // e.g., '53524'
     const fullNPM = npmPrefix + npmLast3Digits; // e.g., '535240023'
 
     // Validate NPM length
@@ -74,8 +75,9 @@ exports.register = async (req, res) => {
     const user = await User.create({
       firstName,
       lastName: lastName || '',
-      facultyCode: faculty,
-      majorCode: major,
+      faculty,
+      major,
+      majorCode,
       yearEntry: parseInt(yearEntry),
       npm: fullNPM,
       email,
