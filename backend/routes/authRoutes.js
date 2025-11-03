@@ -3,6 +3,7 @@ const router = express.Router();
 const { body } = require('express-validator');
 const { register, login, getMe } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
+const { verifyEmail, resendVerificationEmail } = require('../controllers/authController');
 
 // Validation rules
 const registerValidation = [
@@ -75,5 +76,7 @@ const loginValidation = [
 router.post('/register', registerValidation, register);
 router.post('/login', loginValidation, login);
 router.get('/me', protect, getMe);
+router.get('/verify', verifyEmail);
+router.post('/resend-email', resendVerificationEmail);
 
 module.exports = router;

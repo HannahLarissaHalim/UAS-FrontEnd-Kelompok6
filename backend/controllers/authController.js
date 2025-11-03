@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
+const crypto = require("crypto");
+const { sendVerificationEmail } = require("../services/emailService");
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -85,7 +87,17 @@ exports.register = async (req, res) => {
       role: 'customer'
     });
 
-    // Generate token
+    // Generate verification token 
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpires = Date.now() + 5 * 60 * 1000;
+    await user.save();
+
+    // Send email verification
+    await sendVerificationEmail(user.email, verificationToken);
+
+    // Generate JWT token
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -205,6 +217,121 @@ exports.getMe = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Terjadi kesalahan pada server'
+    });
+  }
+};
+
+// @desc    Verify user email
+// @route   GET /api/auth/verify?token=abc123
+// @access  Public
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    // Check if token exists in query
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token tidak ditemukan'
+      });
+    }
+
+     // Find user by verification token
+    const user = await User.findOne({ verificationToken: token });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token tidak valid atau sudah digunakan'
+      });
+    }
+
+    // Cek apakah token sudah kadaluwarsa
+    if (!user.verificationTokenExpires || user.verificationTokenExpires < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Link verifikasi sudah kedaluwarsa. Silakan kirim ulang email verifikasi.'
+      });
+    }
+
+    // Mark user as verified
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+    await user.save();
+
+    // Generate JWT token for auto-login after verification
+    const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '30d'
+    });
+
+    // Send success response with user info
+    res.json({
+      success: true,
+      message: 'Verifikasi berhasil',
+      data: {
+        token: jwtToken,
+        npm: user.npm,
+        name: user.firstName,
+        role: user.role
+      }
+    });
+
+  } catch (error) {
+    console.error('Verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan pada server'
+    });
+  }
+};
+
+// @desc    Resend verification email (can be sent multiple times)
+// @route   POST /api/auth/resend-email
+// @access  Public
+exports.resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if the user exists in the database
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Akun sudah diverifikasi.'
+      });
+    }
+
+    // Always generate a new verification token
+    // Every resend email has a fresh link
+    const newToken = crypto.randomBytes(32).toString('hex');
+    user.verificationToken = newToken;
+    user.verificationTokenExpires = Date.now() + 5 * 60 * 1000; 
+    await user.save();
+
+    // Send the new verification email with the updated token
+    await sendVerificationEmail(user.email, newToken);
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: "Email verifikasi telah dikirim ulang."
+    });
+
+  } catch (error) {
+    // Log the error for debugging
+    console.error("Resend verification error:", error);
+
+    // Return a generic server error response
+    res.status(500).json({
+      success: false,
+      message: "Failed to resend verification email."
     });
   }
 };

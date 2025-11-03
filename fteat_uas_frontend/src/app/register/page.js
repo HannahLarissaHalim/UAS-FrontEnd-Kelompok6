@@ -185,7 +185,9 @@ export default function RegisterPage() {
       */
 
       //const data = await response.json();
-      router.push('/login');
+      localStorage.setItem("email", formData.email);
+      
+      router.push(`/check-email?email=${encodeURIComponent(formData.email)}`);
     } catch (err) {
       setError(err.message || 'Connection failed');
     } finally {
