@@ -13,6 +13,7 @@ export default function Navbar() {
     // used to check if user has token in local storage (already signed in)
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [profilePic, setProfilePic] = useState("/images/navbar_icons/profile.png");
+    const [cartCount, setCartCount] = useState(0);
 
     useEffect(() => {
         // check token asynchronously to avoid sync state update warning
@@ -22,13 +23,53 @@ export default function Navbar() {
                 // wrap setstate in a microtask to avoid cascading render
                 setTimeout(() => {
                     setIsLoggedIn(true);
-                    setProfilePic("/images/navbar_icons/profile.png");
+                    // Load profile image from localStorage
+                    const savedImage = localStorage.getItem('profileImage');
+                    setProfilePic(savedImage || "/images/navbar_icons/profile.png");
                 }, 0);
             }
         };
         
-    checkAuth();
-}, []);
+        // Load cart count
+        const updateCartCount = () => {
+            const cart = localStorage.getItem('cart');
+            if (cart) {
+                const cartItems = JSON.parse(cart);
+                setCartCount(cartItems.length);
+            }
+        };
+        
+        checkAuth();
+        updateCartCount();
+        
+        // Listen for storage changes to update cart count
+        const handleStorageChange = (e) => {
+            if (e.key === 'cart') {
+                updateCartCount();
+            }
+        };
+        
+        window.addEventListener('storage', handleStorageChange);
+        
+        // Also listen for custom cart update event
+        const handleCartUpdate = () => {
+            updateCartCount();
+        };
+        window.addEventListener('cartUpdated', handleCartUpdate);
+        
+        // Listen for user/profile updates
+        const handleUserUpdate = () => {
+            const savedImage = localStorage.getItem('profileImage');
+            setProfilePic(savedImage || "/images/navbar_icons/profile.png");
+        };
+        window.addEventListener('userUpdated', handleUserUpdate);
+        
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('cartUpdated', handleCartUpdate);
+            window.removeEventListener('userUpdated', handleUserUpdate);
+        };
+    }, []);
 
     // handle button clicks
     const handleProfileClick = () => {
@@ -37,7 +78,7 @@ export default function Navbar() {
         if (!isLoggedIn) {
             alert("please sign in to view your profile.");
         } else {
-            router.push("/home");
+            router.push("/profile");
         }
     };
 
@@ -128,7 +169,7 @@ export default function Navbar() {
                         {/* cart icon */}
                         <button
                             onClick={handleCartClick}
-                            className="navbar-icon-btn"
+                            className="navbar-icon-btn navbar-cart-btn"
                             aria-label="cart"
                         >
                             <Image
@@ -138,6 +179,9 @@ export default function Navbar() {
                                 height={26}
                                 unoptimized
                             />
+                            {cartCount > 0 && (
+                                <span className="cart-badge">{cartCount}</span>
+                            )}
                         </button>
 
                         {/* profile icon */}

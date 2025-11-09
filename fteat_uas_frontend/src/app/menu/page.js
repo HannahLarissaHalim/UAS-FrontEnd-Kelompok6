@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Card, Button, Badge } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -15,6 +15,21 @@ export default function MenuPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [cart, setCart] = useState([]);
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    if (cart.length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+  }, [cart]);
 
   const toggleCategory = (category) => {
     setSelectedCategories(prev => {
@@ -41,14 +56,30 @@ export default function MenuPage() {
   });
 
   const handleAddToCart = (menuWithAdditionals) => {
-    setCart(prev => [...prev, { ...menuWithAdditionals, quantity: 1 }]);
-    alert(`${menuWithAdditionals.name} ditambahkan ke keranjang!`);
+    const newCart = [...cart, { ...menuWithAdditionals, quantity: 1 }];
+    setCart(newCart);
+    localStorage.setItem('cart', JSON.stringify(newCart));
+    // Dispatch custom event to update cart count in navbar
+    window.dispatchEvent(new Event('cartUpdated'));
   };
 
   const handleBuyNow = (menuWithAdditionals) => {
-    // Store the order temporarily
-    localStorage.setItem('tempOrder', JSON.stringify([{ ...menuWithAdditionals, quantity: 1 }]));
-    router.push('/order');
+    // Prepare order data for payment page
+    const orderData = {
+      vendor: menuWithAdditionals.vendorName || 'Kantin Lupa Namanya',
+      items: [{
+        name: menuWithAdditionals.name,
+        category: menuWithAdditionals.category,
+        quantity: 1,
+        price: menuWithAdditionals.totalPrice || menuWithAdditionals.price,
+        basePrice: menuWithAdditionals.price, // Store original menu price
+        image: menuWithAdditionals.image,
+        toppings: menuWithAdditionals.selectedAdditionals?.map(a => `${a.name} (${a.quantity})`).join(', ') || ''
+      }],
+      total: menuWithAdditionals.totalPrice || menuWithAdditionals.price
+    };
+    localStorage.setItem('currentOrder', JSON.stringify(orderData));
+    router.push('/payment');
   };
 
   const clearFilters = () => {
