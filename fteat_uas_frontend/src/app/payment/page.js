@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Modal, Button, ListGroup } from 'react-bootstrap';
 import HomeNavbar from '../components/HomeNavbar';
+import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 
@@ -293,261 +294,263 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="payment-page">
-      <HomeNavbar />
-      
-      <div className="payment-container">
-        <h1 className="payment-main-title">Payment</h1>
+    <ProtectedRoute>
+      <div className="payment-page">
+        <HomeNavbar />
         
-        <div className="payment-layout">
-          {/* Left Section - Fixed */}
-          <div className="payment-left-section">
-            <div className="payment-instructions">
-              <h2 className="payment-instructions-title">Tata Cara Pembayaran</h2>
-              
-              <div className="payment-step">
-                <div className="payment-step-number">1</div>
-                <div className="payment-step-content">
-                  <p className="payment-step-text">Setiap vendor memiliki rekening pembayaran dan nomor WhatsApp yang berbeda.</p>
+        <div className="payment-container">
+          <h1 className="payment-main-title">Payment</h1>
+          
+          <div className="payment-layout">
+            {/* Left Section - Fixed */}
+            <div className="payment-left-section">
+              <div className="payment-instructions">
+                <h2 className="payment-instructions-title">Tata Cara Pembayaran</h2>
+                
+                <div className="payment-step">
+                  <div className="payment-step-number">1</div>
+                  <div className="payment-step-content">
+                    <p className="payment-step-text">Setiap vendor memiliki rekening pembayaran dan nomor WhatsApp yang berbeda.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="payment-step">
-                <div className="payment-step-number">2</div>
-                <div className="payment-step-content">
-                  <p className="payment-step-text">Lakukan transfer ke nomor rekening yang tertera, dan kirim bukti pembayaran melalui WhatsApp vendor terkait.</p>
+                <div className="payment-step">
+                  <div className="payment-step-number">2</div>
+                  <div className="payment-step-content">
+                    <p className="payment-step-text">Lakukan transfer ke nomor rekening yang tertera, dan kirim bukti pembayaran melalui WhatsApp vendor terkait.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="payment-step">
-                <div className="payment-step-number">3</div>
-                <div className="payment-step-content">
-                  <p className="payment-step-text">Setelah vendor memverifikasi pembayaran Anda, pesanan akan muncul di halaman "History Order".</p>
+                <div className="payment-step">
+                  <div className="payment-step-number">3</div>
+                  <div className="payment-step-content">
+                    <p className="payment-step-text">Setelah vendor memverifikasi pembayaran Anda, pesanan akan muncul di halaman &quot;History Order&quot;.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="payment-step">
-                <div className="payment-step-number">4</div>
-                <div className="payment-step-content">
-                  <p className="payment-step-text">Pesanan Anda siap diambil.</p>
+                <div className="payment-step">
+                  <div className="payment-step-number">4</div>
+                  <div className="payment-step-content">
+                    <p className="payment-step-text">Pesanan Anda siap diambil.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="payment-step">
-                <div className="payment-step-number">5</div>
-                <div className="payment-step-content">
-                  <p className="payment-step-text">Pesanan Anda siap diambil.</p>
+                <div className="payment-step">
+                  <div className="payment-step-number">5</div>
+                  <div className="payment-step-content">
+                    <p className="payment-step-text">Pesanan Anda siap diambil.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="payment-step">
-                <div className="payment-step-number">6</div>
-                <div className="payment-step-content">
-                  <p className="payment-step-text">Pesanan Anda siap diambil.</p>
+                <div className="payment-step">
+                  <div className="payment-step-number">6</div>
+                  <div className="payment-step-content">
+                    <p className="payment-step-text">Pesanan Anda siap diambil.</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Section - Scrollable */}
-          <div className="payment-right-section" key={renderKey}>
-            <div className="payment-order-details">
-              {Object.keys(orderData).length > 0 ? Object.keys(orderData).map((vendorName) => {
-                const vendorOrder = orderData[vendorName];
-                // Get vendor details with proper fallback
-                let vendorDetails = vendorPaymentDetails[vendorName];
-                
-                // If vendor not found, create default details
-                if (!vendorDetails) {
-                  vendorDetails = {
-                    bankAccount: 'BCA 1234567890 a/n Bpk. Asep',
-                    whatsapp: '081245678901',
-                    location: vendorName
-                  };
-                }
-                
-                return (
-                  <div key={vendorName} className="payment-vendor-section">
-                    {/* Vendor Header */}
-                    <div className="payment-vendor-header">
-                      <h2 className="payment-vendor-name">{vendorName}</h2>
-                    </div>
-
-                    {/* Vendor Items */}
-                    {vendorOrder.items && vendorOrder.items.map((item, index) => (
-                <div key={index} className="payment-order-card">
-                  <div className="payment-order-header">
-                    <span className="payment-order-location">{vendorDetails.location}</span>
-                  </div>
+            {/* Right Section - Scrollable */}
+            <div className="payment-right-section" key={renderKey}>
+              <div className="payment-order-details">
+                {Object.keys(orderData).length > 0 ? Object.keys(orderData).map((vendorName) => {
+                  const vendorOrder = orderData[vendorName];
+                  // Get vendor details with proper fallback
+                  let vendorDetails = vendorPaymentDetails[vendorName];
                   
-                  <div className="payment-order-content">
-                    <div className="payment-order-image">
-                      <Image 
-                        src={item.image || '/images/logo.png'}
-                        alt={item.name}
-                        width={100}
-                        height={100}
-                        unoptimized
-                      />
+                  // If vendor not found, create default details
+                  if (!vendorDetails) {
+                    vendorDetails = {
+                      bankAccount: 'BCA 1234567890 a/n Bpk. Asep',
+                      whatsapp: '081245678901',
+                      location: vendorName
+                    };
+                  }
+                  
+                  return (
+                    <div key={vendorName} className="payment-vendor-section">
+                      {/* Vendor Header */}
+                      <div className="payment-vendor-header">
+                        <h2 className="payment-vendor-name">{vendorName}</h2>
+                      </div>
+
+                      {/* Vendor Items */}
+                      {vendorOrder.items && vendorOrder.items.map((item, index) => (
+                  <div key={index} className="payment-order-card">
+                    <div className="payment-order-header">
+                      <span className="payment-order-location">{vendorDetails.location}</span>
                     </div>
                     
-                    <div className="payment-order-info">
-                      <h3 className="payment-order-name">{item.name}</h3>
-                      {item.toppings && (
-                        <p className="payment-order-toppings">Topping: {item.toppings}</p>
+                    <div className="payment-order-content">
+                      <div className="payment-order-image">
+                        <Image 
+                          src={item.image || '/images/logo.png'}
+                          alt={item.name}
+                          width={100}
+                          height={100}
+                          unoptimized
+                        />
+                      </div>
+                      
+                      <div className="payment-order-info">
+                        <h3 className="payment-order-name">{item.name}</h3>
+                        {item.toppings && (
+                          <p className="payment-order-toppings">Topping: {item.toppings}</p>
+                        )}
+                        <p className="payment-order-price">{formatPrice(item.price)}</p>
+                      </div>
+                    </div>
+
+                    <div className="payment-order-actions">
+                      {isFromKantinBursa(vendorName) && (
+                        <button 
+                          className="payment-edit-btn"
+                          onClick={() => handleEdit(vendorName, index)}
+                        >
+                          ✏️ Edit
+                        </button>
                       )}
-                      <p className="payment-order-price">{formatPrice(item.price)}</p>
+                      
+                      <div className="payment-quantity-controls">
+                        <button 
+                          className="payment-qty-btn"
+                          onClick={() => updateQuantity(vendorName, index, 1)}
+                        >
+                          +
+                        </button>
+                        <span className="payment-qty-display">{item.quantity}</span>
+                        <button 
+                          className="payment-qty-btn"
+                          onClick={() => updateQuantity(vendorName, index, -1)}
+                        >
+                          -
+                        </button>
+                      </div>
                     </div>
                   </div>
+                ))}
 
-                  <div className="payment-order-actions">
-                    {isFromKantinBursa(vendorName) && (
-                      <button 
-                        className="payment-edit-btn"
-                        onClick={() => handleEdit(vendorName, index)}
-                      >
-                        ✏️ Edit
-                      </button>
-                    )}
-                    
-                    <div className="payment-quantity-controls">
-                      <button 
-                        className="payment-qty-btn"
-                        onClick={() => updateQuantity(vendorName, index, 1)}
-                      >
-                        +
-                      </button>
-                      <span className="payment-qty-display">{item.quantity}</span>
-                      <button 
-                        className="payment-qty-btn"
-                        onClick={() => updateQuantity(vendorName, index, -1)}
-                      >
-                        -
-                      </button>
+                {/* Total Section for this vendor */}
+                <div className="payment-total-card">
+                  <div className="payment-total-row">
+                    <span className="payment-total-label">Total Pembayaran {vendorName}:</span>
+                    <span className="payment-total-amount">{formatPrice(vendorOrder.total)}</span>
+                  </div>
+                </div>
+
+                {/* Bank Transfer Section for this vendor */}
+                <div className="payment-bank-card">
+                  <div className="payment-bank-icon">🏦</div>
+                  <div className="payment-bank-info">
+                    <p className="payment-bank-label">Transfer ke:</p>
+                    <p className="payment-bank-account">{vendorDetails.bankAccount}</p>
+                  </div>
+                </div>
+
+                {/* WhatsApp Section for this vendor */}
+                <div 
+                  className="payment-whatsapp-card"
+                  onClick={() => handleWhatsAppClick(vendorName)}
+                >
+                  <div className="payment-whatsapp-icon">
+                    💬
+                  </div>
+                  <div className="payment-whatsapp-info">
+                    <p className="payment-whatsapp-label">Kirim bukti pembayaran ke:</p>
+                    <p className="payment-whatsapp-number">{vendorDetails.whatsapp}</p>
+                  </div>
+                </div>
                     </div>
+                  );
+                }) : (
+                  <div className="payment-empty-state">
+                    <p>Tidak ada pesanan. Silakan tambahkan item ke keranjang terlebih dahulu.</p>
                   </div>
-                </div>
-              ))}
-
-              {/* Total Section for this vendor */}
-              <div className="payment-total-card">
-                <div className="payment-total-row">
-                  <span className="payment-total-label">Total Pembayaran {vendorName}:</span>
-                  <span className="payment-total-amount">{formatPrice(vendorOrder.total)}</span>
-                </div>
+                )}
               </div>
-
-              {/* Bank Transfer Section for this vendor */}
-              <div className="payment-bank-card">
-                <div className="payment-bank-icon">🏦</div>
-                <div className="payment-bank-info">
-                  <p className="payment-bank-label">Transfer ke:</p>
-                  <p className="payment-bank-account">{vendorDetails.bankAccount}</p>
-                </div>
-              </div>
-
-              {/* WhatsApp Section for this vendor */}
-              <div 
-                className="payment-whatsapp-card"
-                onClick={() => handleWhatsAppClick(vendorName)}
-              >
-                <div className="payment-whatsapp-icon">
-                  💬
-                </div>
-                <div className="payment-whatsapp-info">
-                  <p className="payment-whatsapp-label">Kirim bukti pembayaran ke:</p>
-                  <p className="payment-whatsapp-number">{vendorDetails.whatsapp}</p>
-                </div>
-              </div>
-                  </div>
-                );
-              }) : (
-                <div className="payment-empty-state">
-                  <p>Tidak ada pesanan. Silakan tambahkan item ke keranjang terlebih dahulu.</p>
-                </div>
-              )}
             </div>
           </div>
         </div>
-      </div>
 
-      <footer className="payment-footer">
-        <p>Developed by <strong>HELD</strong></p>
-      </footer>
+        <footer className="payment-footer">
+          <p>Developed by <strong>HELD</strong></p>
+        </footer>
 
-      {/* Edit Toppings Modal */}
-      <Modal show={showEditModal} onHide={handleCloseModal} centered className="additionals-modal">
-        <Modal.Header closeButton className="additionals-modal-header">
-          <Modal.Title className="additionals-modal-title">
-            {editingItem?.item?.name || 'Edit Toppings'}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="additionals-modal-body">
-          <h6 className="additionals-subtitle">Pilih Tambahan (Optional)</h6>
-          <ListGroup className="additionals-list">
-            {instantNoodleAdditionals.map((additional, idx) => {
-              const quantity = selectedAdditionals[additional.name] || 0;
-              return (
-                <ListGroup.Item 
-                  key={idx}
-                  className="additionals-list-item"
-                >
-                  <div className="additionals-info">
-                    <span className="additionals-name">{additional.name}</span>
-                    <span className="additionals-price">{formatPrice(additional.price)}</span>
-                  </div>
-                  <div className="additionals-quantity-controls">
-                    <Button 
-                      variant="outline-secondary"
-                      size="sm"
-                      className="qty-btn qty-minus"
-                      onClick={() => updateAdditionalQuantity(additional.name, -1)}
-                      disabled={quantity === 0}
-                    >
-                      -
-                    </Button>
-                    <span className="qty-display">{quantity}</span>
-                    <Button 
-                      variant="outline-primary"
-                      size="sm"
-                      className="qty-btn qty-plus"
-                      onClick={() => updateAdditionalQuantity(additional.name, 1)}
-                    >
-                      +
-                    </Button>
-                  </div>
-                </ListGroup.Item>
-              );
-            })}
-          </ListGroup>
-          
-          {/* Selected Additionals Summary */}
-          {Object.keys(selectedAdditionals).length > 0 && (
-            <div className="selected-additionals-summary">
-              <h6 className="summary-title">Terpilih:</h6>
-              {Object.entries(selectedAdditionals)
-                .filter(([_, qty]) => qty > 0)
-                .map(([name, qty], idx) => {
-                  const additional = instantNoodleAdditionals.find(a => a.name === name);
-                  return (
-                    <div key={idx} className="summary-item">
-                      <span>{name} x{qty}</span>
-                      <span>{formatPrice((additional?.price || 0) * qty)}</span>
+        {/* Edit Toppings Modal */}
+        <Modal show={showEditModal} onHide={handleCloseModal} centered className="additionals-modal">
+          <Modal.Header closeButton className="additionals-modal-header">
+            <Modal.Title className="additionals-modal-title">
+              {editingItem?.item?.name || 'Edit Toppings'}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="additionals-modal-body">
+            <h6 className="additionals-subtitle">Pilih Tambahan (Optional)</h6>
+            <ListGroup className="additionals-list">
+              {instantNoodleAdditionals.map((additional, idx) => {
+                const quantity = selectedAdditionals[additional.name] || 0;
+                return (
+                  <ListGroup.Item 
+                    key={idx}
+                    className="additionals-list-item"
+                  >
+                    <div className="additionals-info">
+                      <span className="additionals-name">{additional.name}</span>
+                      <span className="additionals-price">{formatPrice(additional.price)}</span>
                     </div>
-                  );
-                })}
-            </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer className="additionals-modal-footer">
-          <Button variant="secondary" onClick={handleCloseModal} className="modal-btn-cancel">
-            Batal
-          </Button>
-          <Button variant="primary" onClick={handleSaveEdit} className="modal-btn-buy">
-            Simpan
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+                    <div className="additionals-quantity-controls">
+                      <Button 
+                        variant="outline-secondary"
+                        size="sm"
+                        className="qty-btn qty-minus"
+                        onClick={() => updateAdditionalQuantity(additional.name, -1)}
+                        disabled={quantity === 0}
+                      >
+                        -
+                      </Button>
+                      <span className="qty-display">{quantity}</span>
+                      <Button 
+                        variant="outline-primary"
+                        size="sm"
+                        className="qty-btn qty-plus"
+                        onClick={() => updateAdditionalQuantity(additional.name, 1)}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                );
+              })}
+            </ListGroup>
+            
+            {/* Selected Additionals Summary */}
+            {Object.keys(selectedAdditionals).length > 0 && (
+              <div className="selected-additionals-summary">
+                <h6 className="summary-title">Terpilih:</h6>
+                {Object.entries(selectedAdditionals)
+                  .filter(([_, qty]) => qty > 0)
+                  .map(([name, qty], idx) => {
+                    const additional = instantNoodleAdditionals.find(a => a.name === name);
+                    return (
+                      <div key={idx} className="summary-item">
+                        <span>{name} x{qty}</span>
+                        <span>{formatPrice((additional?.price || 0) * qty)}</span>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer className="additionals-modal-footer">
+            <Button variant="secondary" onClick={handleCloseModal} className="modal-btn-cancel">
+              Batal
+            </Button>
+            <Button variant="primary" onClick={handleSaveEdit} className="modal-btn-buy">
+              Simpan
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    </ProtectedRoute>
   );
 }

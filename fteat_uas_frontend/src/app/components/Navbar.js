@@ -71,26 +71,43 @@ export default function Navbar() {
         };
     }, []);
 
-    // handle button clicks
     const handleProfileClick = () => {
-        // if not logged in, show alert
-        // else redirect to welcome page
         if (!isLoggedIn) {
-            alert("please sign in to view your profile.");
-        } else {
-            router.push("/profile");
+            router.push("/login"); // langsung redirect ke login page
+            return;
         }
+        router.push("/profile");
     };
 
     const handleCartClick = () => {
-        // if not logged in, show alert
-        // else redirect to payment page
         if (!isLoggedIn) {
-            alert("please sign in to access your cart.");
-        } else {
-            router.push("/payment");
+            router.push("/login"); // langsung redirect ke login page
+            return;
         }
+        router.push("/payment");
     };
+
+
+    // // handle button clicks
+    // const handleProfileClick = () => {
+    //     // if not logged in, show alert
+    //     // else redirect to welcome page
+    //     if (!isLoggedIn) {
+    //         alert("please sign in to view your profile.");
+    //     } else {
+    //         router.push("/profile");
+    //     }
+    // };
+
+    // const handleCartClick = () => {
+    //     // if not logged in, show alert
+    //     // else redirect to payment page
+    //     if (!isLoggedIn) {
+    //         alert("please sign in to access your cart.");
+    //     } else {
+    //         router.push("/payment");
+    //     }
+    // };
 
     // helper to mark active link
     // gives visual cue for current page in navbar
