@@ -189,3 +189,32 @@ exports.getUsersByRole = async (req, res) => {
     }
 
 };
+
+exports.deleteAccount = async (req, res) => {
+    try {
+        // Get user from req object (added by auth middleware)
+        const userId = req.user.id;
+
+        // Delete the user from database
+        const deletedUser = await User.findByIdAndDelete(userId);
+
+        if (!deletedUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'User tidak ditemukan'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Akun berhasil dihapus'
+        });
+
+    } catch (error) {
+        console.error('Delete account error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Terjadi kesalahan pada server'
+        });
+    }
+};
