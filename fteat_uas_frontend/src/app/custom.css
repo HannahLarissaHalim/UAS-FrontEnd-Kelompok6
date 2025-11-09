@@ -4263,3 +4263,69 @@ body {
     gap: 1rem;
   }
 }
+
+/* Choose Login Page */
+.choose-login-page {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.choose-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  gap: 3rem;
+  padding: 2rem;
+}
+
+.choose-login-left img {
+  border-radius: 16px;
+}
+
+.choose-login-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.choose-login-title {
+  font-family: 'Offside', sans-serif;
+  font-size: 2.5rem;
+  color: var(--primary-blue);
+  margin-bottom: 1.5rem;
+}
+
+.choose-login-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 250px;
+}
+
+.choose-btn {
+  border: 2px solid var(--primary-blue);
+  background: transparent;
+  border-radius: 12px;
+  padding: 0.75rem;
+  font-size: 1.2rem;
+  color: var(--primary-blue);
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.choose-btn:hover {
+  background-color: var(--primary-blue);
+  color: white;
+}
+
+.mahasiswa-btn::after {
+  content: ' 🎓';
+}
+
+.vendor-btn::after {
+  content: ' 🏪';
+}

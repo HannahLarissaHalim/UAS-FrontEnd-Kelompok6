@@ -50,7 +50,7 @@ export default function Home() {
               Register
             </Link>
             <span className="auth-text"> | </span>
-            <Link href="/login" className="auth-link-home">
+            <Link href="/choose-login" className="auth-link-home">
               Login
             </Link>
             <div className="user-icon">
