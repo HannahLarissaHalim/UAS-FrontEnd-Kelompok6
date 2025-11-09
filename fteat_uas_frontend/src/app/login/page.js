@@ -61,7 +61,7 @@ export default function LoginPage() {
       if (user.role === 'vendor') {
         router.push('/dashboard/vendor');
       } else {
-        router.push('/dashboard/customer');
+        router.push('/profile');
       }
     } catch (err) {
       console.error('Login error (frontend):', err);

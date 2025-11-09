@@ -29,11 +29,6 @@ export default function CustomerDashboard() {
     setOrders(mockOrders);
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    router.push('/');
-  };
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -70,29 +65,6 @@ export default function CustomerDashboard() {
     <>
       <HomeNavbar />
       <Container className="py-5">
-        <Row className="mb-4">
-          <Col>
-            <Card className="shadow-sm bg-primary text-white">
-              <Card.Body>
-                <Row className="align-items-center">
-                  <Col md={8}>
-                    <h3 className="mb-2">Selamat Datang, {user.name}!</h3>
-                    <p className="mb-0">NPM: {user.npm}</p>
-                  </Col>
-                  <Col md={4} className="text-md-end">
-                    <Button 
-                      variant="light" 
-                      onClick={handleLogout}
-                      size="sm"
-                    >
-                      Logout
-                    </Button>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
 
         <Row className="mb-4">
           <Col md={4}>
