@@ -4,7 +4,7 @@ import { Form, Alert } from 'react-bootstrap';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import HomeNavbar from '../components/HomeNavbar';
+import Navbar from '../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 import { api } from '../../utils/api';
@@ -73,7 +73,7 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      <HomeNavbar />
+      <Navbar />
 
       <div className="login-container">
         <div className="login-left">

@@ -20,6 +20,7 @@ export default function MenuPage() {
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCart(JSON.parse(savedCart));
     }
   }, []);

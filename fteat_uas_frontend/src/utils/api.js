@@ -22,6 +22,15 @@ export const api = {
     return response.json();
   },
 
+  vendorLogin: async (email, password) => {  // ✅ fungsi baru
+    const response = await fetch(`${API_URL}/api/vendor/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    return response.json();
+  },
+
   register: async (userData) => {
     const response = await fetch(`${API_URL}/api/auth/register`, {
       method: 'POST',
