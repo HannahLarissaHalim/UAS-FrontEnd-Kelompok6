@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Modal } from 'react-bootstrap';
 import Image from 'next/image';
-import HomeNavbar from '../components/HomeNavbar';
+import Navbar from '../components/Navbar';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
@@ -128,33 +128,8 @@ export default function HistoryOrderPage() {
   return (
     <ProtectedRoute> 
       <div className="history-order-page">
-        <HomeNavbar />
-
-        {/* Background Logo */}
-        <div className="history-bg-logo">
-          <Image 
-            src="/images/logo.png" 
-            alt="FTEat Logo" 
-            width={822}
-            height={822}
-            unoptimized
-          />
-        </div>
-
-        {/* Top Logo */}
-        <div className="history-top-logo">
-          <Image 
-            src="/images/logo.png" 
-            alt="FTEat Icon" 
-            width={221}
-            height={212}
-            unoptimized
-          />
-        </div>
-
-        {/* Navbar Line */}
-        <div className="history-navbar-line"></div>
-
+        <Navbar />
+        
         {/* History Order Title */}
         <div className="history-order-header">
           <svg className="history-icon" width="68" height="68" viewBox="0 0 68 68" fill="none">

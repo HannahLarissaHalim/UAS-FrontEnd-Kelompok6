@@ -112,9 +112,14 @@ export default function Navbar() {
     // helper to mark active link
     // gives visual cue for current page in navbar
     const isActive = (path) => {
-        return pathname === path
-            ? "text-blue-700 font-semibold underline underline-offset-4"
-            : "hover:text-blue-600 transition-all duration-200";
+        // buat /home aktif juga kalau lagi di /login atau /register
+        const homeRelatedPages = ['/login', '/register', '/choose-login'];
+        
+        if (homeRelatedPages.includes(pathname) && path === '/home') {
+            return 'active-link';
+        }
+
+        return pathname === path ? 'active-link' : '';
     };
 
     // hide icons on specific pages
@@ -160,12 +165,9 @@ export default function Navbar() {
                     >
                         About Us
                     </Link>
-                    <Link
-                        href="/home"
-                        className={pathname === "/home" ? "active" : ""}
-                    >
-                        Home
-                    </Link>
+
+                    <Link href="/home" className={isActive("/home")}>Home</Link>
+
                     <Link
                         href="/stand"
                         className={pathname === "/stand" ? "active" : ""}
@@ -186,7 +188,7 @@ export default function Navbar() {
                         {/* cart icon */}
                         <button
                             onClick={handleCartClick}
-                            className="navbar-icon-btn navbar-cart-btn"
+                            className={`navbar-icon-btn navbar-cart-btn ${pathname === "/payment" ? "active-icon" : ""}`}
                             aria-label="cart"
                         >
                             <Image

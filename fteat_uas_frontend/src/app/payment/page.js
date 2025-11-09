@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Modal, Button, ListGroup } from 'react-bootstrap';
-import HomeNavbar from '../components/HomeNavbar';
+import Navbar from '../components/Navbar';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
@@ -296,7 +296,7 @@ export default function PaymentPage() {
   return (
     <ProtectedRoute>
       <div className="payment-page">
-        <HomeNavbar />
+        <Navbar />
         
         <div className="payment-container">
           <h1 className="payment-main-title">Payment</h1>

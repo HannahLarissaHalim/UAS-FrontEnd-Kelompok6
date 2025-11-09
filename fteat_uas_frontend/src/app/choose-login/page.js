@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import HomeNavbar from '../components/HomeNavbar';
+import Navbar from '../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 
@@ -10,7 +10,7 @@ export default function ChooseLoginPage() {
 
   return (
     <div className="choose-login-page">
-      <HomeNavbar />
+      <Navbar />
 
       <div className="choose-login-container">
         {/* Left side - logo

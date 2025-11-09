@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Form, Alert, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import HomeNavbar from '../components/HomeNavbar';
+import Navbar from '../components/Navbar';
 import { mockFaculties, mockMajors } from '../../utils/mockData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
@@ -198,7 +198,7 @@ export default function RegisterPage() {
 
   return (
     <div className="register-page">
-      <HomeNavbar />
+      <Navbar />
 
       <div className="register-container">
         <div className="register-left">
