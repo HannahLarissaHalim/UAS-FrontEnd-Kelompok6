@@ -1990,6 +1990,10 @@ body {
   padding: 1rem 2rem 0.5rem 2rem;
   box-sizing: border-box;
   border-bottom: 3px solid #0A4988;
+  margin: 0;
+  position: relative;
+  left: 0;
+  right: 0;
 }
 
 /* inner content: logo, links, icons aligned in one row */
@@ -2118,4 +2122,6 @@ body {
   .navbar-divider {
     margin-top: 0.8rem;
   }
+
 }
+
