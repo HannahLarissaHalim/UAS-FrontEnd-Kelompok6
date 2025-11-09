@@ -7,7 +7,8 @@ const {
     getUsersByFaculty,
     getUsersByMajor,
     getUsersByName,
-    getUsersByRole
+    getUsersByRole,
+    deleteAccount
 } = require('../controllers/usersController');
 const { protect } = require('../middleware/auth');
 
@@ -19,5 +20,6 @@ router.get('/faculty/:faculty', protect, getUsersByFaculty);
 router.get('/major/:major', protect, getUsersByMajor);
 router.get('/name/:name', protect, getUsersByName);
 router.get('/role/:role', protect, getUsersByRole);
+router.delete('/delete-account', protect, deleteAccount);
 
 module.exports = router;

@@ -1,6 +1,17 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export const api = {
+  // User endpoints
+  deleteAccount: async (token) => {
+    const response = await fetch(`${API_URL}/api/users/delete-account`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  },
+
   // Auth endpoints
   login: async (npm, password) => {
     const response = await fetch(`${API_URL}/api/auth/login`, {

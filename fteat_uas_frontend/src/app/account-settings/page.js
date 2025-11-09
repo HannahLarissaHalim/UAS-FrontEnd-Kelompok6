@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Navbar from '../components/Navbar';
+import { api } from '../../utils/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 
@@ -29,7 +30,7 @@ export default function AccountSettingsPage() {
       parsedUser.name = `${parsedUser.firstName} ${parsedUser.lastName}`;
     }
     setUser(parsedUser);
-    
+
     setFormData({
       name: parsedUser.name || '',
       email: parsedUser.email || `${parsedUser.npm}@stu.untar.ac.id`,
@@ -69,10 +70,10 @@ export default function AccountSettingsPage() {
       email: formData.email
     };
     localStorage.setItem('user', JSON.stringify(updatedUser));
-    
+
     // Dispatch event to update navbar and other components
     window.dispatchEvent(new Event('userUpdated'));
-    
+
     alert('Settings saved successfully!');
   };
 
@@ -83,12 +84,33 @@ export default function AccountSettingsPage() {
     router.push('/login');
   };
 
-  const handleDeleteAccount = () => {
-    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      localStorage.removeItem('profileImage');
-      router.push('/register');
+  const handleDeleteAccount = async () => {
+    if (confirm('Apakah kamu yakin untuk menghapus akun ini? Akunmu tidak akan bisa dikembalikan')) {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('Kamu tidak memiliki akun. Harap login untuk menghapus akun');
+          router.push('/login');
+          return;
+        }
+
+        const response = await api.deleteAccount(token);
+
+        if (response.success) {
+          // Clear all local storage data
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          localStorage.removeItem('profileImage');
+
+          alert('Akunmu telah berhasil dihapus');
+          router.push('/register');
+        } else {
+          alert(response.message || 'Gagal untuk menghapus akun');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error terjadi saat menghapus akunmu, Coba lagi nanti');
+      }
     }
   };
 
