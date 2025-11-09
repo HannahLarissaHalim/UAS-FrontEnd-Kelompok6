@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Container, Row, Col, Form, Card, Button, Badge } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import HomeNavbar from '../components/HomeNavbar';
+//import HomeNavbar from '../components/HomeNavbar';
+import Navbar from '../components/Navbar';
 import MenuCard from '../components/MenuCard';
 import { mockMenus, mockCategories } from '../../utils/mockData';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -57,21 +58,7 @@ export default function MenuPage() {
 
   return (
     <div className="menu-page">
-      {/* Navbar with Title on Right */}
-      <div className="page-navbar">
-        <HomeNavbar />
-        <div className="page-title-section">
-          <h1 className="page-title">Menu</h1>
-          <Image 
-            src="/images/icon_small.png" 
-            alt="FTEAT Logo" 
-            width={60}
-            height={60}
-            className="page-logo-icon"
-            unoptimized
-          />
-        </div>
-      </div>
+      <Navbar />
 
       <Container fluid className="menu-container">
         <Row>

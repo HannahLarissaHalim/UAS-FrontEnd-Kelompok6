@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { Container, Row, Col, Card, ListGroup, Button, Modal } from 'react-bootstrap';
 import Image from 'next/image';
-import HomeNavbar from '../components/HomeNavbar';
+//import HomeNavbar from '../components/HomeNavbar';
+import Navbar from '../components/Navbar';
 import { mockMenus } from '../../utils/mockData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
@@ -35,21 +36,8 @@ export default function StandPage() {
 
   return (
     <div className="stand-page">
-      {/* Navbar with Logo and Title on Left */}
-      <div className="page-navbar stand-navbar">
-        <div className="stand-brand-section">
-          <h1 className="stand-brand-title">Stand</h1>
-          <Image 
-            src="/images/LOGO_SMALL.png" 
-            alt="FTEAT Logo" 
-            width={80}
-            height={80}
-            className="stand-brand-logo"
-            unoptimized
-          />
-        </div>
-        <HomeNavbar />
-      </div>
+      {/* global navbar (flat layout, no background container) */}
+      <Navbar />
 
       <Container className="stand-container">
         <Row className="stand-content">
