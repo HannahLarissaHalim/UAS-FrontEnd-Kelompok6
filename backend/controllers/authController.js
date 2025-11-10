@@ -11,6 +11,28 @@ const generateToken = (userId) => {
   });
 };
 
+// Helper function to format user response
+const formatUserResponse = (user) => {
+  const fullName = user.lastName 
+    ? `${user.firstName} ${user.lastName}` 
+    : user.firstName;
+  
+  return {
+    userId: user._id,
+    npm: user.npm,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    nickname: user.nickname, 
+    displayName: user.nickname || fullName,
+    role: user.role,
+    faculty: user.faculty,
+    major: user.major,
+    majorCode: user.majorCode,
+    yearEntry: user.yearEntry
+  };
+};
+
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -104,12 +126,7 @@ exports.register = async (req, res) => {
       success: true,
       message: 'Registrasi berhasil',
       data: {
-        userId: user._id,
-        npm: user.npm,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
+        ...formatUserResponse(user), // Use helper function
         token
       }
     });
@@ -190,12 +207,7 @@ exports.login = async (req, res) => {
       success: true,
       message: 'Login berhasil',
       data: {
-        userId: user._id,
-        npm: user.npm,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
+        ...formatUserResponse(user), // Include nickname & displayName
         token
       }
     });
@@ -218,7 +230,7 @@ exports.getMe = async (req, res) => {
 
     res.json({
       success: true,
-      data: user
+      data: formatUserResponse(user) // Use helper function
     });
   } catch (error) {
     console.error('Get user error:', error);
@@ -277,10 +289,8 @@ exports.verifyEmail = async (req, res) => {
       success: true,
       message: 'Verifikasi berhasil',
       data: {
-        token: jwtToken,
-        npm: user.npm,
-        name: user.firstName,
-        role: user.role
+        ...formatUserResponse(user), // Use helper function
+        token: jwtToken
       }
     });
 
@@ -293,7 +303,7 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
-// @desc    Resend verification email (can be sent multiple times)
+// @desc    Resend verification email
 // @route   POST /api/auth/resend-email
 // @access  Public
 exports.resendVerificationEmail = async (req, res) => {

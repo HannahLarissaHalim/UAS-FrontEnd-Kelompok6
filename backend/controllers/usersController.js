@@ -190,6 +190,49 @@ exports.getUsersByRole = async (req, res) => {
 
 };
 
+// PUT /api/users/update-nickname - Update nickname saja
+exports.updateNickname = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { nickname } = req.body;
+
+        // Validasi nickname tidak boleh kosong string, tapi boleh null
+        if (nickname !== null && nickname !== undefined && nickname.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Nickname tidak boleh kosong'
+            });
+        }
+
+        // Update nickname di database
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { nickname: nickname ? nickname.trim() : null },
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'User tidak ditemukan'
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: 'Nickname berhasil diupdate',
+            data: updatedUser
+        });
+
+    } catch (error) {
+        console.error('Update nickname error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Terjadi kesalahan pada server'
+        });
+    }
+};
+
 exports.deleteAccount = async (req, res) => {
     try {
         // Get user from req object (added by auth middleware)

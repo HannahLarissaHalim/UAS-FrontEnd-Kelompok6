@@ -20,7 +20,6 @@ export default function ProfilePage() {
       router.push('/login'); // jika belum login langsung ke halaman login
       return;
     }
-
     // const parsedUser = JSON.parse(userData); // ubah string JSON ke object JS
 
     let parsedUser = null;
@@ -37,11 +36,13 @@ export default function ProfilePage() {
       return;
     }
 
-    // Combine firstName and lastName if available
+    // Build full name for display
     if (parsedUser.firstName && parsedUser.lastName) {
       parsedUser.name = `${parsedUser.firstName} ${parsedUser.lastName}`;
+    } else if (parsedUser.firstName) {
+      parsedUser.name = parsedUser.firstName;
     }
-    
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setUser(parsedUser);
     
@@ -53,14 +54,24 @@ export default function ProfilePage() {
 
     // Listen for profile updates from account settings
     const handleUserUpdate = () => {
-      const updatedUser = localStorage.getItem('user');
-      if (updatedUser) {
-        const parsedUpdatedUser = JSON.parse(updatedUser);
-        if (parsedUpdatedUser.firstName && parsedUpdatedUser.lastName) {
-          parsedUpdatedUser.name = `${parsedUpdatedUser.firstName} ${parsedUpdatedUser.lastName}`;
+      const updatedUserData = localStorage.getItem('user');
+      if (updatedUserData) {
+        try {
+          const parsedUpdatedUser = JSON.parse(updatedUserData);
+          
+          // Build full name
+          if (parsedUpdatedUser.firstName && parsedUpdatedUser.lastName) {
+            parsedUpdatedUser.name = `${parsedUpdatedUser.firstName} ${parsedUpdatedUser.lastName}`;
+          } else if (parsedUpdatedUser.firstName) {
+            parsedUpdatedUser.name = parsedUpdatedUser.firstName;
+          }
+          
+          setUser(parsedUpdatedUser);
+        } catch (error) {
+          console.error("Error parsing updated user data:", error);
         }
-        setUser(parsedUpdatedUser);
       }
+      
       const updatedImage = localStorage.getItem('profileImage');
       if (updatedImage) {
         setProfileImage(updatedImage);
@@ -74,13 +85,14 @@ export default function ProfilePage() {
     };
   }, [router]);
 
-
   if (!user) {
-    return null;  // tampilkan null dulu sebelum data user siap
+    return null;
   }
 
+  const displayName = user.displayName || user.nickname || user.name || 'User';
+
   return (
-    <ProtectedRoute> {/* 🔒 hanya render jika sudah login */}
+    <ProtectedRoute>
       <div className="welcome-profile-page">
         <Navbar />
 
@@ -111,9 +123,9 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* Name Box */}
+          {/* Name Box - Display displayName (nickname atau fullname) */}
           <div className="welcome-name-box">
-            <h2 className="welcome-user-name">{user.name || 'Asep Nel Irawelvira'}</h2>
+            <h2 className="welcome-user-name">{displayName}</h2>
           </div>
 
           {/* Info Box */}

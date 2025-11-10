@@ -8,7 +8,8 @@ const {
     getUsersByMajor,
     getUsersByName,
     getUsersByRole,
-    deleteAccount
+    deleteAccount,
+    updateNickname
 } = require('../controllers/usersController');
 const { protect } = require('../middleware/auth');
 
@@ -20,6 +21,8 @@ router.get('/faculty/:faculty', protect, getUsersByFaculty);
 router.get('/major/:major', protect, getUsersByMajor);
 router.get('/name/:name', protect, getUsersByName);
 router.get('/role/:role', protect, getUsersByRole);
+
+router.put('/update-nickname', protect, updateNickname);
 router.delete('/delete-account', protect, deleteAccount);
 
 module.exports = router;

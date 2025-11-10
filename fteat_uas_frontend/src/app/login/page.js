@@ -43,22 +43,40 @@ export default function LoginPage() {
         return;
       }
 
-      // Successful login: store token and user info
+      // Simpan SEMUA data dari backend response
       const token = data.data?.token;
-      const user = {
-        npm: data.data?.npm || formData.npm,
-        firstName: data.data?.firstName || '',
-        lastName: data.data?.lastName || '',
-        role: data.data?.role || 'customer'
-      };
-
+      
+      // Simpan token
       if (token) {
         localStorage.setItem('token', token);
       }
-      localStorage.setItem('user', JSON.stringify(user));
+
+      // Simpan SEMUA user data dari response (termasuk nickname & displayName)
+      const userData = {
+        userId: data.data?.userId,
+        npm: data.data?.npm,
+        email: data.data?.email,
+        firstName: data.data?.firstName,
+        lastName: data.data?.lastName,
+        nickname: data.data?.nickname, 
+        displayName: data.data?.displayName, 
+        role: data.data?.role,
+        faculty: data.data?.faculty,
+        major: data.data?.major,
+        majorCode: data.data?.majorCode,
+        yearEntry: data.data?.yearEntry
+      };
+
+      if (userData.firstName && userData.lastName) {
+        userData.name = `${userData.firstName} ${userData.lastName}`;
+      } else if (userData.firstName) {
+        userData.name = userData.firstName;
+      }
+
+      localStorage.setItem('user', JSON.stringify(userData));
 
       // Redirect based on role
-      if (user.role === 'vendor') {
+      if (userData.role === 'vendor') {
         router.push('/dashboard/vendor');
       } else {
         router.push('/profile');
