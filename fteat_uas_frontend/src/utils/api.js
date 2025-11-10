@@ -12,6 +12,18 @@ export const api = {
     return response.json();
   },
 
+  updateNickname: async (nickname, token) => {
+    const response = await fetch(`${API_URL}/api/users/update-nickname`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ nickname }),
+    });
+    return response.json();
+  },
+
   // Auth endpoints
   login: async (npm, password) => {
     const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -22,7 +34,7 @@ export const api = {
     return response.json();
   },
 
-  vendorLogin: async (email, password) => {  // ✅ fungsi baru
+  vendorLogin: async (email, password) => {
     const response = await fetch(`${API_URL}/api/vendor/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

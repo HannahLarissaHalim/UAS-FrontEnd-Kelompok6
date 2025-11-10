@@ -12,6 +12,11 @@ const userSchema = new mongoose.Schema({
     trim: true,
     default: ''
   },
+  nickname: {
+    type: String,
+    trim: true,
+    default: null 
+  },
   faculty: {
     type: String,
     required: [true, 'Fakultas harus diisi']
@@ -98,6 +103,11 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 // Method to get full name
 userSchema.methods.getFullName = function() {
   return this.lastName ? `${this.firstName} ${this.lastName}` : this.firstName;
+};
+
+// Method to get display name (nickname or full name)
+userSchema.methods.getDisplayName = function() {
+  return this.nickname || this.getFullName();
 };
 
 const User = mongoose.model('User', userSchema);

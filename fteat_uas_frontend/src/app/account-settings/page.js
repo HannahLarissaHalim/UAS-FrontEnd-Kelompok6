@@ -14,7 +14,7 @@ export default function AccountSettingsPage() {
   const [profileImage, setProfileImage] = useState('/images/profile_dummy.png');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    nickname: '',
     email: '',
     password: '••••••••'
   });
@@ -27,14 +27,20 @@ export default function AccountSettingsPage() {
       return;
     }
     const parsedUser = JSON.parse(userData);
+    
+    // Combine firstName and lastName for display
     if (parsedUser.firstName && parsedUser.lastName) {
       parsedUser.name = `${parsedUser.firstName} ${parsedUser.lastName}`;
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setUser(parsedUser);
 
+    // Set nickname dari data user
+    // Biarkan kosong jika memang belum ada nickname
+    const displayNickname = parsedUser.nickname || '';
+    
     setFormData({
-      name: parsedUser.name || '',
+      nickname: displayNickname,
       email: parsedUser.email || `${parsedUser.npm}@stu.untar.ac.id`,
       password: 'asepasep'
     });
@@ -64,19 +70,65 @@ export default function AccountSettingsPage() {
     }
   };
 
-  const handleSave = () => {
-    // Save user data
-    const updatedUser = {
-      ...user,
-      name: formData.name,
-      email: formData.email
-    };
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Sesi kamu telah habis. Silahkan login kembali');
+        router.push('/login');
+        return;
+      }
 
-    // Dispatch event to update navbar and other components
-    window.dispatchEvent(new Event('userUpdated'));
+      // Validasi nickname tidak boleh kosong
+      if (!formData.nickname || formData.nickname.trim() === '') {
+        alert('Nickname tidak boleh kosong');
+        return;
+      }
 
-    alert('Settings saved successfully!');
+      // Update nickname ke backend
+      const response = await api.updateNickname(formData.nickname.trim(), token);
+
+      if (response.success) {
+        // Update dengan data dari server response
+        const serverUser = response.data;
+        
+        // Build full name
+        const fullName = serverUser.lastName 
+          ? `${serverUser.firstName} ${serverUser.lastName}` 
+          : serverUser.firstName;
+        
+        // Create updated user object dengan semua field dari server
+        const updatedUser = {
+          userId: serverUser._id,
+          npm: serverUser.npm,
+          email: serverUser.email,
+          firstName: serverUser.firstName,
+          lastName: serverUser.lastName,
+          nickname: serverUser.nickname, 
+          displayName: serverUser.nickname || fullName, 
+          role: serverUser.role,
+          faculty: serverUser.faculty,
+          major: serverUser.major,
+          name: fullName 
+        };
+        
+        // Save updated data ke localStorage
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+
+        // Dispatch event untuk update komponen lain
+        window.dispatchEvent(new Event('userUpdated'));
+
+        alert('Nickname berhasil disimpan!');
+        
+        router.push('/profile');
+      } else {
+        alert(response.message || 'Gagal menyimpan nickname');
+      }
+    } catch (error) {
+      console.error('Error saving nickname:', error);
+      alert('Terjadi kesalahan saat menyimpan nickname');
+    }
   };
 
   const handleLogout = () => {
@@ -181,19 +233,19 @@ export default function AccountSettingsPage() {
             />
           </div>
 
-          {/* Name Box - Editable */}
+          {/* Nickname Box - Editable */}
           <div className="account-name-box">
             <input
               type="text"
-              name="name"
+              name="nickname"
               className="account-user-name-input"
-              value={formData.name}
+              value={formData.nickname}
               onChange={handleInputChange}
-              placeholder="Enter your name"
+              placeholder={user.name || "Enter your nickname"}
             />
           </div>
 
-          {/* Info Box - Editable */}
+          {/* Info Box - Read Only */}
           <div className="account-info-box">
             <div className="account-info-row">
               <input
@@ -235,6 +287,7 @@ export default function AccountSettingsPage() {
               className="account-form-input"
               value={formData.email}
               onChange={handleInputChange}
+              readOnly
             />
           </div>
 
