@@ -1,17 +1,26 @@
+// Catatan: File ini berasumsi Express.js kembali digunakan.
 const express = require('express');
 const router = express.Router();
-const orderController = require('../controllers/orderController');
+const {
+    getOrders,
+    getOrderById,
+    getOrdersByUser,
+    getOrdersByVendor,
+    createOrder,
+    updateOrderStatus
+} = require('../controllers/orderController');
+const { protect } = require('../middleware/auth'); 
 
-// Route: GET /api/orders (Mendapatkan semua pesanan)
-router.get('/', orderController.getAllOrders);
+router.get('/', protect, getOrders); 
 
-// Route: POST /api/orders (Membuat pesanan baru)
-router.post('/', orderController.createOrder);
+router.get('/:id', protect, getOrderById); 
 
-// Route: GET /api/orders/:orderId (Mendapatkan pesanan berdasarkan ID)
-router.get('/:orderId', orderController.getOrderById);
+router.get('/user/:userId', protect, getOrdersByUser); 
 
-// Route: PATCH /api/orders/:orderId/status (Memperbarui status pesanan)
-router.patch('/:orderId/status', orderController.updateOrderStatus);
+router.get('/vendor/:vendorId', protect, getOrdersByVendor); 
+
+router.post('/create', protect, createOrder); 
+
+router.put('/status/:id', protect, updateOrderStatus); 
 
 module.exports = router;

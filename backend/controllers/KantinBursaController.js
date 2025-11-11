@@ -1,36 +1,36 @@
 const KantinBursa = require('../models/KantinBursa');
 
+const sendJson = (res, statusCode, success, data, message) => {
+    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success, message, data }));
+};
+
 exports.getKantinBursaMenus = async (req, res) => {
     try {
         const menus = await KantinBursa.find({ VendorID: 'VND002' })
-            .sort({ Price: 1 }) 
+            .populate('vendorDetail', 'name stallName') // Populate detail vendor
+            .sort({ Price: 1 })
             .select('-__v'); 
 
-        res.status(200).json({
-            success: true,
-            count: menus.length,
-            data: menus
-        });
+        sendJson(res, 200, true, menus, 'Daftar menu Kantin Bursa berhasil diambil.');
     } catch (error) {
         console.error('Error fetching Kantin Bursa menus:', error.message);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Gagal mengambil data menu Kantin Bursa.' 
-        });
+        sendJson(res, 500, false, null, 'Gagal mengambil data menu Kantin Bursa.');
     }
 };
 
-exports.getKantinBursaMenuById = async (req, res) => {
+exports.getKantinBursaMenuById = async (req, res, id) => {
     try {
-        const menu = await KantinBursa.findById(req.params.id)
+        const menu = await KantinBursa.findById(id)
+            .populate('vendorDetail', 'name stallName')
             .select('-__v');
 
         if (!menu) {
-            return res.status(404).json({ success: false, message: 'Menu tidak ditemukan.' });
+            return sendJson(res, 404, false, null, 'Menu Kantin Bursa tidak ditemukan.');
         }
 
-        res.status(200).json({ success: true, data: menu });
+        sendJson(res, 200, true, menu, 'Detail menu berhasil diambil.');
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        sendJson(res, 500, false, null, 'Gagal mengambil detail menu Kantin Bursa.');
     }
 };

@@ -22,12 +22,13 @@ const menuSchema = new mongoose.Schema({
         type: Number,
         required: true,
         default: 0,
+        min: 0, 
     },
     vendor: {
         type: String,
         required: true,
-        alias: 'VendorID',
-        ref: 'Vendor'
+        alias: 'VendorID', 
+        ref: 'Vendor' 
     },
     variants: [String],
     addOns: [addOnSchema],
@@ -39,8 +40,8 @@ const menuSchema = new mongoose.Schema({
 });
 
 menuSchema.pre('save', function(next) {
-    if (this.VendorID) {
-        this.vendor = this.VendorID;
+    if (this.isModified('VendorID') && this.get('VendorID')) {
+        this.vendor = this.get('VendorID');
     }
     next();
 });

@@ -1,53 +1,81 @@
 const Order = require('../models/Order');
 
-exports.getAllOrders = async (req, res) => {
+const sendJson = (res, statusCode, success, data, message) => {
+    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success, message, data }));
+};
+
+
+exports.getOrders = async (req, res) => {
     try {
-        const orders = await Order.find();
-        res.status(200).json(orders);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+        const orders = await Order.find()
+            .populate('user', 'name npm email') 
+            .populate('vendor', 'name stallName') 
+            .sort({ createdAt: -1 }); 
+
+        sendJson(res, 200, true, orders, 'Daftar semua pesanan berhasil diambil.');
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        sendJson(res, 500, false, null, 'Gagal mengambil data pesanan.');
     }
 };
 
-exports.createOrder = async (req, res) => {
-    const newOrder = new Order({
-        _id: req.body._id, 
-        userId: req.body.userId,
-        vendorId: req.body.vendorId,
-        items: req.body.items,
-        totalPrice: req.body.totalPrice,
-        status: req.body.status || 'processing', 
-        pickupTime: req.body.pickupTime
-    });
-
+exports.createOrder = async (req, res, body) => {
     try {
-        const savedOrder = await newOrder.save();
-        res.status(201).json(savedOrder);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+        const orderData = JSON.parse(body);
+
+        if (!orderData.user || !orderData.vendor || !orderData.totalPrice || orderData.items.length === 0) {
+            return sendJson(res, 400, false, null, 'Data pesanan tidak lengkap.');
+        }
+
+        const order = await Order.create(orderData);
+
+        sendJson(res, 201, true, order, 'Pesanan berhasil dibuat.');
+    } catch (error) {
+        console.error('Error creating order:', error);
+        sendJson(res, 500, false, null, 'Gagal membuat pesanan.');
     }
 };
 
-exports.getOrderById = async (req, res) => {
+
+exports.getOrderById = async (req, res, id) => {
     try {
-        const order = await Order.findById(req.params.orderId);
-        if (!order) return res.status(404).json({ message: 'Order not found' });
-        res.status(200).json(order);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+        const order = await Order.findById(id)
+            .populate('user', 'name npm email')
+            .populate('vendor', 'name stallName');
+
+        if (!order) {
+            return sendJson(res, 404, false, null, `Pesanan dengan ID ${id} tidak ditemukan.`);
+        }
+
+        sendJson(res, 200, true, order, 'Detail pesanan berhasil diambil.');
+    } catch (error) {
+        console.error('Error fetching order by ID:', error);
+        sendJson(res, 500, false, null, 'Gagal mengambil detail pesanan.');
     }
 };
 
-exports.updateOrderStatus = async (req, res) => {
+exports.updateOrderStatus = async (req, res, id, body) => {
     try {
-        const updatedOrder = await Order.findByIdAndUpdate(
-            req.params.orderId,
-            { status: req.body.status }, 
-            { new: true }
+        const { status } = JSON.parse(body);
+
+        if (!status || !['processing', 'completed', 'cancelled'].includes(status)) {
+            return sendJson(res, 400, false, null, 'Status pesanan tidak valid.');
+        }
+
+        const order = await Order.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true, runValidators: true }
         );
-        if (!updatedOrder) return res.status(404).json({ message: 'Order not found' });
-        res.status(200).json(updatedOrder);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+
+        if (!order) {
+            return sendJson(res, 404, false, null, `Pesanan dengan ID ${id} tidak ditemukan.`);
+        }
+
+        sendJson(res, 200, true, order, `Status pesanan berhasil diubah menjadi ${status}.`);
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        sendJson(res, 500, false, null, 'Gagal memperbarui status pesanan.');
     }
 };
