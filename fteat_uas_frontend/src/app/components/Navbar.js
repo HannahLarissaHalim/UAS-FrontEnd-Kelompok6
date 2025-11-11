@@ -23,9 +23,19 @@ export default function Navbar() {
                 // wrap setstate in a microtask to avoid cascading render
                 setTimeout(() => {
                     setIsLoggedIn(true);
-                    // Load profile image from localStorage
-                    const savedImage = localStorage.getItem('profileImage');
-                    setProfilePic(savedImage || "/images/navbar_icons/profile.png");
+                    
+                    // Load profile image from user data
+                    const userData = localStorage.getItem('user');
+                    if (userData) {
+                        try {
+                            const user = JSON.parse(userData);
+                            if (user.profileImage) {
+                                setProfilePic(user.profileImage);
+                            }
+                        } catch (error) {
+                            console.error('Error parsing user data:', error);
+                        }
+                    }
                 }, 0);
             }
         };
@@ -59,8 +69,19 @@ export default function Navbar() {
         
         // Listen for user/profile updates
         const handleUserUpdate = () => {
-            const savedImage = localStorage.getItem('profileImage');
-            setProfilePic(savedImage || "/images/navbar_icons/profile.png");
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    if (user.profileImage) {
+                        setProfilePic(user.profileImage);
+                    } else {
+                        setProfilePic("/images/navbar_icons/profile.png");
+                    }
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                }
+            }
         };
         window.addEventListener('userUpdated', handleUserUpdate);
         
@@ -86,7 +107,6 @@ export default function Navbar() {
         }
         router.push("/payment");
     };
-
 
     // // handle button clicks
     // const handleProfileClick = () => {
@@ -209,13 +229,17 @@ export default function Navbar() {
                             className="navbar-icon-btn"
                             aria-label="profile"
                         >
-                            <Image
+                            {/* Gunakan img biasa untuk support base64 */}
+                            <img
                                 src={profilePic}
                                 alt="profile"
-                                width={35}
-                                height={35}
                                 className="navbar-profile-img"
-                                unoptimized
+                                style={{
+                                    width: '35px',
+                                    height: '35px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                }}
                             />
                         </button>
                     </div>

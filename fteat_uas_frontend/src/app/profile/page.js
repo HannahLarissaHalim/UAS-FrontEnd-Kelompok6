@@ -46,10 +46,12 @@ export default function ProfilePage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setUser(parsedUser);
     
-    // Load saved profile image if exists
-    const savedImage = localStorage.getItem('profileImage');
-    if (savedImage) {
-      setProfileImage(savedImage);
+    // Load profile image dari database (dari localStorage yang sudah di-sync dengan database)
+    if (parsedUser.profileImage) {
+      setProfileImage(parsedUser.profileImage);
+    } else {
+      // Fallback ke default jika tidak ada
+      setProfileImage('/images/profile_dummy.png');
     }
 
     // Listen for profile updates from account settings
@@ -67,14 +69,14 @@ export default function ProfilePage() {
           }
           
           setUser(parsedUpdatedUser);
+
+          // Update profile image
+          if (parsedUpdatedUser.profileImage) {
+            setProfileImage(parsedUpdatedUser.profileImage);
+          }
         } catch (error) {
           console.error("Error parsing updated user data:", error);
         }
-      }
-      
-      const updatedImage = localStorage.getItem('profileImage');
-      if (updatedImage) {
-        setProfileImage(updatedImage);
       }
     };
 
@@ -112,7 +114,7 @@ export default function ProfilePage() {
 
         {/* Profile Section */}
         <div className="welcome-profile-section">
-          {/* Profile Image - Read Only */}
+          {/* Profile Image - Display dari database */}
           <div className="welcome-profile-image">
             <Image 
               src={profileImage} 

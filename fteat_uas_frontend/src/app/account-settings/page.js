@@ -12,7 +12,9 @@ export default function AccountSettingsPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [profileImage, setProfileImage] = useState('/images/profile_dummy.png');
+  const [tempProfileImage, setTempProfileImage] = useState(null); // Temporary image preview
   const [showPassword, setShowPassword] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     nickname: '',
     email: '',
@@ -27,7 +29,7 @@ export default function AccountSettingsPage() {
       return;
     }
     const parsedUser = JSON.parse(userData);
-    
+
     // Combine firstName and lastName for display
     if (parsedUser.firstName && parsedUser.lastName) {
       parsedUser.name = `${parsedUser.firstName} ${parsedUser.lastName}`;
@@ -45,9 +47,8 @@ export default function AccountSettingsPage() {
       password: 'asepasep'
     });
 
-    const savedImage = localStorage.getItem('profileImage');
-    if (savedImage) {
-      setProfileImage(savedImage);
+    if (parsedUser.profileImage) {
+      setProfileImage(parsedUser.profileImage);
     }
   }, [router]);
 
@@ -55,22 +56,85 @@ export default function AccountSettingsPage() {
     fileInputRef.current?.click();
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
+  // Fungsi untuk kompres gambar
+  const compressImage = (file) => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageData = reader.result;
-        setProfileImage(imageData);
-        localStorage.setItem('profileImage', imageData);
-        // Dispatch event to update navbar and other components
-        window.dispatchEvent(new Event('userUpdated'));
+      
+      reader.onload = (e) => {
+        const img = document.createElement('img');
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Ukuran maksimal
+          const maxWidth = 800;
+          const maxHeight = 800;
+          let width = img.width;
+          let height = img.height;
+          
+          // Hitung proporsi
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert ke base64 dengan quality 0.7
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressedBase64);
+        };
+        
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = e.target.result;
       };
+      
+      reader.onerror = () => reject(new Error('Failed to read file'));
       reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validasi tipe file
+    if (!file.type.startsWith('image/')) {
+      alert('File harus berupa gambar');
+      return;
+    }
+
+    // Validasi ukuran file (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file maksimal 5MB');
+      return;
+    }
+
+    try {
+      // Kompres gambar dan set sebagai temporary preview
+      const compressedImage = await compressImage(file);
+      setTempProfileImage(compressedImage);
+      setProfileImage(compressedImage); // Update preview
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      alert('Terjadi kesalahan saat memproses gambar');
     }
   };
 
   const handleSave = async () => {
+    setUploading(true);
+    
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -79,62 +143,78 @@ export default function AccountSettingsPage() {
         return;
       }
 
-      // Validasi nickname tidak boleh kosong
+      // Validasi nickname
       if (!formData.nickname || formData.nickname.trim() === '') {
         alert('Nickname tidak boleh kosong');
+        setUploading(false);
         return;
       }
 
-      // Update nickname ke backend
-      const response = await api.updateNickname(formData.nickname.trim(), token);
+      // Update nickname
+      const nicknameResponse = await api.updateNickname(formData.nickname.trim(), token);
 
-      if (response.success) {
-        // Update dengan data dari server response
-        const serverUser = response.data;
-        
-        // Build full name
-        const fullName = serverUser.lastName 
-          ? `${serverUser.firstName} ${serverUser.lastName}` 
-          : serverUser.firstName;
-        
-        // Create updated user object dengan semua field dari server
-        const updatedUser = {
-          userId: serverUser._id,
-          npm: serverUser.npm,
-          email: serverUser.email,
-          firstName: serverUser.firstName,
-          lastName: serverUser.lastName,
-          nickname: serverUser.nickname, 
-          displayName: serverUser.nickname || fullName, 
-          role: serverUser.role,
-          faculty: serverUser.faculty,
-          major: serverUser.major,
-          name: fullName 
-        };
-        
-        // Save updated data ke localStorage
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setUser(updatedUser);
-
-        // Dispatch event untuk update komponen lain
-        window.dispatchEvent(new Event('userUpdated'));
-
-        alert('Nickname berhasil disimpan!');
-        
-        router.push('/profile');
-      } else {
-        alert(response.message || 'Gagal menyimpan nickname');
+      if (!nicknameResponse.success) {
+        alert(nicknameResponse.message || 'Gagal menyimpan nickname');
+        setUploading(false);
+        return;
       }
+
+      let finalUser = nicknameResponse.data;
+
+      // Upload profile image jika ada perubahan
+      if (tempProfileImage) {
+        const imageResponse = await api.updateProfileImage(tempProfileImage, token);
+
+        if (!imageResponse.success) {
+          alert(imageResponse.message || 'Gagal menyimpan foto profil');
+          setUploading(false);
+          return;
+        }
+
+        finalUser = imageResponse.data;
+        setTempProfileImage(null); // Clear temporary image
+      }
+
+      // Update localStorage dengan data terbaru
+      const fullName = finalUser.lastName 
+        ? `${finalUser.firstName} ${finalUser.lastName}` 
+        : finalUser.firstName;
+      
+      const updatedUser = {
+        userId: finalUser._id,
+        npm: finalUser.npm,
+        email: finalUser.email,
+        firstName: finalUser.firstName,
+        lastName: finalUser.lastName,
+        nickname: finalUser.nickname, 
+        displayName: finalUser.nickname || fullName,
+        profileImage: finalUser.profileImage,
+        role: finalUser.role,
+        faculty: finalUser.faculty,
+        major: finalUser.major,
+        name: fullName
+      };
+      
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      
+      // Trigger event untuk update navbar dan profile page
+      window.dispatchEvent(new Event('userUpdated'));
+
+      alert('Profil telah diperbarui');
+      router.push('/profile');
+
     } catch (error) {
-      console.error('Error saving nickname:', error);
-      alert('Terjadi kesalahan saat menyimpan nickname');
+      console.error('Error:', error);
+      alert('Terjadi kesalahan saat menyimpan profil');
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    localStorage.removeItem('profileImage');
     router.push('/login');
   };
 
@@ -154,8 +234,6 @@ export default function AccountSettingsPage() {
           // Clear all local storage data
           localStorage.removeItem('user');
           localStorage.removeItem('token');
-          localStorage.removeItem('profileImage');
-
           alert('Akunmu telah berhasil dihapus');
           router.push('/register');
         } else {
@@ -211,12 +289,10 @@ export default function AccountSettingsPage() {
               onClick={handleProfileImageClick}
               title="Click to change profile picture"
             >
-              <Image 
+              <img 
                 src={profileImage} 
                 alt="Profile" 
-                width={180}
-                height={179}
-                unoptimized
+                style={{ width: '180px', height: '179px', objectFit: 'cover', borderRadius: '50%' }}
               />
             </div>
             <div className="account-profile-edit-icon" onClick={handleProfileImageClick}>
@@ -324,8 +400,12 @@ export default function AccountSettingsPage() {
             </svg>
             Delete account
           </button>
-          <button className="account-btn-save" onClick={handleSave}>
-            Save
+          <button 
+            className="account-btn-save" 
+            onClick={handleSave}
+            disabled={uploading}
+          >
+            {uploading ? 'Saving' : 'Save'}
           </button>
         </div>
 
