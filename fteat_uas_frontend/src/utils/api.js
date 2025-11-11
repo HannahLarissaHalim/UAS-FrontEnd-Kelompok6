@@ -1,12 +1,44 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export const api = {
+  // User endpoints
+  deleteAccount: async (token) => {
+    const response = await fetch(`${API_URL}/api/users/delete-account`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  },
+
+  updateNickname: async (nickname, token) => {
+    const response = await fetch(`${API_URL}/api/users/update-nickname`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ nickname }),
+    });
+    return response.json();
+  },
+
   // Auth endpoints
   login: async (npm, password) => {
     const response = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ npm, password }),
+    });
+    return response.json();
+  },
+
+  vendorLogin: async (email, password) => {
+    const response = await fetch(`${API_URL}/api/vendor/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
     });
     return response.json();
   },

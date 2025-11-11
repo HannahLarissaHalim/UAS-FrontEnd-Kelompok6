@@ -6,6 +6,8 @@ const menuRoutes = require('./routes/menuRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
 const kantinBursaRoutes = require('./routes/KantinBursaRoutes');
 const indomieRoutes = require('./routes/IndomieRoutes');
+const vendorAuthRoutes = require('./routes/vendorAuth');
+
 
 // Load environment variables
 dotenv.config();
@@ -34,6 +36,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 // Users routes (protected)
 app.use('/api/users', require('./routes/usersRoutes'));
 app.use('/api/menus', menuRoutes);
+app.use('/api/vendor', vendorAuthRoutes);
 
 // Welcome route
 app.get('/', (req, res) => {

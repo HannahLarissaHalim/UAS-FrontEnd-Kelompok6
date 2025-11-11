@@ -96,6 +96,9 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
         <Card.Body className="menu-card-body">
           <div className="menu-badges">
             <Badge className="menu-badge-category">{menu.category}</Badge>
+            {menu.brand && menu.category === "Instant Noodles" && (
+              <Badge className="menu-badge-brand">{menu.brand}</Badge>
+            )}
             <span className="menu-time">⏱️ {menu.estimatedTime}</span>
           </div>
           
@@ -106,7 +109,7 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
             <h4 className="menu-price">{formatPrice(menu.price)}</h4>
           </div>
           
-          <p className="menu-vendor">Kantin Teknik Bursa Lt.7</p>
+          <p className="menu-vendor">{menu.vendorName || 'Kantin Teknik Bursa Lt.7'}</p>
           
           <div className="menu-card-actions">
             <Button 

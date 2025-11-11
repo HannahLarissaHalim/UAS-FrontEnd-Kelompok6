@@ -11,6 +11,28 @@ const generateToken = (userId) => {
   });
 };
 
+// Helper function to format user response
+const formatUserResponse = (user) => {
+  const fullName = user.lastName 
+    ? `${user.firstName} ${user.lastName}` 
+    : user.firstName;
+  
+  return {
+    userId: user._id,
+    npm: user.npm,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    nickname: user.nickname, 
+    displayName: user.nickname || fullName,
+    role: user.role,
+    faculty: user.faculty,
+    major: user.major,
+    majorCode: user.majorCode,
+    yearEntry: user.yearEntry
+  };
+};
+
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -38,9 +60,9 @@ exports.register = async (req, res) => {
 
     // NPM Format: majorCode(3) + year(2) + 0 + customDigits(3) = 9 digits
     // Example: Major SI (535) + Year 2024 (24) + 0 + 023 = 535240023
-    
+
     const yearShort = yearEntry.toString().slice(-2); // Last 2 digits of year (e.g., '24')
-    
+
     // Generate NPM: MajorCode(3) + Year(2) + 0 + Last3Digits(3)
     const npmPrefix = `${majorCode}${yearShort}0`; // e.g., '53524'
     const fullNPM = npmPrefix + npmLast3Digits; // e.g., '535240023'
@@ -104,19 +126,14 @@ exports.register = async (req, res) => {
       success: true,
       message: 'Registrasi berhasil',
       data: {
-        userId: user._id,
-        npm: user.npm,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
+        ...formatUserResponse(user), // Use helper function
         token
       }
     });
 
   } catch (error) {
     console.error('Registration error:', error);
-    
+
     // Handle mongoose validation errors
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
@@ -175,6 +192,14 @@ exports.login = async (req, res) => {
       });
     }
 
+    // Ensure the user has verified their account (registered & confirmed email)
+    if (!user.isVerified) {
+      return res.status(403).json({
+        success: false,
+        message: 'Akun belum terverifikasi. Silakan verifikasi email terlebih dahulu.'
+      });
+    }
+
     // Generate token
     const token = generateToken(user._id);
 
@@ -182,12 +207,7 @@ exports.login = async (req, res) => {
       success: true,
       message: 'Login berhasil',
       data: {
-        userId: user._id,
-        npm: user.npm,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
+        ...formatUserResponse(user), // Include nickname & displayName
         token
       }
     });
@@ -207,10 +227,10 @@ exports.login = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
-    
+
     res.json({
       success: true,
-      data: user
+      data: formatUserResponse(user) // Use helper function
     });
   } catch (error) {
     console.error('Get user error:', error);
@@ -236,7 +256,7 @@ exports.verifyEmail = async (req, res) => {
       });
     }
 
-     // Find user by verification token
+    // Find user by verification token
     const user = await User.findOne({ verificationToken: token });
     if (!user) {
       return res.status(400).json({
@@ -269,10 +289,8 @@ exports.verifyEmail = async (req, res) => {
       success: true,
       message: 'Verifikasi berhasil',
       data: {
-        token: jwtToken,
-        npm: user.npm,
-        name: user.firstName,
-        role: user.role
+        ...formatUserResponse(user), // Use helper function
+        token: jwtToken
       }
     });
 
@@ -285,7 +303,7 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
-// @desc    Resend verification email (can be sent multiple times)
+// @desc    Resend verification email
 // @route   POST /api/auth/resend-email
 // @access  Public
 exports.resendVerificationEmail = async (req, res) => {
@@ -312,7 +330,7 @@ exports.resendVerificationEmail = async (req, res) => {
     // Every resend email has a fresh link
     const newToken = crypto.randomBytes(32).toString('hex');
     user.verificationToken = newToken;
-    user.verificationTokenExpires = Date.now() + 5 * 60 * 1000; 
+    user.verificationTokenExpires = Date.now() + 5 * 60 * 1000;
     await user.save();
 
     // Send the new verification email with the updated token

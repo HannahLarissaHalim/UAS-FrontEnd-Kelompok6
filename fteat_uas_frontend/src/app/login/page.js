@@ -4,9 +4,10 @@ import { Form, Alert } from 'react-bootstrap';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import HomeNavbar from '../components/HomeNavbar';
+import Navbar from '../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
+import { api } from '../../utils/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,25 +31,59 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await api.login(formData.npm, formData.password);
+      const data = await api.login(formData.npm, formData.password);
+
+      if (!data) {
+        setError('Tidak dapat terhubung ke server');
+        return;
+      }
+
+      if (!data.success) {
+        setError(data.message || 'Login gagal. Periksa NPM dan password Anda.');
+        return;
+      }
+
+      // Simpan SEMUA data dari backend response
+      const token = data.data?.token;
       
-      // Mock login for testing
-      if (formData.npm && formData.password) {
-        // Store user data in localStorage
-        localStorage.setItem('user', JSON.stringify({
-          npm: formData.npm,
-          name: 'User Name', // This should come from API
-          role: 'customer', // or 'vendor'
-        }));
-        
-        // Redirect to dashboard
-        router.push('/dashboard/customer');
+      // Simpan token
+      if (token) {
+        localStorage.setItem('token', token);
+      }
+
+      // Simpan SEMUA user data dari response (termasuk nickname & displayName)
+      const userData = {
+        userId: data.data?.userId,
+        npm: data.data?.npm,
+        email: data.data?.email,
+        firstName: data.data?.firstName,
+        lastName: data.data?.lastName,
+        nickname: data.data?.nickname, 
+        displayName: data.data?.displayName, 
+        role: data.data?.role,
+        faculty: data.data?.faculty,
+        major: data.data?.major,
+        majorCode: data.data?.majorCode,
+        yearEntry: data.data?.yearEntry
+      };
+
+      if (userData.firstName && userData.lastName) {
+        userData.name = `${userData.firstName} ${userData.lastName}`;
+      } else if (userData.firstName) {
+        userData.name = userData.firstName;
+      }
+
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      // Redirect based on role
+      if (userData.role === 'vendor') {
+        router.push('/dashboard/vendor');
       } else {
-        setError('NPM dan password harus diisi');
+        router.push('/profile');
       }
     } catch (err) {
-      setError('Login gagal. Periksa NPM dan password Anda.');
+      console.error('Login error (frontend):', err);
+      setError('Login gagal. Periksa koneksi atau coba lagi nanti.');
     } finally {
       setLoading(false);
     }
@@ -56,26 +91,26 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      <HomeNavbar />
-      
+      <Navbar />
+
       <div className="login-container">
         <div className="login-left">
-          <Image 
-            src="/images/logo.png" 
-            alt="FTEAT Logo" 
+          <Image
+            src="/images/logo.png"
+            alt="FTEAT Logo"
             width={500}
             height={500}
             className="login-logo"
             unoptimized
           />
         </div>
-        
+
         <div className="login-right">
           <div className="login-card">
             <h2 className="login-title">Login</h2>
-            
+
             {error && <Alert variant="danger">{error}</Alert>}
-            
+
             <Form onSubmit={handleSubmit} className="login-form">
               <Form.Group className="mb-3">
                 <Form.Label>Nomor Induk Mahasiswa</Form.Label>
@@ -98,11 +133,11 @@ export default function LoginPage() {
                   required
                 />
               </Form.Group>
-              
+
               <div className="forgot-password-link mb-3">
                 <p>Lupa Kata Sandi? | <Link href="/forgot-password" className="register-link">Klik di sini</Link></p>
               </div>
-              
+
               <div className="register-link-section mb-3">
                 <p>Belum punya akun? <Link href="/register" className="register-link">Daftar di sini</Link></p>
               </div>
@@ -118,7 +153,7 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      
+
       {/* Footer */}
       <div className="homepage-footer">
         <p>Developed by <strong>HELD</strong></p>
