@@ -51,7 +51,7 @@ export default function LoginPage() {
         localStorage.setItem('token', token);
       }
 
-      // Simpan SEMUA user data dari response (termasuk nickname & displayName)
+      // Simpan SEMUA user data dari response (termasuk nickname, displayName, dan profileImage)
       const userData = {
         userId: data.data?.userId,
         npm: data.data?.npm,
@@ -59,7 +59,8 @@ export default function LoginPage() {
         firstName: data.data?.firstName,
         lastName: data.data?.lastName,
         nickname: data.data?.nickname, 
-        displayName: data.data?.displayName, 
+        displayName: data.data?.displayName,
+        profileImage: data.data?.profileImage, 
         role: data.data?.role,
         faculty: data.data?.faculty,
         major: data.data?.major,

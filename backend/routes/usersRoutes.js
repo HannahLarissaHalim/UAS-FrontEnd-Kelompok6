@@ -9,7 +9,8 @@ const {
     getUsersByName,
     getUsersByRole,
     deleteAccount,
-    updateNickname
+    updateNickname,
+    updateProfileImage
 } = require('../controllers/usersController');
 const { protect } = require('../middleware/auth');
 
@@ -23,6 +24,7 @@ router.get('/name/:name', protect, getUsersByName);
 router.get('/role/:role', protect, getUsersByRole);
 
 router.put('/update-nickname', protect, updateNickname);
+router.put('/update-profile-image', protect, updateProfileImage);
 router.delete('/delete-account', protect, deleteAccount);
 
 module.exports = router;

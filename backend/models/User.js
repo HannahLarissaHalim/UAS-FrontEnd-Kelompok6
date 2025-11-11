@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema({
     trim: true,
     default: null 
   },
+  profileImage: {
+    type: String,
+    default: null // Menyimpan base64 string atau URL gambar
+  },
   faculty: {
     type: String,
     required: [true, 'Fakultas harus diisi']

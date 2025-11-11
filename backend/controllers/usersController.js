@@ -232,6 +232,62 @@ exports.updateNickname = async (req, res) => {
         });
     }
 };
+exports.updateProfileImage = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { profileImage } = req.body;
+
+    if (!profileImage) {
+      return res.status(400).json({
+        success: false,
+        message: 'Profile image tidak boleh kosong'
+      });
+    }
+
+    if (!profileImage.startsWith('data:image/')) {
+      return res.status(400).json({
+        success: false,
+        message: 'Format gambar tidak valid'
+      });
+    }
+
+    // Validasi ukuran base64 (approx 1.37x ukuran file asli)
+    // Jika base64 > 6.8MB, maka file asli > 5MB
+    const base64Size = profileImage.length * 0.75; // Convert to bytes
+    if (base64Size > 5 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ukuran gambar terlalu besar. Maksimal 5MB'
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profileImage },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User tidak ditemukan'
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Profile image berhasil diupdate',
+      data: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Update profile image error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan pada server'
+    });
+  }
+};
 
 exports.deleteAccount = async (req, res) => {
     try {

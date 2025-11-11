@@ -31,6 +31,13 @@ app.use(cors({
   credentials: true
 }));
 
+// Middleware
+app.use(express.json({ limit: '50mb' })); //handle image berukuran besar
+app.use(express.urlencoded({ limit: '50mb', extended: true })); //handle image berukuran besar
+app.use('/api/vendors', vendorRoutes);
+app.use('/api/kantinbursa', kantinBursaRoutes);
+app.use('/api/indomie', indomieRoutes);
+
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 // Users routes (protected)
@@ -82,4 +89,3 @@ process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err);
   process.exit(1);
 });
-

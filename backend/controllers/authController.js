@@ -25,6 +25,7 @@ const formatUserResponse = (user) => {
     lastName: user.lastName,
     nickname: user.nickname, 
     displayName: user.nickname || fullName,
+    profileImage: user.profileImage,
     role: user.role,
     faculty: user.faculty,
     major: user.major,

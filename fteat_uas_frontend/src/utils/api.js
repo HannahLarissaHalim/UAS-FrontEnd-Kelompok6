@@ -24,6 +24,18 @@ export const api = {
     return response.json();
   },
 
+  updateProfileImage: async (profileImage, token) => {
+    const response = await fetch(`${API_URL}/api/users/update-profile-image`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ profileImage }),
+    });
+    return response.json();
+  },
+
   // Auth endpoints
   login: async (npm, password) => {
     const response = await fetch(`${API_URL}/api/auth/login`, {
