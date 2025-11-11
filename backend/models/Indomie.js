@@ -30,7 +30,16 @@ const indomieSchema = new mongoose.Schema({
         required: true,
     },
 }, { 
-    timestamps: true 
+    timestamps: true,
+    toJSON: { virtuals: true },
+    id: false
+});
+
+indomieSchema.virtual('vendorDetail', {
+    ref: 'Vendor',
+    localField: 'VendorID',
+    foreignField: '_id',
+    justOne: true 
 });
 
 const Indomie = mongoose.model('Indomie', indomieSchema, 'Indomie'); 

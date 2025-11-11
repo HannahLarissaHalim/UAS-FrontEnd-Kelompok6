@@ -2,21 +2,39 @@ const mongoose = require('mongoose');
 
 const vendorSchema = new mongoose.Schema({
     _id: {
-        type: String,
+        type: String, 
         required: true,
         alias: 'vendorId',
+        unique: true
     },
     name: {
         type: String,
         required: true,
     },
-    standName: {
+    stallName: { 
         type: String,
         required: true,
     },
-    contact: {
+    bankName: { 
         type: String,
         required: true,
+    },
+    accountNumber: { 
+        type: String,
+        required: true,
+    },
+    accountHolder: { 
+        type: String,
+        required: true,
+    },
+    whatsapp: { 
+        type: String,
+        required: true,
+    },
+    status: { 
+        type: String,
+        enum: ['Available', 'Unavailable', 'Closed'],
+        default: 'Unavailable'
     },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
@@ -32,9 +50,9 @@ const vendorSchema = new mongoose.Schema({
 vendorSchema.virtual('menus', {
     ref: 'Menu',
     localField: '_id',
-    foreignField: 'VendorID',
+    foreignField: 'VendorID', 
     justOne: false
 });
 
-const Vendor = mongoose.model('Vendor', vendorSchema, 'vendors'); 
+const Vendor = mongoose.model('Vendor', vendorSchema, 'Vendors'); 
 module.exports = Vendor;
