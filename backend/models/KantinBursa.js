@@ -27,7 +27,16 @@ const kantinBursaSchema = new mongoose.Schema({
         ref: 'Vendor'
     },
 }, { 
-    timestamps: true 
+    timestamps: true,
+    toJSON: { virtuals: true },
+    id: false
+});
+
+kantinBursaSchema.virtual('vendorDetail', {
+    ref: 'Vendor',
+    localField: 'VendorID',
+    foreignField: '_id',
+    justOne: true 
 });
 
 const KantinBursa = mongoose.model('KantinBursa', kantinBursaSchema, 'Kantin Bursa');

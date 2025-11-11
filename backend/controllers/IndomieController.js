@@ -1,35 +1,35 @@
 const Indomie = require('../models/Indomie');
 
+const sendJson = (res, statusCode, success, data, message) => {
+    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success, message, data }));
+};
+
 exports.getIndomieMenu = async (req, res) => {
     try {
         const menus = await Indomie.find()
+            .populate('vendorDetail', 'name stallName')
             .select('-__v'); 
 
-        res.status(200).json({
-            success: true,
-            count: menus.length,
-            data: menus
-        });
+        sendJson(res, 200, true, menus, 'Daftar menu Indomie berhasil diambil.');
     } catch (error) {
         console.error('Error fetching Indomie menu:', error.message);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Gagal mengambil data menu Indomie.' 
-        });
+        sendJson(res, 500, false, null, 'Gagal mengambil data menu Indomie.');
     }
 };
 
-exports.getIndomieMenuById = async (req, res) => {
+exports.getIndomieMenuById = async (req, res, id) => {
     try {
-        const menu = await Indomie.findById(req.params.id)
+        const menu = await Indomie.findById(id)
+            .populate('vendorDetail', 'name stallName')
             .select('-__v');
 
         if (!menu) {
-            return res.status(404).json({ success: false, message: 'Menu Indomie tidak ditemukan.' });
+            return sendJson(res, 404, false, null, 'Menu Indomie tidak ditemukan.');
         }
 
-        res.status(200).json({ success: true, data: menu });
+        sendJson(res, 200, true, menu, 'Detail menu berhasil diambil.');
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        sendJson(res, 500, false, null, 'Gagal mengambil detail menu Indomie.');
     }
 };
