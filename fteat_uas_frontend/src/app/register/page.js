@@ -213,12 +213,11 @@ export default function RegisterPage() {
         </div>
 
         <div className="register-right">
-          <div className="register-card">
-            <h2 className="register-title">Registrasi</h2>
+          <h2 className="register-title">Registrasi</h2>
 
-            {error && <Alert variant="danger">{error}</Alert>}
+          {error && <Alert variant="danger">{error}</Alert>}
 
-            <Form onSubmit={handleSubmit} className="register-form">
+          <Form onSubmit={handleSubmit} className="register-form">
               {/* Step 1: Personal Info & NPM Generation */}
               {step === 1 && (
                 <>
@@ -458,8 +457,7 @@ export default function RegisterPage() {
                 </>
               )}
 
-            </Form>
-          </div>
+          </Form>
         </div>
       </div>
 

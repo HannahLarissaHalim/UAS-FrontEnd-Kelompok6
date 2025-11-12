@@ -130,6 +130,18 @@ export default function HistoryOrderPage() {
       <div className="history-order-page">
         <Navbar />
         
+        {/* Back Button */}
+        <button 
+          className="back-button"
+          onClick={() => router.push('/profile')}
+          aria-label="Back to profile"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18L9 12L15 6" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span>Back</span>
+        </button>
+        
         {/* History Order Title */}
         <div className="history-order-header">
           <svg className="history-icon" width="68" height="68" viewBox="0 0 68 68" fill="none">

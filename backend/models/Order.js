@@ -37,9 +37,27 @@ const orderSchema = new mongoose.Schema({
     enum: ['pending', 'processing', 'completed', 'cancelled', 'paid'],
     default: 'pending',
   },
+  paymentStatus: {
+    type: String,
+    enum: ['unpaid', 'paid', 'verified'],
+    default: 'unpaid',
+  },
   paymentMethod: {
     type: String,
     enum: ['cash', 'transfer', 'ewallet'],
+  },
+  queueNumber: {
+    type: String,
+    default: null,
+  },
+  verifiedAt: {
+    type: Date,
+    default: null,
+  },
+  verifiedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null,
   }
 }, { timestamps: true });
 

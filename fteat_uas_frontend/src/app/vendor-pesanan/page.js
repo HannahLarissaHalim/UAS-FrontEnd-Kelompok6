@@ -1,0 +1,417 @@
+'use client';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { Modal } from 'react-bootstrap';
+import VendorNavbar from '../components/VendorNavbar';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './vendor-pesanan.css';
+
+export default function VendorPesananPage() {
+  const router = useRouter();
+  const [vendorData, setVendorData] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+
+    // Always use dummy data for now (until backend is connected)
+    setVendorData({
+      vendorName: 'Kantin Bursa Lt.7',
+      email: 'fteat_kantinbursalt7@gmail.com',
+      role: 'vendor',
+      id: 'vendor123'
+    });
+    loadDummyOrders();
+
+    // TODO: Uncomment when backend is ready
+    // if (user) {
+    //   const userData = JSON.parse(user);
+    //   setVendorData(userData);
+    //   fetchOrders(userData.id);
+    // }
+  }, []);
+
+  const loadDummyOrders = () => {
+    // Dummy orders for testing
+    const dummyOrders = [
+      {
+        _id: '1',
+        createdAt: '2024-11-02T10:09:00',
+        totalPrice: 70000,
+        paymentStatus: 'unpaid',
+        queueNumber: null,
+        user: { name: 'John Doe', email: 'john@example.com' },
+        items: [
+          { name: 'Indomie Goreng', quantity: 2, price: 15000, image: '/images/ikon_indomie.png', additionals: ['Telur', 'Kornet'] },
+          { name: 'Es Teh Manis', quantity: 2, price: 5000, image: '/images/ikon_gorengan.png', additionals: [] }
+        ],
+        paymentMethod: 'Cash',
+        pickupLocation: 'Kantin Bursa Lt.7'
+      },
+      {
+        _id: '2',
+        createdAt: '2024-10-27T09:09:00',
+        totalPrice: 35000,
+        paymentStatus: 'verified',
+        queueNumber: '002',
+        user: { name: 'Jane Smith', email: 'jane@example.com' },
+        items: [
+          { name: 'Indomie Rebus', quantity: 1, price: 12000, image: '/images/ikon_indomie.png', additionals: ['Telur'] },
+          { name: 'Teh Botol', quantity: 1, price: 5000, image: '/images/ikon_gorengan.png', additionals: [] }
+        ],
+        paymentMethod: 'E-Wallet',
+        pickupLocation: 'Kantin Bursa Lt.7'
+      },
+      {
+        _id: '3',
+        createdAt: '2024-10-18T13:12:00',
+        totalPrice: 35000,
+        paymentStatus: 'verified',
+        queueNumber: '003',
+        user: { name: 'Bob Wilson', email: 'bob@example.com' },
+        items: [
+          { name: 'Indomie Goreng Jumbo', quantity: 1, price: 18000, image: '/images/ikon_indomie.png', additionals: ['Telur', 'Sosis', 'Keju'] }
+        ],
+        paymentMethod: 'Transfer',
+        pickupLocation: 'Kantin Bursa Lt.7'
+      },
+      {
+        _id: '4',
+        createdAt: '2024-10-10T11:27:00',
+        totalPrice: 8000,
+        paymentStatus: 'unpaid',
+        queueNumber: null,
+        user: { name: 'Alice Brown', email: 'alice@example.com' },
+        items: [
+          { name: 'Es Teh Manis', quantity: 1, price: 5000, image: '/images/ikon_gorengan.png', additionals: [] }
+        ],
+        paymentMethod: 'Cash',
+        pickupLocation: 'Kantin Bursa Lt.7'
+      }
+    ];
+    setOrders(dummyOrders);
+    setLoading(false);
+  };
+
+  const fetchOrders = async (vendorId) => {
+    try {
+      const response = await fetch(`/api/orders/vendor/${vendorId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setOrders(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleHomeClick = () => {
+    router.push('/vendor-welcome');
+  };
+
+  const handleMenuClick = () => {
+    router.push('/vendor-menu');
+  };
+
+  const handleVerifyPayment = async (orderId) => {
+    // For demo: Simulate verification without backend
+    const verifiedOrders = orders.filter(o => o.paymentStatus === 'verified');
+    const newQueueNumber = String(verifiedOrders.length + 1).padStart(3, '0');
+
+    // Update local state
+    setOrders(orders.map(order =>
+      order._id === orderId
+        ? { ...order, paymentStatus: 'verified', queueNumber: newQueueNumber }
+        : order
+    ));
+    alert(`Pembayaran berhasil diverifikasi! Nomor antrian: ${newQueueNumber}`);
+
+    // TODO: Uncomment when backend is ready
+    // try {
+    //   const response = await fetch(`/api/orders/${orderId}/verify`, {
+    //     method: 'PATCH',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${localStorage.getItem('token')}`
+    //     },
+    //     body: JSON.stringify({ vendorId: vendorData.id })
+    //   });
+    //   
+    //   const data = await response.json();
+    //   if (data.success) {
+    //     setOrders(orders.map(order => 
+    //       order._id === orderId 
+    //         ? { ...order, paymentStatus: 'verified', queueNumber: data.data.queueNumber }
+    //         : order
+    //     ));
+    //     alert(`Pembayaran berhasil diverifikasi! Nomor antrian: ${data.data.queueNumber}`);
+    //   } else {
+    //     alert('Gagal memverifikasi pembayaran: ' + data.message);
+    //   }
+    // } catch (error) {
+    //   console.error('Error verifying payment:', error);
+    //   alert('Terjadi kesalahan saat memverifikasi pembayaran');
+    // }
+  };
+
+  const handleCancelVerification = async (orderId) => {
+    if (!confirm('Apakah Anda yakin ingin membatalkan verifikasi pembayaran?')) {
+      return;
+    }
+
+    // For demo: Simulate cancellation without backend
+    setOrders(orders.map(order =>
+      order._id === orderId
+        ? { ...order, paymentStatus: 'unpaid', queueNumber: null }
+        : order
+    ));
+    alert('Verifikasi pembayaran berhasil dibatalkan');
+
+    // TODO: Uncomment when backend is ready
+    // try {
+    //   const response = await fetch(`/api/orders/${orderId}/cancel-verification`, {
+    //     method: 'PATCH',
+    //     headers: {
+    //       'Authorization': `Bearer ${localStorage.getItem('token')}`
+    //     }
+    //   });
+    //   
+    //   const data = await response.json();
+    //   if (data.success) {
+    //     setOrders(orders.map(order => 
+    //       order._id === orderId 
+    //         ? { ...order, paymentStatus: 'unpaid', queueNumber: null }
+    //         : order
+    //     ));
+    //     alert('Verifikasi pembayaran berhasil dibatalkan');
+    //   } else {
+    //     alert('Gagal membatalkan verifikasi: ' + data.message);
+    //   }
+    // } catch (error) {
+    //   console.error('Error canceling verification:', error);
+    //   alert('Terjadi kesalahan saat membatalkan verifikasi');
+    // }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString('id-ID', { month: 'short' });
+    const time = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    return { date: `${day} ${month}`, time: `jam ${time}` };
+  };
+
+  const handleShowDetails = (order) => {
+    setSelectedOrder(order);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedOrder(null);
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
+  if (!vendorData) {
+    return null;
+  }
+
+  return (
+    <div className="vendor-page">
+      <VendorNavbar />
+
+      {/* Main Content */}
+      <div className="vendor-content">
+        <div className="pesanan-header">
+          <svg width="63" height="63" viewBox="0 0 63 63" fill="none" className="pesanan-icon">
+            <path d="M10.5 10.5H52.5V52.5H10.5V10.5Z" stroke="#0A4988" strokeWidth="4" />
+            <path d="M21 21H42M21 31.5H42M21 42H31.5" stroke="#0A4988" strokeWidth="4" strokeLinecap="round" />
+          </svg>
+          <h1 className="pesanan-title">Pesanan</h1>
+          <div className="stand-icon-circle">
+            <Image
+              src="/images/ikon_indomie.png"
+              alt="Stand Icon"
+              width={100}
+              height={100}
+              unoptimized
+            />
+          </div>
+        </div>
+
+        <div className="orders-grid">
+          {loading ? (
+            <p className="loading-text">Memuat pesanan...</p>
+          ) : orders.length === 0 ? (
+            <p className="no-orders-text">Belum ada pesanan</p>
+          ) : (
+            orders.map((order) => {
+              const { date, time } = formatDate(order.createdAt);
+              const isVerified = order.paymentStatus === 'verified';
+
+              return (
+                <div key={order._id} className="order-card">
+                  {/* Left Box: Order Info */}
+                  <div className="order-info-box">
+                    <div className="order-date-time">
+                      <span className="order-date">{date}, {time}</span>
+                    </div>
+
+                    <div className="queue-number-box">
+                      <span className="queue-number">{order.queueNumber || '---'}</span>
+                    </div>
+
+                    <div className="order-price">
+                      <span>Rp. {order.totalPrice.toLocaleString('id-ID')}</span>
+                    </div>
+
+                    <button className="details-btn" onClick={() => handleShowDetails(order)}>Details</button>
+                  </div>
+
+                  {/* Vertical Divider */}
+                  <div className="order-divider"></div>
+
+                  {/* Right Side: Actions */}
+                  <div className="order-actions">
+                    <div className={`payment-status ${isVerified ? 'verified' : 'unverified'}`}>
+                      {isVerified ? 'Sudah Bayar' : 'Belum Bayar'}
+                    </div>
+
+                    <div className="action-buttons">
+                      <button className="verify-btn" onClick={() => handleVerifyPayment(order._id)} disabled={isVerified}>
+                        <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                          <circle cx="22" cy="22" r="20" fill="#14AE5C" />
+                          <path d="M14 22L19 27L30 16" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                      <button className="action-text" onClick={() => handleVerifyPayment(order._id)} disabled={isVerified}>
+                        Verifikasi Pembayaran
+                      </button>
+                    </div>
+
+                    <div className="action-buttons">
+                      <button className="cancel-btn" onClick={() => handleCancelVerification(order._id)}>
+                        <svg width="41" height="42" viewBox="0 0 41 42" fill="none">
+                          <circle cx="20.5" cy="21" r="20" fill="#A52334" />
+                          <path d="M14 15L27 28M27 15L14 28" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
+                      </button>
+                      <button className="action-text" onClick={() => handleCancelVerification(order._id)}>
+                        Batalkan Verifikasi
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="stand-footer">
+        <span className="stand-footer-text">Developed by </span>
+        <span className="stand-footer-held">HELD</span>
+      </div>
+
+      {/* Order Details Modal */}
+      <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
+        <Modal.Header closeButton className="order-modal-header">
+          <Modal.Title className="order-modal-title">Order Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="order-modal-body">
+          {selectedOrder && (
+            <>
+              <div className="modal-order-info">
+                <div className="modal-info-row">
+                  <span className="modal-label">Order ID:</span>
+                  <span className="modal-value">#{selectedOrder._id}</span>
+                </div>
+                <div className="modal-info-row">
+                  <span className="modal-label">Date:</span>
+                  <span className="modal-value">{formatDate(selectedOrder.createdAt).date}, {formatDate(selectedOrder.createdAt).time}</span>
+                </div>
+                <div className="modal-info-row">
+                  <span className="modal-label">Pickup Location:</span>
+                  <span className="modal-value">{selectedOrder.pickupLocation}</span>
+                </div>
+                <div className="modal-info-row">
+                  <span className="modal-label">Payment Status:</span>
+                  <span className={`modal-value ${selectedOrder.paymentStatus === 'verified' ? 'modal-status-verified' : 'modal-status-unpaid'}`}>
+                    {selectedOrder.paymentStatus === 'verified' ? 'Verified' : 'Unpaid'}
+                  </span>
+                </div>
+                {selectedOrder.queueNumber && (
+                  <div className="modal-info-row">
+                    <span className="modal-label">Queue Number:</span>
+                    <span className="modal-value modal-queue-number">{selectedOrder.queueNumber}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="modal-items-section">
+                <h5 className="modal-section-title">Items Ordered:</h5>
+                <div className="modal-items-list">
+                  {selectedOrder.items.map((item, idx) => (
+                    <div key={idx} className="modal-item-row">
+                      <div className="modal-item-image">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={60}
+                          height={60}
+                          unoptimized
+                        />
+                      </div>
+                      <div className="modal-item-details">
+                        <span className="modal-item-name">{item.name}</span>
+                        <span className="modal-item-quantity">x{item.quantity}</span>
+                        {item.additionals && item.additionals.length > 0 && (
+                          <span className="modal-item-additionals">
+                            + {item.additionals.join(', ')}
+                          </span>
+                        )}
+                      </div>
+                      <div className="modal-item-price">
+                        {formatPrice(item.price * item.quantity)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="modal-total-section">
+                <div className="modal-total-row">
+                  <span className="modal-total-label">Total:</span>
+                  <span className="modal-total-value">{formatPrice(selectedOrder.totalPrice)}</span>
+                </div>
+              </div>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer className="order-modal-footer">
+          <button className="modal-close-btn" onClick={handleCloseModal}>
+            Close
+          </button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
+}

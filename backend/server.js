@@ -14,6 +14,7 @@ const authController = require('./controllers/authController');
 const userController = require('./controllers/usersController'); 
 const menuController = require('./controllers/menuController');
 const vendorController = require('./controllers/vendorController');
+const vendorAuthController = require('./controllers/vendorAuthController');
 const kantinBursaController = require('./controllers/KantinBursaController'); 
 const indomieController = require('./controllers/IndomieController');       
 const orderController = require('./controllers/orderController'); 
@@ -97,6 +98,12 @@ const server = http.createServer(async (req, res) => {
             }
             if (param1 === 'id' && param2 && method === 'GET') {
                 return callGetController(userController.getUserById, param2);
+            }
+        }
+        
+        if (resource === 'vendor') {
+            if (param1 === 'login' && method === 'POST') {
+                return handleRequest(req, res, vendorAuthController.vendorLogin);
             }
         }
         

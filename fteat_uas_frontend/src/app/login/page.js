@@ -78,7 +78,7 @@ export default function LoginPage() {
 
       // Redirect based on role
       if (userData.role === 'vendor') {
-        router.push('/dashboard/vendor');
+        router.push('/vendor-welcome');
       } else {
         router.push('/profile');
       }

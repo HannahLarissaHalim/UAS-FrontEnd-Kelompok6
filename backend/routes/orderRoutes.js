@@ -7,7 +7,9 @@ const {
     getOrdersByUser,
     getOrdersByVendor,
     createOrder,
-    updateOrderStatus
+    updateOrderStatus,
+    verifyPayment,
+    cancelVerification
 } = require('../controllers/orderController');
 const { protect } = require('../middleware/auth'); 
 
@@ -22,5 +24,10 @@ router.get('/vendor/:vendorId', protect, getOrdersByVendor);
 router.post('/create', protect, createOrder); 
 
 router.put('/status/:id', protect, updateOrderStatus); 
+
+// Payment verification routes
+router.patch('/:id/verify', protect, verifyPayment);
+
+router.patch('/:id/cancel-verification', protect, cancelVerification);
 
 module.exports = router;
