@@ -4,8 +4,7 @@ const vendorSchema = new mongoose.Schema({
     _id: {
         type: String, 
         required: true,
-        alias: 'vendorId',
-        unique: true
+        alias: 'vendorId'
     },
     name: {
         type: String,
@@ -30,6 +29,10 @@ const vendorSchema = new mongoose.Schema({
     whatsapp: { 
         type: String,
         required: true,
+    },
+    contact: {
+        type: String,
+        required: false,
     },
     status: { 
         type: String,

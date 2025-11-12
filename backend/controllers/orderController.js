@@ -79,3 +79,104 @@ exports.updateOrderStatus = async (req, res, id, body) => {
         sendJson(res, 500, false, null, 'Gagal memperbarui status pesanan.');
     }
 };
+
+// Generate queue number based on date
+const generateQueueNumber = async (date) => {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Count orders verified today
+    const count = await Order.countDocuments({
+        verifiedAt: {
+            $gte: startOfDay,
+            $lte: endOfDay
+        },
+        queueNumber: { $ne: null }
+    });
+
+    // Format: 001, 002, 003, etc.
+    return String(count + 1).padStart(3, '0');
+};
+
+// Verify payment endpoint
+exports.verifyPayment = async (req, res, id, body) => {
+    try {
+        const { vendorId } = JSON.parse(body);
+
+        const order = await Order.findById(id).populate('user', 'name email');
+
+        if (!order) {
+            return sendJson(res, 404, false, null, `Pesanan dengan ID ${id} tidak ditemukan.`);
+        }
+
+        if (order.paymentStatus === 'verified') {
+            return sendJson(res, 400, false, null, 'Pembayaran sudah diverifikasi sebelumnya.');
+        }
+
+        // Generate queue number
+        const queueNumber = await generateQueueNumber(new Date());
+
+        // Update order
+        order.paymentStatus = 'verified';
+        order.status = 'paid';
+        order.queueNumber = queueNumber;
+        order.verifiedAt = new Date();
+        order.verifiedBy = vendorId;
+
+        await order.save();
+
+        // TODO: Send email notification to customer
+        // sendEmailNotification(order.user.email, order.queueNumber);
+
+        sendJson(res, 200, true, order, `Pembayaran berhasil diverifikasi. Nomor antrian: ${queueNumber}`);
+    } catch (error) {
+        console.error('Error verifying payment:', error);
+        sendJson(res, 500, false, null, 'Gagal memverifikasi pembayaran.');
+    }
+};
+
+// Cancel verification endpoint
+exports.cancelVerification = async (req, res, id) => {
+    try {
+        const order = await Order.findById(id);
+
+        if (!order) {
+            return sendJson(res, 404, false, null, `Pesanan dengan ID ${id} tidak ditemukan.`);
+        }
+
+        if (order.paymentStatus !== 'verified') {
+            return sendJson(res, 400, false, null, 'Pembayaran belum diverifikasi.');
+        }
+
+        // Reset verification
+        order.paymentStatus = 'unpaid';
+        order.status = 'pending';
+        order.queueNumber = null;
+        order.verifiedAt = null;
+        order.verifiedBy = null;
+
+        await order.save();
+
+        sendJson(res, 200, true, order, 'Verifikasi pembayaran berhasil dibatalkan.');
+    } catch (error) {
+        console.error('Error canceling verification:', error);
+        sendJson(res, 500, false, null, 'Gagal membatalkan verifikasi.');
+    }
+};
+
+// Get orders by vendor
+exports.getOrdersByVendor = async (req, res, vendorId) => {
+    try {
+        const orders = await Order.find({ vendor: vendorId })
+            .populate('user', 'name npm email')
+            .sort({ createdAt: -1 });
+
+        sendJson(res, 200, true, orders, 'Daftar pesanan vendor berhasil diambil.');
+    } catch (error) {
+        console.error('Error fetching vendor orders:', error);
+        sendJson(res, 500, false, null, 'Gagal mengambil data pesanan vendor.');
+    }
+};

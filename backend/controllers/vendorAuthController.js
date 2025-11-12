@@ -1,44 +1,47 @@
-const express = require('express');
-const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Vendor = require('../models/Vendor');
 
-// daftar vendor dari .env
-const allowedVendors = [
-  {
-    email: process.env.VENDOR1_EMAIL,
-    password: process.env.VENDOR1_PASS,
-  },
-  {
-    email: process.env.VENDOR2_EMAIL,
-    password: process.env.VENDOR2_PASS,
-  },
-];
-
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
+exports.vendorLogin = async (req, res, body) => {
   try {
+    const { email, password } = JSON.parse(body);
+
+    // daftar vendor dari .env (dibuat saat login untuk memastikan env sudah loaded)
+    const allowedVendors = [
+      {
+        email: process.env.VENDOR1_EMAIL,
+        password: process.env.VENDOR1_PASS,
+      },
+      {
+        email: process.env.VENDOR2_EMAIL,
+        password: process.env.VENDOR2_PASS,
+      },
+    ];
+
+    console.log('Login attempt for email:', email);
+    console.log('Allowed vendors:', allowedVendors.map(v => ({ email: v.email, hasPassword: !!v.password })));
+
     // cek apakah email & password cocok dengan yang di .env
     const matchedVendor = allowedVendors.find(
       (v) => v.email === email && v.password === password
     );
 
     if (!matchedVendor) {
-      return res.status(401).json({
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({
         success: false,
         message: 'Email atau password salah',
-      });
+      }));
     }
 
     // cari info vendor dari database
     const vendorData = await Vendor.findOne({ contact: email });
 
     if (!vendorData) {
-      return res.status(404).json({
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({
         success: false,
         message: 'Data vendor tidak ditemukan di database',
-      });
+      }));
     }
 
     // generate token
@@ -48,7 +51,8 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    return res.json({
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({
       success: true,
       message: 'Login vendor berhasil',
       data: {
@@ -58,14 +62,13 @@ router.post('/login', async (req, res) => {
         vendorName: vendorData.stallName,
         email: email,
       },
-    });
+    }));
   } catch (error) {
     console.error('Vendor login error:', error);
-    res.status(500).json({
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
       success: false,
       message: 'Terjadi kesalahan server',
-    });
+    }));
   }
-});
-
-module.exports = router;
+};

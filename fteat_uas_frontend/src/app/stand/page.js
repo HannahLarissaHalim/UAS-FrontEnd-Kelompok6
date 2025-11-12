@@ -42,9 +42,6 @@ export default function StandPage() {
       {/* Stand Title */}
       <h1 className="stand-page-title">Stand</h1>
 
-      {/* Navbar Line */}
-      <div className="stand-navbar-line"></div>
-
       {/* Kantin Bursa Lt.7 */}
       <h2
         className="stand-vendor-title stand-vendor-bursa"

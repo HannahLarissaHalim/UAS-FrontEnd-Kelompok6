@@ -14,6 +14,7 @@ export default function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [profilePic, setProfilePic] = useState("/images/navbar_icons/profile.png");
     const [cartCount, setCartCount] = useState(0);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         // check token asynchronously to avoid sync state update warning
@@ -177,26 +178,46 @@ export default function Navbar() {
                     <span className="navbar-brand-text">FTEAT</span>
                 </div>
 
+                {/* Burger menu button */}
+                <button 
+                    className="burger-menu"
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    aria-label="Toggle menu"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
                 {/* navigation links */}
-                <div className="navbar-links">
+                <div className={`navbar-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
                     <Link
                         href="/aboutus"
                         className={pathname === "/aboutus" ? "active" : ""}
+                        onClick={() => setIsMobileMenuOpen(false)}
                     >
                         About Us
                     </Link>
 
-                    <Link href="/home" className={isActive("/home")}>Home</Link>
+                    <Link 
+                        href="/home" 
+                        className={isActive("/home")}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        Home
+                    </Link>
 
                     <Link
                         href="/stand"
                         className={pathname === "/stand" ? "active" : ""}
+                        onClick={() => setIsMobileMenuOpen(false)}
                     >
                         Stand
                     </Link>
                     <Link
                         href="/menu"
                         className={pathname === "/menu" ? "active" : ""}
+                        onClick={() => setIsMobileMenuOpen(false)}
                     >
                         Menu
                     </Link>

@@ -30,17 +30,12 @@ export default function Home() {
             <div className="brand-line">
               <span className="brand-word">Teknik</span>
             </div>
-            <div className="brand-line">
-              <span className="brand-word">
-                <span className="brand-r">R</span>
+            <div className="brand-line brand-rekayasa-line">
+              <span className="brand-r-large">R</span>
+              <div className="brand-stacked">
                 <span className="brand-rest">ekayasa</span>
-              </span>
-            </div>
-            <div className="brand-line">
-              <span className="brand-word">
-                <span className="brand-r">R</span>
                 <span className="brand-rest">asa</span>
-              </span>
+              </div>
             </div>
           </div>
           
@@ -53,15 +48,6 @@ export default function Home() {
             <Link href="/choose-login" className="auth-link-home">
               Login
             </Link>
-            <div className="user-icon">
-              <Image 
-                src="/images/logo.png" 
-                alt="User Icon" 
-                width={50}
-                height={50}
-                unoptimized
-              />
-            </div>
           </div>
         </div>
       </div>

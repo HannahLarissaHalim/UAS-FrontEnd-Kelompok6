@@ -1,5 +1,10 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+// Debug: Log API URL on initialization
+if (typeof window !== 'undefined') {
+  console.log('API_URL configured as:', API_URL);
+}
+
 export const api = {
   // User endpoints
   deleteAccount: async (token) => {
@@ -47,12 +52,32 @@ export const api = {
   },
 
   vendorLogin: async (email, password) => {
-    const response = await fetch(`${API_URL}/api/vendor/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    return response.json();
+    try {
+      const url = `${API_URL}/api/vendor/login`;
+      console.log('Attempting vendor login to:', url);
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response received:', text);
+        throw new Error('Server returned non-JSON response. Check if backend is running correctly.');
+      }
+      
+      return response.json();
+    } catch (error) {
+      console.error('Vendor login API error:', error);
+      throw error;
+    }
   },
 
   register: async (userData) => {

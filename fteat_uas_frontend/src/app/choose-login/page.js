@@ -38,7 +38,7 @@ export default function ChooseLoginPage() {
 
             <button
               className="choose-btn vendor-btn"
-              onClick={() => router.push('/vendor-login')}
+              onClick={() => router.push('/vendor-welcome')}
             >
               <span>Vendor</span>
             </button>

@@ -1,0 +1,448 @@
+/* Vendor Welcome Page Styles */
+.vendor-welcome-page {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  background: #FDF8F2;
+  overflow-x: hidden;
+}
+
+/* Background Logo */
+.background-logo {
+  position: absolute;
+  width: 722px;
+  height: 722px;
+  left: -102px;
+  top: 123px;
+  z-index: 0;
+  opacity: 0.9;
+}
+
+/* Welcome Content */
+.welcome-content {
+  position: relative;
+  z-index: 5;
+  padding-top: 102px;
+}
+
+.welcome-title {
+  position: absolute;
+  width: 653px;
+  height: 82px;
+  left: 700px;
+  top: 100px;
+  font-family: 'Offside', cursive;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 64px;
+  line-height: 81px;
+  color: #0A4988;
+  z-index: 10;
+}
+
+/* Vendor Info Section */
+.vendor-info-section {
+  position: absolute;
+  left: 615px;
+  top: 250px;
+  display: flex;
+  gap: 28px;
+  z-index: 10;
+}
+
+/* Vendor Icon */
+.vendor-icon-container {
+  position: relative;
+  width: 265px;
+  height: 217.6px;
+}
+
+.vendor-icon-circle {
+  position: absolute;
+  width: 300px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vendor-icon-circle img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+
+/* Vendor Details */
+.vendor-details {
+  position: relative;
+  width: 520px;
+}
+
+.vendor-name-box {
+  position: relative;
+  width: 520px;
+  height: 67px;
+  border: 1px solid #000000;
+  border-radius: 17px;
+  display: flex;
+  align-items: center;
+  padding-left: 23px;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+  background: #FDF8F2;
+  box-sizing: border-box;
+}
+
+.vendor-name {
+  font-family: 'Montserrat', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 49px;
+  color: #0A4988;
+  margin: 0;
+}
+
+/* Email Section */
+.vendor-email-section {
+  margin-top: 42px;
+}
+
+.email-label {
+  position: relative;
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 29px;
+  color: #0A4988;
+  margin-bottom: 12px;
+  margin-left: 14px;
+}
+
+.vendor-email-box {
+  position: relative;
+  width: 520px;
+  height: 61px;
+  border: 1px solid #000000;
+  border-radius: 17px;
+  display: flex;
+  align-items: center;
+  padding-left: 23px;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+  background: #FDF8F2;
+  box-sizing: border-box;
+}
+
+.vendor-email {
+  font-family: 'Montserrat', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 34px;
+  color: #0A4988;
+  margin: 0;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 51px;
+  margin-top: 53px;
+}
+
+.menu-button {
+  position: relative;
+  width: 215px;
+  height: 79px;
+  background: #EAF1FF;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  transition: all 0.3s ease;
+}
+
+.menu-button:hover {
+  background: #d5e3f7;
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.3);
+}
+
+.menu-button span {
+  font-family: 'Montserrat', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 34px;
+  color: #1E2767;
+}
+
+.button-icon {
+  width: 64px;
+  height: 62px;
+  filter: drop-shadow(0px 4px 4px rgba(255, 255, 255, 0.25));
+}
+
+.pesanan-button {
+  position: relative;
+  width: 248px;
+  height: 80px;
+  background: #1D56CF;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  transition: all 0.3s ease;
+}
+
+.pesanan-button:hover {
+  background: #164ab3;
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.3);
+}
+
+.pesanan-button span {
+  font-family: 'Montserrat', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 39px;
+  color: #FFFFFF;
+}
+
+.order-icon {
+  width: 51px;
+  height: 51px;
+}
+
+/* Footer - Using stand-footer from custom.css */
+
+/* Responsive Design */
+@media (max-width: 1440px) {
+  .vendor-welcome-page {
+    width: 100%;
+  }
+
+  .welcome-title {
+    left: 60%;
+    transform: translateX(-28%);
+  }
+
+  .vendor-info-section {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 1024px) {
+
+  .welcome-title {
+    font-size: 40px;
+    width: auto;
+  }
+
+  .vendor-name {
+    font-size: 32px;
+  }
+
+  .vendor-email {
+    font-size: 22px;
+  }
+
+  .vendor-name-box,
+  .vendor-email-box {
+    width: 600px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .menu-button,
+  .pesanan-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* Hide background logo on mobile */
+  .background-logo {
+    display: none;
+  }
+
+  .welcome-content {
+    padding: 40px 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+  }
+
+  .welcome-title {
+    position: static;
+    font-size: 40px;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 30px;
+    margin-left: 278px;
+  }
+
+  .vendor-info-section {
+    position: static;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+    transform: none;
+    margin-bottom: 40px;
+  }
+
+  .vendor-icon-container {
+    width: 250px;
+    height: 195px;
+    order: -1;
+    margin: 0 auto;
+  }
+
+  .vendor-icon-circle {
+    width: 250px;
+    height: 170px;
+  }
+
+  .vendor-icon-circle img {
+    width: 200px;
+    height: 200px;
+    margin: 0;
+  }
+
+  .vendor-details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .vendor-name-box {
+    position: static;
+    width: 90%;
+    max-width: 400px;
+    height: 60px;
+    text-align: center;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .vendor-name {
+    font-size: 28px;
+    line-height: 34px;
+  }
+
+  .vendor-email-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+  }
+
+  .email-label {
+    position: static;
+    width: 90%;
+    max-width: 460px;
+    text-align: left;
+    font-size: 24px;
+    margin: 0 auto 10px auto;
+    line-height: 29px;
+    padding-left: 5%;
+  }
+
+  .vendor-email-box {
+    position: static;
+    width: 90%;
+    max-width: 400px;
+    height: 48px;
+    text-align: center;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .vendor-email {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .action-buttons {
+    position: static;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+    margin: 60px auto 0 auto;
+    align-items: center;
+  }
+
+  .menu-button {
+    width: 90%;
+    max-width: 300px;
+    height: 80px;
+    margin: 0;
+  }
+
+  .menu-button span {
+    font-size: 28px;
+    line-height: 34px;
+  }
+
+  .pesanan-button {
+    width: 90%;
+    max-width: 300px;
+    height: 80px;
+    margin: 0;
+  }
+
+  .pesanan-button span {
+    font-size: 28px;
+    line-height: 34px;
+  }
+
+  .menu-icon,
+  .order-icon {
+    width: 64px;
+    height: 62px;
+  }
+
+  .vendor-footer {
+    position: relative;
+    margin-top: auto;
+    padding: 40px 20px 20px 20px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .vendor-footer p {
+    font-size: 30px;
+    line-height: 37px;
+  }
+
+  .vendor-footer strong {
+    font-family: 'Montserrat Subrayada', cursive;
+    font-size: 30px;
+    line-height: 37px;
+  }
+}

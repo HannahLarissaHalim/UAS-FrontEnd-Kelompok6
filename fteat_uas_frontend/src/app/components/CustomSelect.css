@@ -1,0 +1,101 @@
+.custom-select-container {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  border: 1px solid #000000;
+  border-radius: 20px;
+  padding: 12px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  line-height: 24px;
+  letter-spacing: 0.01em;
+  color: #000000;
+  background: #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.custom-select-trigger:hover {
+  border-color: #0A4988;
+}
+
+.custom-select-trigger .placeholder-text {
+  color: rgba(29, 86, 207, 0.4);
+}
+
+.dropdown-arrow {
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border: 2px solid #0A4988;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.custom-select-option {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #0A4988;
+  padding: 15px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid #1D56CF;
+  background: #FFFFFF;
+  transition: background-color 0.2s ease;
+}
+
+.custom-select-option:last-child {
+  border-bottom: none;
+}
+
+.custom-select-option.first {
+  background-color: rgba(116, 215, 251, 0.15);
+}
+
+.custom-select-option:hover {
+  background-color: rgba(116, 215, 251, 0.3) !important;
+}
+
+.custom-select-option.selected {
+  font-weight: 600;
+}
+
+/* Scrollbar styling */
+.custom-select-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-thumb {
+  background: #0A4988;
+  border-radius: 10px;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #083a6f;
+}
