@@ -16,10 +16,10 @@ const kantinBursaSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    Stock: {
-        type: Number,
+    statusKetersediaan: {
+        type: String,
         required: true,
-        default: 0,
+        default: 'available',
     },
     VendorID: {
         type: String,
