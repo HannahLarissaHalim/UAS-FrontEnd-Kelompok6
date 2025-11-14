@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
 
 const vendorSchema = new mongoose.Schema({
-    _id: {
-        type: String, 
-        required: true,
-        alias: 'vendorId'
-    },
+    
     name: {
         type: String,
         required: true,
@@ -30,30 +26,29 @@ const vendorSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    contact: {
-        type: String,
-        required: false,
-    },
+
     status: { 
         type: String,
         enum: ['Available', 'Unavailable', 'Closed'],
         default: 'Unavailable'
     },
-    owner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: false,
-    }
+    VendorId: {
+        type: String,
+        required: true,
+        unique: true,
+    },
 }, { 
     timestamps: true,
     toJSON: { virtuals: true }, 
-    id: false
+    id: true 
 });
+
+
 
 vendorSchema.virtual('menus', {
     ref: 'Menu',
-    localField: '_id',
-    foreignField: 'VendorID', 
+    localField: 'VendorId', 
+    foreignField: 'vendor', 
     justOne: false
 });
 
