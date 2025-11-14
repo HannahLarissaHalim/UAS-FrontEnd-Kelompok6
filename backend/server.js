@@ -1,174 +1,193 @@
+const express = require('express');
 const http = require('http');
 const url = require('url');
+const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 
 // Load environment variables FIRST
 dotenv.config();
+connectDB();
 
-// Koneksi ke MongoDB
-connectDB(); 
+// Import Express routes
+const menuRoutes = require('./routes/menuRoutes');
+const vendorRoutes = require('./routes/vendorRoutes');
+const kantinBursaRoutes = require('./routes/KantinBursaRoutes');
+const indomieRoutes = require('./routes/IndomieRoutes');
+const vendorAuthRoutes = require('./routes/vendorAuth');
 
-// Import Controllers (Casing diperbaiki berdasarkan konvensi PascalCase/CamelCase)
+// Import Controllers (for manual HTTP server)
 const authController = require('./controllers/authController');
-const userController = require('./controllers/usersController'); 
+const userController = require('./controllers/usersController');
 const menuController = require('./controllers/menuController');
 const vendorController = require('./controllers/vendorController');
 const vendorAuthController = require('./controllers/vendorAuthController');
-const kantinBursaController = require('./controllers/KantinBursaController'); 
-const indomieController = require('./controllers/IndomieController');       
-const orderController = require('./controllers/orderController'); 
+const kantinBursaController = require('./controllers/KantinBursaController');
+const indomieController = require('./controllers/IndomieController');
+const orderController = require('./controllers/orderController');
 
-const PORT = process.env.PORT || 5000;
+const PORT_EXPRESS = process.env.PORT || 5000;
+const PORT_HTTP = 5001;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 
-// Helper CORS (Middleware Manual)
-const enableCors = (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', CLIENT_URL);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-};
+// ======================================================
+// EXPRESS SERVER
+// ======================================================
+const app = express();
 
-// Helper JSON Parsing dan Error Handling
-const handleRequest = (req, res, callback, params = null) => {
-    if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        return res.end();
-    }
-    
-    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
-        let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
-        req.on('end', () => {
-            try {
-                callback(req, res, body, params);
-            } catch (error) {
-                console.error("JSON Parsing/Controller Error:", error);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ success: false, message: 'Kesalahan internal server.' }));
-            }
-        });
-    } else {
-        callback(req, res, null, params);
-    }
-};
+app.use(cors({ origin: CLIENT_URL, credentials: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// --- REQUEST HANDLER UTAMA (Routing Manual) ---
-const server = http.createServer(async (req, res) => {
-    enableCors(req, res);
+// Routes
+app.use('/api/vendors', vendorRoutes);
+app.use('/api/kantinbursa', kantinBursaRoutes);
+app.use('/api/indomie', indomieRoutes);
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/usersRoutes'));
+app.use('/api/menus', menuRoutes);
+app.use('/api/vendor', vendorAuthRoutes);
 
-    const parsedUrl = url.parse(req.url, true);
-    const path = parsedUrl.pathname;
-    const method = req.method;
-    const parts = path.split('/').filter(p => p); 
-
-    const callGetController = (controller, ...params) => controller(req, res, ...params);
-    
-    if (path === '/' && method === 'GET') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({
-            message: 'FTEAT Backend API is running! (Node.js Native)',
-            version: '1.0.0',
-        }));
-    }
-
-    if (parts[0] === 'api') {
-        const resource = parts[1];
-        const param1 = parts[2];
-        const param2 = parts[3]; 
-
-        if (resource === 'auth') {
-            if (param1 === 'register' && method === 'POST') {
-                return handleRequest(req, res, authController.register);
-            }
-            if (param1 === 'login' && method === 'POST') {
-                return handleRequest(req, res, authController.login);
-            }
-            if (param1 === 'me' && method === 'GET') {
-                return callGetController(authController.getMe);
-            }
-        }
-        
-        if (resource === 'users') {
-            if (parts.length === 2 && method === 'GET') {
-                return callGetController(userController.listUsers);
-            }
-            if (param1 === 'id' && param2 && method === 'GET') {
-                return callGetController(userController.getUserById, param2);
-            }
-        }
-        
-        if (resource === 'vendor') {
-            if (param1 === 'login' && method === 'POST') {
-                return handleRequest(req, res, vendorAuthController.vendorLogin);
-            }
-        }
-        
-        if (resource === 'vendors') {
-            if (parts.length === 2 && method === 'GET') {
-                return callGetController(vendorController.getVendors);
-            }
-            if (parts.length === 3 && method === 'GET') {
-                return callGetController(vendorController.getVendorWithMenus, param1);
-            }
-        }
-        
-        if (resource === 'menus') {
-            if (method === 'GET' && parts.length === 2) {
-                return callGetController(menuController.getMenus);
-            }
-        }
-
-        if (resource === 'kantinbursa') {
-             if (parts.length === 2 && method === 'GET') {
-                return callGetController(kantinBursaController.getKantinBursaMenus);
-            }
-            if (parts.length === 3 && method === 'GET') {
-                return callGetController(kantinBursaController.getKantinBursaMenuById, param1);
-            }
-        }
-
-        if (resource === 'indomie') {
-             if (parts.length === 2 && method === 'GET') {
-                return callGetController(indomieController.getIndomieMenu);
-            }
-            if (parts.length === 3 && method === 'GET') {
-                return callGetController(indomieController.getIndomieMenuById, param1);
-            }
-        }
-
-        if (resource === 'orders') {
-            if (parts.length === 2 && method === 'POST') {
-                return handleRequest(req, res, orderController.createOrder);
-            }
-            if (parts.length === 2 && method === 'GET') {
-                return callGetController(orderController.getOrders);
-            }
-            if (parts.length === 4 && param2 === 'status' && (method === 'PUT' || method === 'PATCH')) {
-                return handleRequest(req, res, orderController.updateOrderStatus, param1);
-            }
-            if (parts.length === 3 && method === 'GET') {
-                return callGetController(orderController.getOrderById, param1);
-            }
-        }
-    }
-
-
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: false, message: 'Route tidak ditemukan' }));
+app.get('/', (req, res) => {
+  res.json({
+    message: 'FTEAT Backend API (Express)',
+    version: '1.0.0',
+  });
 });
 
-server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+// Error handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
+});
+
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: 'Route tidak ditemukan' });
+});
+
+app.listen(PORT_EXPRESS, () => {
+  console.log(`🚀 Express server running on port ${PORT_EXPRESS}`);
+  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+
+// ======================================================
+// HTTP SERVER (Manual API)
+// ======================================================
+const enableCors = (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', CLIENT_URL);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+};
+
+const handleRequest = (req, res, callback, params = null) => {
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    return res.end();
+  }
+
+  if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+    let body = '';
+    req.on('data', chunk => { body += chunk.toString(); });
+    req.on('end', () => {
+      try {
+        callback(req, res, body, params);
+      } catch (error) {
+        console.error("JSON Parsing/Controller Error:", error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Kesalahan internal server.' }));
+      }
+    });
+  } else {
+    callback(req, res, null, params);
+  }
+};
+
+const server = http.createServer(async (req, res) => {
+  enableCors(req, res);
+
+  const parsedUrl = url.parse(req.url, true);
+  const path = parsedUrl.pathname;
+  const method = req.method;
+  const parts = path.split('/').filter(p => p);
+
+  const callGetController = (controller, ...params) => controller(req, res, ...params);
+
+  if (path === '/' && method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({
+      message: 'FTEAT Backend API is running! (Node.js Native)',
+      version: '1.0.0',
+    }));
+  }
+
+  if (parts[0] === 'api') {
+    const resource = parts[1];
+    const param1 = parts[2];
+    const param2 = parts[3];
+
+    // auth
+    if (resource === 'auth') {
+      if (param1 === 'register' && method === 'POST') return handleRequest(req, res, authController.register);
+      if (param1 === 'login' && method === 'POST') return handleRequest(req, res, authController.login);
+      if (param1 === 'me' && method === 'GET') return callGetController(authController.getMe);
+    }
+
+    // users
+    if (resource === 'users') {
+      if (parts.length === 2 && method === 'GET') return callGetController(userController.listUsers);
+      if (param1 === 'id' && param2 && method === 'GET') return callGetController(userController.getUserById, param2);
+    }
+
+    // vendor auth
+    if (resource === 'vendor') {
+      if (param1 === 'login' && method === 'POST') {
+        return handleRequest(req, res, vendorAuthController.vendorLogin);
+      }
+    }
+
+    // vendors
+    if (resource === 'vendors') {
+      if (parts.length === 2 && method === 'GET') return callGetController(vendorController.getVendors);
+      if (parts.length === 3 && method === 'GET') return callGetController(vendorController.getVendorWithMenus, param1);
+    }
+
+    // menus
+    if (resource === 'menus' && method === 'GET' && parts.length === 2)
+      return callGetController(menuController.getMenus);
+
+    // kantinbursa
+    if (resource === 'kantinbursa') {
+      if (parts.length === 2 && method === 'GET') return callGetController(kantinBursaController.getKantinBursaMenus);
+      if (parts.length === 3 && method === 'GET') return callGetController(kantinBursaController.getKantinBursaMenuById, param1);
+    }
+
+    // indomie
+    if (resource === 'indomie') {
+      if (parts.length === 2 && method === 'GET') return callGetController(indomieController.getIndomieMenu);
+      if (parts.length === 3 && method === 'GET') return callGetController(indomieController.getIndomieMenuById, param1);
+    }
+
+    // orders
+    if (resource === 'orders') {
+      if (parts.length === 2 && method === 'POST') return handleRequest(req, res, orderController.createOrder);
+      if (parts.length === 2 && method === 'GET') return callGetController(orderController.getOrders);
+      if (parts.length === 4 && param2 === 'status' && ['PUT', 'PATCH'].includes(method))
+        return handleRequest(req, res, orderController.updateOrderStatus, param1);
+      if (parts.length === 3 && method === 'GET')
+        return callGetController(orderController.getOrderById, param1);
+    }
+  }
+
+  res.writeHead(404, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ success: false, message: 'Route tidak ditemukan' }));
+});
+
+server.listen(PORT_HTTP, () => {
+  console.log(`🌐 HTTP native server running on port ${PORT_HTTP}`);
 });
 
 process.on('unhandledRejection', (err) => {
-    console.error('Unhandled Rejection:', err);
-    server.close(() => {
-        process.exit(1);
-    });
+  console.error('Unhandled Rejection:', err);
+  server.close(() => process.exit(1));
 });
