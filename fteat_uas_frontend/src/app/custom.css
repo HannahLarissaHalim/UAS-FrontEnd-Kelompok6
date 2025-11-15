@@ -29,7 +29,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Navbar Custom Styles */
+/* Navbar Custom Styles
 .navbar-custom {
   background-color: var(--bg-color) !important;
   border: none !important;
@@ -40,9 +40,9 @@ body {
   top: 0;
   z-index: 1000;
   backdrop-filter: blur(10px);
-}
+} */
 
-.navbar-custom .container-fluid {
+/* .navbar-custom .container-fluid {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -101,9 +101,9 @@ body {
   filter: brightness(0) saturate(100%) invert(22%) sepia(95%) saturate(2400%) hue-rotate(197deg) brightness(92%) contrast(97%);
   transform: scale(1.05);
   transition: all 0.2s ease-in-out;
-}
+} */
 
-.navbar-custom .btn-login {
+/* .navbar-custom .btn-login {
   font-family: 'Offside', cursive;
   background-color: transparent;
   color: var(--text-black);
@@ -112,14 +112,14 @@ body {
   margin: 0 0.25rem;
   transition: all 0.3s ease;
   border-radius: 8px;
-}
+} */
 
-.navbar-custom .btn-login:hover {
+/* .navbar-custom .btn-login:hover {
   background-color: var(--text-black);
   color: var(--text-white);
-}
+} */
 
-/* Logo Styles */
+/* Logo Styles
 .logo-small {
   max-width: 80px;
   height: auto;
@@ -128,7 +128,7 @@ body {
 .icon-small {
   max-width: 40px;
   height: auto;
-}
+} */
 
 /* Homepage Hero Section */
 .hero-content {
@@ -180,7 +180,7 @@ body {
 }
 
 .brand-word {
-  font-size: 8rem;
+  font-size: 9rem;
   line-height: 1.1;
   display: inline-flex;
   align-items: baseline;
@@ -194,7 +194,7 @@ body {
 }
 
 .brand-r-large {
-  font-size: 16rem;
+  font-size: 13rem;
   font-weight: bold;
   color: var(--primary-blue);
   line-height: 0.9;
@@ -209,7 +209,7 @@ body {
 }
 
 .brand-rest {
-  font-size: 5.5rem;
+  font-size: 5rem;
   display: block;
   color: var(--primary-blue);
   line-height: 1;
@@ -222,7 +222,8 @@ body {
   gap: 1.5rem;
   font-family: 'Montserrat Alternates', sans-serif;
   font-size: 2rem;
-  margin-top: 3rem;
+  margin-top: 0.4rem;
+  transform: translateY(-15px);
 }
 
 .auth-text {
