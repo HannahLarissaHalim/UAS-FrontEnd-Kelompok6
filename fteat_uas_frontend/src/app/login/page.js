@@ -8,6 +8,7 @@ import Navbar from '../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 import { api } from '../../utils/api';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetStatus, setResetStatus] = useState("");
   const [resetState, setResetState] = useState("");
+  const [showLoginPass, setShowLoginPass] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -131,13 +133,23 @@ export default function LoginPage() {
 
               <Form.Group className="mb-4">
                 <Form.Label>Kata Sandi</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
+
+                <div className="password-wrapper">
+                  <Form.Control
+                    type={showLoginPass ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                  />
+
+                  <span
+                    className="password-toggle"
+                    onClick={() => setShowLoginPass(!showLoginPass)}
+                  >
+                    {showLoginPass ? <FaEyeSlash /> : <FaEye />}
+                  </span>
+                </div>
               </Form.Group>
 
               <div className="forgot-password-link mb-3">
@@ -149,7 +161,7 @@ export default function LoginPage() {
               </div>
 
               <div className="register-link-section mb-3">
-                <p>Belum punya akun? <Link href="/register" className="register-link">Daftar di sini</Link></p>
+                <p>Belum punya akun? <Link href="/register" className="register-link">Daftar di sini!</Link></p>
               </div>
 
               <button
