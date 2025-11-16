@@ -124,6 +124,15 @@ export const api = {
     return response.json();
   },
 
+  getAllMenus: async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/menus`);
+      return response.json();
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  },
+
   getMenuById: async (id) => {
     const response = await fetch(`${API_URL}/api/menus/${id}`);
     return response.json();

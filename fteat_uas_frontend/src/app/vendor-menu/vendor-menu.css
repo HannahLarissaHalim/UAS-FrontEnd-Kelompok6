@@ -439,10 +439,28 @@
   background: #FFFFFF;
   border: 1px solid #000000;
   border-radius: 24px;
+  width: 100% !important;
+  padding: 20px 35px !important;
+  overflow: hidden !important;   /* modal gak boleh scroll */
+  max-height: none !important;
+}
+
+.add-menu-modal .modal-dialog {
+  margin-top: 60px !important;
+  margin-bottom: 40px !important;
+  width: 900px !important;
+  max-width: 95vw !important;
+  margin: auto !important;
 }
 
 .add-modal-body {
   padding: 40px;
+}
+
+.scroll-body {
+  max-height: 70vh !important;
+  overflow-y: auto;
+  padding-right: 10px;
 }
 
 .add-menu-form {
