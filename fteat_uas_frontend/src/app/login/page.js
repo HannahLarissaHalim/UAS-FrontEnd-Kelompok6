@@ -18,6 +18,11 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetStatus, setResetStatus] = useState("");
+  const [resetState, setResetState] = useState("");
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -136,7 +141,11 @@ export default function LoginPage() {
               </Form.Group>
 
               <div className="forgot-password-link mb-3">
-                <p>Lupa Kata Sandi? | <Link href="/forgot-password" className="register-link">Klik di sini</Link></p>
+                <p>
+                  <span className="forgot-link" onClick={() => setShowForgotModal(true)}>
+                    Forgot Password?
+                  </span>
+                </p>
               </div>
 
               <div className="register-link-section mb-3">
@@ -154,6 +163,68 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* FORGOT PASSWORD MODAL */}
+      {showForgotModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+
+            <h3 className="modal-title">Reset Password</h3>
+            <p className="modal-desc">
+              Masukkan email UNTAR kamu. Kami akan mengirimkan link reset password.
+            </p>
+
+            <input
+              type="email"
+              placeholder="firstName.NIM@stu.untar.ac.id"
+              className="modal-input"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+            />
+
+            <button
+              className="modal-submit-btn"
+              onClick={async () => {
+                setResetStatus("Mengirim...");
+                setResetState("sending");
+
+                try {
+                  const res = await api.requestResetPassword(resetEmail);
+
+                  if (!res.success) {
+                    setResetStatus(res.message || "Gagal mengirim email.");
+                    setResetState("error");
+                    return;
+                  }
+
+                  setResetStatus("Link reset password telah dikirim.");
+                  setResetState("success");
+
+                } catch {
+                  setResetStatus("Gagal mengirim email.");
+                  setResetState("error");
+                }
+              }}
+            >
+              Kirim Link Reset
+            </button>
+
+            {resetStatus && (
+              <p className={`modal-status ${resetState}`}>
+                {resetStatus}
+              </p>
+            )}
+
+            <span
+              className="modal-close-x"
+              onClick={() => setShowForgotModal(false)}
+            >
+              ✖
+            </span>
+
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="homepage-footer">
