@@ -130,27 +130,45 @@ body {
   font-weight: 500;
 }
 
+/* HOMEPAGE — Register & Login Links */
+.auth-text-link,
 .auth-link-home {
-  color: var(--primary-blue);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.auth-text-link {
   color: var(--text-black);
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+
+  position: relative;
+  display: inline-block;
+
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease,
+    letter-spacing 0.25s ease;
 }
 
-.auth-text-link:hover {
-  color: var(--primary-blue);
+.auth-text-link::after,
+.auth-link-home::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0%;
+  height: 2px;
+  background-color: #1D56CF;
+  transition: width 0.25s ease;
 }
 
+.auth-text-link:hover,
 .auth-link-home:hover {
-  color: #083a6f;
-  text-decoration: underline;
+  color: #0A4988;                
+  transform: translateY(-2px);   
+  letter-spacing: 0.3px;
+}
+
+.auth-text-link:hover::after,
+.auth-link-home:hover::after {
+  width: 100%;
 }
 
 .user-icon {
@@ -216,20 +234,50 @@ body {
   padding: 0.75rem;
   background-color: transparent;
   color: var(--text-black);
+
+  transition: 
+  border-color 0.25s ease,
+  background-color 0.25s ease,
+  box-shadow 0.25s ease;
+}
+
+.register-form .form-control:hover,
+.register-form .form-select:hover {
+  background-color: #F3F8FF; 
 }
 
 .register-form .form-control:focus,
 .register-form .form-select:focus {
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 0.2rem rgba(10, 73, 136, 0.25);
-  background-color: transparent;
+  border-color: var(--primary-blue) !important;
+  background-color: #E6F2FF !important; 
+  outline: none;
+  box-shadow: none !important;
+}
+
+.register-right .register-form,
+.login-card .login-form,
+.account-form-section,
+.account-profile-section,
+.account-name-box,
+.account-info-box {
+  background: #FDF8F2 !important;
+  border-radius: 20px !important;
+  padding: 32px !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+
+  box-shadow:
+    2px 0px 0px rgba(0,0,0,0.10),
+    0px 4px 0px rgba(0,0,0,0.15),
+    -2px 2px 4px rgba(0,0,0,0.03),
+    0px -2px 4px rgba(0,0,0,0.025) !important;
+
 }
 
 .btn-next-arrow {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: #000080;
+  background-color: #1d56cf;
   color: var(--text-white);
   border: none;
   font-size: 2rem;
@@ -241,7 +289,7 @@ body {
 }
 
 .btn-next-arrow:hover {
-  background-color: #000060;
+  background-color: #0A4988;
   transform: scale(1.05);
 }
 
@@ -360,7 +408,33 @@ body {
   fill: #FFFFFF;
 }
 
-/* Login Page */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper .form-control {
+  padding-right: 45px !important; /* Biar text tidak ketimpa icon */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #0A4988;
+  font-size: 1.2rem;
+  transition: 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: #083a6f;
+  transform: translateY(-50%) scale(1.08);
+}
+
+  
+/* LOGIN PAGE*/
 .login-page {
   position: relative;
   min-height: 100vh;
@@ -374,6 +448,11 @@ body {
   min-height: calc(100vh - 150px);
   padding: 3rem 5rem;
   gap: 5rem;
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-top: 40px !important;  
 }
 
 .login-left {
@@ -389,13 +468,9 @@ body {
 .login-right {
   flex: 1;
   max-width: 600px;
-}
-
-.login-card {
-  background-color: var(--text-white);
-  border-radius: 15px;
-  padding: 2.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .login-title {
@@ -419,21 +494,69 @@ body {
   border: 2px solid var(--primary-blue);
   border-radius: 8px;
   padding: 0.75rem;
+
+  background-color: #FDF8F2 !important; /* default idle */
+  color: var(--text-black);
+
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.login-form .form-control:hover {
+  background-color: #E6F2FF !important;
 }
 
 .login-form .form-control:focus {
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 0.2rem rgba(10, 73, 136, 0.25);
+  border-color: var(--primary-blue) !important;
+  background-color: #E6F2FF !important;
+  border-color: var(--primary-blue) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+
+.forgot-password-link p {
+  margin: 0;
 }
 
 .forgot-password-link {
   font-family: 'Montserrat', sans-serif;
   font-size: 0.9rem;
-  color: var(--text-black);
+  color: #1d56cf;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease,
+    letter-spacing 0.25s ease,
+    filter 0.25s ease;
 }
 
-.forgot-password-link p {
-  margin: 0;
+.forgot-password-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0%;
+  height: 2px;
+  background-color: #1d56cf;
+  transition: width 0.25s ease;
+}
+
+.forgot-password-link:hover {
+  font-weight: 700;            
+  letter-spacing: 0.3px;      
+  transform: translateY(-1px); 
+  filter: blur(0.2px);        
+}
+
+.forgot-password-link:hover::after {
+  width: 100%;
 }
 
 .register-link-section {
@@ -451,15 +574,39 @@ body {
   color: var(--primary-blue);
   text-decoration: none;
   font-weight: 600;
+  position: relative;
+  display: inline-block;
+
+  transition:
+    color 0.25s ease,
+    letter-spacing 0.25s ease,
+    transform 0.25s ease;
+}
+
+.register-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px; 
+  width: 0%;
+  height: 2px;
+  background-color: var(--primary-blue);
+  transition: width 0.25s ease;
 }
 
 .register-link:hover {
-  text-decoration: underline;
+  letter-spacing: 0.3px;
+  transform: translateY(-1px);
+  color: #083a6f;
+}
+
+.register-link:hover::after {
+  width: 100%;
 }
 
 .login-btn {
   font-family: 'Offside', cursive;
-  background-color: var(--primary-blue);
+  background-color: #1d56cf;
   color: var(--text-white);
   border: none;
   padding: 0.75rem;
@@ -469,9 +616,8 @@ body {
 }
 
 .login-btn:hover {
-  background-color: #083a6f;
+  background-color: var(--primary-blue);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(10, 73, 136, 0.3);
 }
 
 /* Homepage Footer */
@@ -484,7 +630,7 @@ body {
 }
 
 .homepage-footer p {
-  margin: 0;
+  margin: 0px;
   color: var(--text-black);
 }
 
@@ -5566,42 +5712,6 @@ select option:first-child {
   color: #CC0000;
 }
 
-.forgot-password-link {
-  color: #0A4988;
-  font-weight: 500;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-
-  transition:
-    color 0.25s ease,
-    transform 0.25s ease,
-    letter-spacing 0.25s ease,
-    filter 0.25s ease;
-}
-
-.forgot-password-link::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0%;
-  height: 2px;
-  background-color: #0A4988;
-  transition: width 0.25s ease;
-}
-
-.forgot-password-link:hover {
-  font-weight: 700;            
-  letter-spacing: 0.3px;      
-  transform: translateY(-1px); 
-  filter: blur(0.2px);        
-}
-
-.forgot-password-link:hover::after {
-  width: 100%;
-}
-
 .reset-input {
   width: 100%;
   padding: 12px 14px;
@@ -5661,3 +5771,5 @@ select option:first-child {
   text-decoration: underline;
   font-weight: 600;
 }
+
+

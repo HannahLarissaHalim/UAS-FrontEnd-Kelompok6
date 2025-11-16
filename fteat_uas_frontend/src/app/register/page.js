@@ -8,12 +8,15 @@ import { mockFaculties, mockMajors } from '../../utils/mockData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 import { api } from '../../utils/api';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -213,7 +216,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="register-right">
-          <h2 className="register-title">Registrasi</h2>
+          <h2 className="register-title">Register</h2>
 
           {error && <Alert variant="danger">{error}</Alert>}
 
@@ -301,7 +304,7 @@ export default function RegisterPage() {
                     </Form.Select>
                     {!formData.faculty && (
                       <Form.Text className="text-muted">
-                        Pilih fakultas terlebih dahulu
+                        Pilih fakultas terlebih dahulu sebelum memilih prodi.
                       </Form.Text>
                     )}
                   </Form.Group>
@@ -412,28 +415,50 @@ export default function RegisterPage() {
                     <Col md={6}>
                       <Form.Group className="mb-4">
                         <Form.Label>Kata Sandi</Form.Label>
-                        <Form.Control
-                          type="password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          required
-                        />
+
+                        <div className="password-wrapper">
+                          <Form.Control
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                          />
+
+                          <span
+                            className="password-toggle"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                          </span>
+                        </div>
+
                         <Form.Text className="text-muted">
                           Minimal 6 karakter
                         </Form.Text>
                       </Form.Group>
                     </Col>
+
                     <Col md={6}>
                       <Form.Group className="mb-4">
                         <Form.Label>Konfirmasi Kata Sandi</Form.Label>
-                        <Form.Control
-                          type="password"
-                          name="confirmPassword"
-                          value={formData.confirmPassword}
-                          onChange={handleChange}
-                          required
-                        />
+
+                        <div className="password-wrapper">
+                          <Form.Control
+                            type={showConfirmPassword ? "text" : "password"}
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            required
+                          />
+
+                          <span
+                            className="password-toggle"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          >
+                            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                          </span>
+                        </div>
                       </Form.Group>
                     </Col>
                   </Row>
