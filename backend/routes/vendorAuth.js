@@ -32,7 +32,7 @@ router.post('/login', async (req, res) => {
     }
 
     // cari info vendor dari database
-    const vendorData = await Vendor.findOne({ contact: email });
+    const vendorData = await Vendor.findOne({ email_address: email });
 
     if (!vendorData) {
       return res.status(404).json({
