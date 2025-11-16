@@ -2,7 +2,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const crypto = require("crypto");
-const { sendVerificationEmail } = require("../services/emailService");
+const { sendVerificationEmail, sendResetPasswordEmail } = require("../services/emailService");
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -351,6 +351,109 @@ exports.resendVerificationEmail = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to resend verification email."
+    });
+  }
+};
+
+// @desc    Forgot password - kirim email reset
+// @route   POST /api/auth/forgot-password
+// @access  Public
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email harus diisi",
+      });
+    }
+
+    if (!email.endsWith("@stu.untar.ac.id")) {
+      return res.status(400).json({
+        success: false,
+        message: "Gunakan email mahasiswa UNTAR (@stu.untar.ac.id)",
+      });
+    }
+
+    const user = await User.findOne({ email });
+
+    // Demi keamanan, jangan bocorin apakah email ada atau tidak
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: "Jika email terdaftar, kami sudah mengirim tautan reset kata sandi.",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 5 * 60 * 1000; // 5 menit
+    await user.save();
+
+    await sendResetPasswordEmail(user.email, resetToken);
+
+    res.status(200).json({
+      success: true,
+      message: "Tautan reset kata sandi telah dikirim ke email kamu.",
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan pada server",
+    });
+  }
+};
+
+// @desc    Reset password - set password baru
+// @route   POST /api/auth/reset-password/:token
+// @access  Public
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: "Token tidak ditemukan",
+      });
+    }
+
+    if (!newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Password baru harus diisi",
+      });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Token tidak valid atau sudah kedaluwarsa.",
+      });
+    }
+
+    user.password = newPassword;               // akan di-hash oleh pre-save hook
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password berhasil diubah. Silakan login dengan password baru.",
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan pada server",
     });
   }
 };

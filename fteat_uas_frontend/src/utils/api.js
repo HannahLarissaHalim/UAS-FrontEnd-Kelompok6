@@ -89,6 +89,28 @@ export const api = {
     return response.json();
   },
 
+  /* PASSWORD RESET ENDPOINTS */
+
+  // Forgot password → User minta email reset
+  requestResetPassword: async (email) => {
+    const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    return response.json();
+  },
+
+  // Change password via token → Halaman change-password/[token]
+  changePassword: async (token, newPassword) => {
+    const response = await fetch(`${API_URL}/api/auth/reset-password/${token}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newPassword }),
+    });
+    return response.json();
+  },
+
   // Menu endpoints
   getMenus: async (filters = {}) => {
     const queryParams = new URLSearchParams(filters).toString();
