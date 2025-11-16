@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Container, Row, Col, Form, Modal, Button } from 'react-bootstrap';
 import VendorNavbar from '../components/VendorNavbar';
 import { mockCategories } from '../../utils/mockData';
+import api from '../../utils/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './vendor-menu.css';
 
@@ -20,6 +21,7 @@ export default function VendorMenuPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddToppingModal, setShowAddToppingModal] = useState(false);
   const [editingMenu, setEditingMenu] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [newMenu, setNewMenu] = useState({
     name: '',
     category: '',
@@ -45,81 +47,8 @@ export default function VendorMenuPage() {
     { name: "Bakso 3pcs", price: 6000 },
   ]);
 
-  // Dummy menu data - will be replaced with API call
-  const [menuItems, setMenuItems] = useState([
-    {
-      id: 1,
-      name: 'Mie Goreng',
-      price: 8000,
-      brand: 'Sakura',
-      category: 'Instant Noodles',
-      time: '5~10 mins',
-      hasTopping: true,
-      image: '/images/menu-placeholder.png',
-      stock: 'ada',
-      vendor: 'Kantin Teknik Bursa Lt.7'
-    },
-    {
-      id: 2,
-      name: 'Korean Spicy Chicken',
-      price: 8000,
-      brand: 'Mie Sedap',
-      category: 'Instant Noodles',
-      time: '5~10 mins',
-      hasTopping: true,
-      image: '/images/korean_spicy_chicken.png',
-      stock: 'habis',
-      vendor: 'Kantin Teknik Bursa Lt.7'
-    },
-    {
-      id: 3,
-      name: 'Mie Goreng Sambal Rica-Rica',
-      price: 8000,
-      brand: 'Indomie',
-      category: 'Instant Noodles',
-      time: '5~10 mins',
-      hasTopping: true,
-      image: '/images/sambal_rica.png',
-      stock: 'ada',
-      vendor: 'Kantin Teknik Bursa Lt.7'
-    },
-    {
-      id: 4,
-      name: 'Mie Goreng',
-      price: 8000,
-      brand: 'Sakura',
-      category: 'Instant Noodles',
-      time: '5~10 mins',
-      hasTopping: true,
-      image: '/images/sosis_mie.png',
-      stock: 'habis',
-      vendor: 'Kantin Teknik Bursa Lt.7'
-    },
-    {
-      id: 5,
-      name: 'Korean Spicy Chicken',
-      price: 8000,
-      brand: 'Mie Sedap',
-      category: 'Instant Noodles',
-      time: '5~10 mins',
-      hasTopping: true,
-      image: '/images/soto_mie.png',
-      stock: 'ada',
-      vendor: 'Kantin Teknik Bursa Lt.7'
-    },
-    {
-      id: 6,
-      name: 'Mie Goreng Sambal Rica-Rica',
-      price: 8000,
-      brand: 'Indomie',
-      category: 'Instant Noodles',
-      time: '5~10 mins',
-      hasTopping: true,
-      image: '/images/aceh.png',
-      stock: 'habis',
-      vendor: 'Kantin Teknik Bursa Lt.7'
-    }
-  ]);
+  // Menu items from database
+  const [menuItems, setMenuItems] = useState([]);
 
   const toggleCategory = (category) => {
     setSelectedCategories(prev => {
@@ -135,7 +64,7 @@ export default function VendorMenuPage() {
     const searchLower = searchQuery.toLowerCase();
     const matchesSearch = searchQuery === '' || 
                          menu.name.toLowerCase().includes(searchLower) ||
-                         menu.brand.toLowerCase().includes(searchLower) ||
+                         (menu.brand && menu.brand.toLowerCase().includes(searchLower)) ||
                          menu.category.toLowerCase().includes(searchLower);
     
     const matchesCategory = selectedCategories.length === 0 || 
@@ -143,21 +72,75 @@ export default function VendorMenuPage() {
     return matchesSearch && matchesCategory;
   });
 
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-    
-    if (!user) {
-      setVendorData({
-        vendorName: 'Kantin Bursa Lt.7',
-        email: 'fteat_kantinbursalt7@gmail.com',
-        role: 'vendor'
-      });
-      return;
+  // Load vendor data and menus
+useEffect(() => {
+  const loadVendorData = async () => {
+    try {
+      const user = localStorage.getItem('user');
+      
+      let userData;
+      if (!user) {
+        // Dummy data for testing - menggunakan vendor name saja
+        userData = {
+          vendorName: 'Kantin Teknik Bursa Lt.7',
+          email: 'fteat_kantinbursalt7@gmail.com',
+          role: 'vendor'
+        };
+        console.log('Using dummy vendor data:', userData);
+      } else {
+        userData = JSON.parse(user);
+        console.log('Loaded user data from localStorage:', userData);
+      }
+      
+      setVendorData(userData);
+      
+      // Load menus after vendor data is set
+      const vendorIdToUse = userData.vendorId || userData.vendorName || 'Kantin Teknik Bursa Lt.7';
+      console.log('Loading menus for vendor:', vendorIdToUse);
+      
+      await loadMenus(vendorIdToUse);
+    } catch (error) {
+      console.error('Error loading vendor data:', error);
     }
+  };
 
-    const userData = JSON.parse(user);
-    setVendorData(userData);
-  }, [router]);
+  loadVendorData();
+}, []);
+
+  // Load menus from database
+const loadMenus = async (vendorId) => {
+  try {
+    setLoading(true);
+    
+    const result = await api.getMenusByVendor(vendorId);
+    
+    if (result.success) {
+      // Transform data to match frontend format
+      const transformedMenus = result.data.map(menu => ({
+        id: menu._id,
+        name: menu.name,
+        price: menu.price,
+        brand: menu.brand || '',
+        category: menu.category,
+        time: menu.time || '5~10 mins',
+        hasTopping: menu.hasTopping || false,
+        additionals: menu.additionals || [],
+        image: menu.image || '/images/menu-placeholder.png',
+        stock: menu.statusKetersediaan === 'available' ? 'ada' : 'habis',
+        vendor: menu.vendor || vendorData?.vendorName || 'Kantin Teknik Bursa Lt.7'
+      }));
+      
+      setMenuItems(transformedMenus);
+    } else {
+      setMenuItems([]);
+    }
+  } catch (error) {
+    console.error('Error loading menus:', error);
+    setMenuItems([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAddMenu = () => {
     setShowAddModal(true);
@@ -172,12 +155,32 @@ export default function VendorMenuPage() {
     }
   };
 
-  const confirmDelete = () => {
-    setMenuItems(prevItems => prevItems.filter(item => !selectedMenus.includes(item.id)));
+ const confirmDelete = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    // remove from UI immediately
+    const deletedMenuIds = selectedMenus;
+    setMenuItems(prevItems => prevItems.filter(item => !deletedMenuIds.includes(item.id)));
     setSelectedMenus([]);
     setDeleteMode(false);
     setShowDeleteConfirm(false);
-  };
+    
+    // Then update backend
+    const result = await api.deleteMultipleMenus(deletedMenuIds, token);
+    
+    if (!result.success) {
+      // On failure, reload to get correct state
+      await loadMenus(vendorData.vendorId || vendorData.vendorName);
+      alert('Gagal menghapus menu: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error deleting menus:', error);
+    // On error, reload to get correct state
+    await loadMenus(vendorData.vendorId || vendorData.vendorName);
+    alert('Terjadi kesalahan saat menghapus menu');
+  }
+};
 
   const toggleMenuSelection = (menuId) => {
     setSelectedMenus(prev => 
@@ -199,26 +202,55 @@ export default function VendorMenuPage() {
     }
   };
 
-  const handleSaveEditMenu = () => {
-    setMenuItems(prevItems =>
-      prevItems.map(item =>
-        item.id === editingMenu.id
-          ? {
-              ...item,
-              name: editingMenu.name,
-              price: parseInt(editingMenu.price),
-              brand: editingMenu.brand,
-              category: editingMenu.category,
-              image: editingMenu.imagePreview || item.image,
-              hasTopping: editingMenu.additionals && editingMenu.additionals.length > 0,
-              additionals: editingMenu.additionals || []
-            }
-          : item
-      )
-    );
-    setShowEditModal(false);
-    setEditingMenu(null);
-  };
+const handleSaveEditMenu = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const updateData = {
+      name: editingMenu.name,
+      price: parseInt(editingMenu.price),
+      brand: editingMenu.brand,
+      category: editingMenu.category,
+      image: editingMenu.imagePreview,
+      hasTopping: editingMenu.additionals && editingMenu.additionals.length > 0,
+      additionals: editingMenu.additionals || [],
+      stock: editingMenu.stock
+    };
+    
+    const result = await api.updateMenu(editingMenu.id, updateData, token);
+    
+    if (result.success) {
+      // Update menu in state immediately
+      setMenuItems(prevItems =>
+        prevItems.map(item =>
+          item.id === editingMenu.id
+            ? {
+                ...item,
+                name: editingMenu.name,
+                price: parseInt(editingMenu.price),
+                brand: editingMenu.brand,
+                category: editingMenu.category,
+                image: editingMenu.imagePreview || item.image,
+                hasTopping: editingMenu.additionals && editingMenu.additionals.length > 0,
+                additionals: editingMenu.additionals || [],
+                stock: editingMenu.stock
+              }
+            : item
+        )
+      );
+      
+      // Close modal and reset
+      setShowEditModal(false);
+      setEditingMenu(null);
+      
+      alert('Menu berhasil diperbarui!');
+    } else {
+      alert('Gagal memperbarui menu: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error updating menu:', error);
+    alert('Terjadi kesalahan saat memperbarui menu');
+  }
+};
 
   const handleEditImageUpload = (e) => {
     const file = e.target.files[0];
@@ -235,15 +267,49 @@ export default function VendorMenuPage() {
     }
   };
 
-  const handleToggleStock = (menuId) => {
+ const handleToggleStock = async (menuId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const menu = menuItems.find(m => m.id === menuId);
+    const newStock = menu.stock === 'ada' ? 'habis' : 'ada';
+    
+    // update UI immediately
     setMenuItems(prevItems =>
       prevItems.map(item =>
         item.id === menuId
-          ? { ...item, stock: item.stock === 'ada' ? 'habis' : 'ada' }
+          ? { ...item, stock: newStock }
           : item
       )
     );
-  };
+    
+    // Then update backend
+    const result = await api.updateStockStatus(menuId, newStock, token);
+    
+    if (!result.success) {
+      // Rollback on failure
+      setMenuItems(prevItems =>
+        prevItems.map(item =>
+          item.id === menuId
+            ? { ...item, stock: menu.stock }
+            : item
+        )
+      );
+      alert('Gagal mengubah status stok: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error updating stock status:', error);
+    // Rollback on error
+    const menu = menuItems.find(m => m.id === menuId);
+    setMenuItems(prevItems =>
+      prevItems.map(item =>
+        item.id === menuId
+          ? { ...item, stock: menu.stock }
+          : item
+      )
+    );
+    alert('Terjadi kesalahan saat mengubah status stok');
+  }
+};
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -317,39 +383,88 @@ export default function VendorMenuPage() {
     });
   };
 
-  const handleSaveNewMenu = () => {
-    const newId = Math.max(...menuItems.map(m => m.id)) + 1;
-    const menuToAdd = {
-      id: newId,
+const handleSaveNewMenu = async () => {
+  try {
+    // Validasi input
+    if (!newMenu.name || !newMenu.category || !newMenu.price) {
+      alert('Mohon lengkapi nama menu, kategori, dan harga!');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    const menuData = {
       name: newMenu.name,
       price: parseInt(newMenu.price),
-      brand: newMenu.brand,
+      brand: newMenu.brand || '',
       category: newMenu.category,
+      image: newMenu.imagePreview || '/images/icon_small.png',
       time: '5~10 mins',
       hasTopping: newMenu.hasTopping,
-      additionals: newMenu.additionals,
-      image: newMenu.imagePreview || '/images/icon_small.png',
+      additionals: newMenu.additionals || [],
       stock: 'ada',
-      vendor: 'Kantin Teknik Bursa Lt.7'
+      vendor: vendorData.vendorId || vendorData.vendorName || 'Kantin Teknik Bursa Lt.7',
+      vendorName: vendorData.vendorName || 'Kantin Teknik Bursa Lt.7'
     };
     
-    setMenuItems([...menuItems, menuToAdd]);
-    setShowAddModal(false);
-    setNewMenu({
-      name: '',
-      category: '',
-      brand: '',
-      price: '',
-      image: null,
-      imagePreview: null,
-      hasTopping: false,
-      additionals: []
-    });
-    setNewTopping({ name: '', price: '' });
-  };
-
+    const result = await api.createMenu(menuData, token);
+    
+    if (result.success) {
+      // Create new menu item from response (no need to reload from DB)
+      const newMenuItem = {
+        id: result.data._id,
+        name: result.data.name,
+        price: result.data.price,
+        brand: result.data.brand || '',
+        category: result.data.category,
+        time: result.data.time || '5~10 mins',
+        hasTopping: result.data.hasTopping || false,
+        additionals: result.data.additionals || [],
+        image: result.data.image || '/images/icon_small.png',
+        stock: result.data.statusKetersediaan === 'available' ? 'ada' : 'habis',
+        vendor: vendorData?.vendorName || 'Kantin Teknik Bursa Lt.7'
+      };
+      
+      // Add to existing menu items immediately
+      setMenuItems(prevItems => [newMenuItem, ...prevItems]);
+      
+      // Close modal and reset form
+      setShowAddModal(false);
+      setNewMenu({
+        name: '',
+        category: '',
+        brand: '',
+        price: '',
+        image: null,
+        imagePreview: null,
+        hasTopping: false,
+        additionals: []
+      });
+      setNewTopping({ name: '', price: '' });
+      
+      alert('Menu berhasil ditambahkan!');
+    } else {
+      alert('Gagal menambahkan menu: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error creating menu:', error);
+    alert('Terjadi kesalahan saat menambahkan menu: ' + error.message);
+  }
+};
   if (!vendorData) {
     return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="vendor-menu-page">
+        <VendorNavbar />
+        <Container fluid className="menu-container">
+          <div className="text-center mt-5">
+            <p  className="text-dark">Memuat menu...</p>
+          </div>
+        </Container>
+      </div>
+    );
   }
 
   return (
@@ -448,7 +563,7 @@ export default function VendorMenuPage() {
                     {/* Menu Info */}
                     <div className="menu-info">
                       <div className="menu-tags">
-                        <span className="brand-tag">{item.brand}</span>
+                        {item.brand && <span className="brand-tag">{item.brand}</span>}
                         <span className="time-tag">
                           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                             <circle cx="6" cy="6" r="5" stroke="#27086E" strokeWidth="1"/>

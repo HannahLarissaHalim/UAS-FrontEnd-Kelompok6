@@ -111,6 +111,12 @@ const server = http.createServer(async (req, res) => {
   const method = req.method;
   const parts = path.split('/').filter(p => p);
 
+  //Debug
+  console.log('=== HTTP REQUEST ===');
+  console.log('Method:', method);
+  console.log('Path:', path);
+  console.log('Parts:', parts);
+
   const callGetController = (controller, ...params) => controller(req, res, ...params);
 
   if (path === '/' && method === 'GET') {
@@ -125,6 +131,7 @@ const server = http.createServer(async (req, res) => {
     const resource = parts[1];
     const param1 = parts[2];
     const param2 = parts[3];
+    const param3 = parts[4];
 
     // auth
     if (resource === 'auth') {
@@ -153,8 +160,55 @@ const server = http.createServer(async (req, res) => {
     }
 
     // menus
-    if (resource === 'menus' && method === 'GET' && parts.length === 2)
-      return callGetController(menuController.getMenus);
+     if (resource === 'menus') {
+      //debug
+      console.log('Menu route detected');
+      console.log('Parts:', parts);
+      console.log('Method:', method);
+      
+      if (parts.length === 2 && method === 'GET') {
+        console.log('Route: Get all menus');
+        return callGetController(menuController.getMenus);
+      }
+      
+      if (parts.length === 3 && param1 === 'delete-multiple' && method === 'POST') {
+        console.log('Route: Delete multiple menus');
+        return handleRequest(req, res, menuController.deleteMultipleMenus);
+      }
+      
+      if (parts.length === 4 && param1 === 'vendor' && method === 'GET') {
+        console.log('Route: Get menus by vendor:', param2);
+        return callGetController(menuController.getMenusByVendor, param2);
+      }
+      
+      if (parts.length === 4 && param2 === 'stock' && method === 'PATCH') {
+        console.log('Route: Update stock status for menu:', param1);
+        return handleRequest(req, res, menuController.updateStockStatus, param1);
+      }
+      
+      if (parts.length === 3 && method === 'GET' && param1 !== 'vendor') {
+        console.log('Route: Get menu by ID:', param1);
+        return callGetController(menuController.getMenuById, param1);
+      }
+      
+      if (parts.length === 2 && method === 'POST') {
+        console.log('Route: Create new menu');
+        return handleRequest(req, res, menuController.createMenu);
+      }
+      
+      if (parts.length === 3 && method === 'PUT') {
+        console.log('Route: Update menu:', param1);
+        return handleRequest(req, res, (req, res, body) => {
+          menuController.updateMenu(req, res, body, param1);
+        });
+      }
+      
+      if (parts.length === 3 && method === 'DELETE') {
+        console.log('Route: Delete menu:', param1);
+        return callGetController(menuController.deleteMenu, param1);
+      }
+    }
+
 
     // kantinbursa
     if (resource === 'kantinbursa') {
@@ -179,6 +233,7 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  console.log('No matching route found');
   res.writeHead(404, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ success: false, message: 'Route tidak ditemukan' }));
 });
