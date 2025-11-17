@@ -153,7 +153,6 @@ export default function Navbar() {
         "/check-email",
         "/verify",
         "/aboutus",
-        "/choose-login",
     ];
 
     const showIcons = !hideIcons.includes(pathname);

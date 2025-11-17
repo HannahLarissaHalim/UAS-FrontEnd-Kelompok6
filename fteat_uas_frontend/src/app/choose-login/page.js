@@ -1,41 +1,57 @@
 'use client';
-
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import Navbar from '../components/Navbar';
-import Link from 'next/link';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 
 export default function ChooseLoginPage() {
+  const router = useRouter();
+
   return (
     <div className="choose-login-page">
-
       <Navbar />
 
-      {/* TITLE */}
-      <h1 className="choose-login-title">Login Sebagai</h1>
+      <div className="choose-login-container">
+        {/* Left side - logo
+        <div className="choose-login-left">
+          <Image
+            src="/images/logo.png"
+            alt="FTEat Logo"
+            width={450}
+            height={450}
+            unoptimized
+          />
+        </div> */}
 
-      {/* BUTTONS */}
-      <div className="choose-login-buttons-center">
+        {/* Right side - options */}
+        <div className="choose-login-right">
+          <h2 className="choose-login-title">Login</h2>
 
-        <Link href="/login" className="no-underline">
-          <div className="role-btn mahasiswa">
-            <span className="icon">🎓</span>
-            <span className="text">Mahasiswa</span>
+          <div className="choose-login-buttons">
+            <button
+              className="choose-btn mahasiswa-btn"
+              onClick={() => router.push('/login')}
+            >
+              <span>Mahasiswa</span>
+            </button>
+
+            <button
+              className="choose-btn vendor-btn"
+              onClick={() => router.push('/vendor-welcome')}
+            >
+              <span>Vendor</span>
+            </button>
           </div>
-        </Link>
-
-        <Link href="/vendor-login" className="no-underline">
-          <div className="role-btn vendor">
-            <span className="icon">🧺</span>
-            <span className="text">Vendor</span>
-          </div>
-        </Link>
-
+        </div>
       </div>
 
-      <footer className="choose-footer">
-        <p>Developed by <strong>HELD</strong></p>
-      </footer>
-
+      {/* Footer */}
+      <div className="homepage-footer">
+        <p>
+          Developed by <strong>HELD</strong>
+        </p>
+      </div>
     </div>
   );
 }

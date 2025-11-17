@@ -80,7 +80,7 @@ export default function VendorNavbar() {
                     </Link>
                 </div>
 
-                {/* Right: Small logo icon
+                {/* Right: Small logo icon */}
                 <div className="navbar-icons">
                     <div className="navbar-vendor-logo">
                         <Image
@@ -91,7 +91,7 @@ export default function VendorNavbar() {
                             unoptimized
                         />
                     </div>
-                </div> */}
+                </div>
             </div>
         </nav>
     );
