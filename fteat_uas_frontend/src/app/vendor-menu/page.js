@@ -24,7 +24,6 @@ export default function VendorMenuPage() {
   const [loading, setLoading] = useState(true);
   const [newMenu, setNewMenu] = useState({
     name: '',
-    vendorID: '', 
     category: '',
     brand: '',
     price: '',
@@ -51,14 +50,6 @@ export default function VendorMenuPage() {
   // Menu items from database
   const [menuItems, setMenuItems] = useState([]);
 
-  // Vendor Mapping untuk dropdown Tambah Menu 
-  // Vendor ID ini dipakai untuk menentukan vendor mana yang punya menu tersebut
-  const vendorIdMap = {
-    "1": "VND001", // Gorengan
-    "2": "VND002", // Soto & Jus
-    "3": "VND003", // Indomie & Katsu
-  };
-
   const toggleCategory = (category) => {
     setSelectedCategories(prev => {
       if (prev.includes(category)) {
@@ -80,8 +71,6 @@ export default function VendorMenuPage() {
                            selectedCategories.includes(menu.category);
     return matchesSearch && matchesCategory;
   });
-
-  
 
   // Load vendor data and menus
 useEffect(() => {
@@ -106,7 +95,7 @@ useEffect(() => {
       setVendorData(userData);
       
       // Load menus after vendor data is set
-      const vendorIdToUse = userData.VendorID || userData.vendorName || 'Kantin Teknik Bursa Lt.7';
+      const vendorIdToUse = userData.vendorId || userData.vendorName || 'Kantin Teknik Bursa Lt.7';
       console.log('Loading menus for vendor:', vendorIdToUse);
       
       await loadMenus(vendorIdToUse);
@@ -119,11 +108,11 @@ useEffect(() => {
 }, []);
 
   // Load menus from database
-const loadMenus = async (VendorID) => {
+const loadMenus = async (vendorId) => {
   try {
     setLoading(true);
     
-    const result = await api.getMenusByVendor(VendorID);
+    const result = await api.getMenusByVendor(vendorId);
     
     if (result.success) {
       // Transform data to match frontend format
@@ -182,13 +171,13 @@ const loadMenus = async (VendorID) => {
     
     if (!result.success) {
       // On failure, reload to get correct state
-      await loadMenus(vendorData.VendorID || vendorData.vendorName);
+      await loadMenus(vendorData.vendorId || vendorData.vendorName);
       alert('Gagal menghapus menu: ' + result.message);
     }
   } catch (error) {
     console.error('Error deleting menus:', error);
     // On error, reload to get correct state
-    await loadMenus(vendorData.VendorID || vendorData.vendorName);
+    await loadMenus(vendorData.vendorId || vendorData.vendorName);
     alert('Terjadi kesalahan saat menghapus menu');
   }
 };
@@ -404,7 +393,6 @@ const handleSaveNewMenu = async () => {
 
     const token = localStorage.getItem('token');
     const menuData = {
-      VendorID: vendorIdMap[newMenu.VendorID],
       name: newMenu.name,
       price: parseInt(newMenu.price),
       brand: newMenu.brand || '',
@@ -414,7 +402,7 @@ const handleSaveNewMenu = async () => {
       hasTopping: newMenu.hasTopping,
       additionals: newMenu.additionals || [],
       stock: 'ada',
-      vendor: vendorData.VendorID || vendorData.vendorName || 'Kantin Teknik Bursa Lt.7',
+      vendor: vendorData.vendorId || vendorData.vendorName || 'Kantin Teknik Bursa Lt.7',
       vendorName: vendorData.vendorName || 'Kantin Teknik Bursa Lt.7'
     };
     
@@ -658,19 +646,6 @@ const handleSaveNewMenu = async () => {
         <Modal.Body className="add-modal-body">
           <div className="add-menu-form">
             <div className="form-group">
-
-              <label>Vendor ID</label>
-              <select
-                className="form-select"
-                value={newMenu.VendorID}
-                onChange={(e) => setNewMenu({ ...newMenu, VendorID: e.target.value })}
-              >
-                <option value="">Pilih Vendor ID Anda</option>
-                <option value="1">Vendor1 (Gorengan) </option>
-                <option value="2">Vendor2 (Soto & Jus)</option>
-                <option value="3">Vendor3 (Indomie & Katsu)</option>
-              </select>
-
               <label>Nama makanan</label>
               <input
                 type="text"

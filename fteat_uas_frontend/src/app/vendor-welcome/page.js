@@ -16,7 +16,6 @@ export default function VendorWelcomePage() {
 
     // For testing: Use dummy data if no user is logged in
     if (!user) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVendorData({
         vendorName: 'Kantin Bursa Lt.7',
         email: 'fteat_kantinbursalt7@gmail.com',
