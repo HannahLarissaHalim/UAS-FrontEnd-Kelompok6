@@ -32,22 +32,24 @@ const vendorSchema = new mongoose.Schema({
         enum: ['Available', 'Unavailable', 'Closed'],
         default: 'Unavailable'
     },
-    VendorId: {
+    VendorID: {
         type: String,
         required: true,
         unique: true,
     },
+    email_address: { 
+        type: String, 
+        required: true
+    }, 
 }, { 
     timestamps: true,
     toJSON: { virtuals: true }, 
     id: true 
 });
 
-
-
 vendorSchema.virtual('menus', {
     ref: 'Menu',
-    localField: 'VendorId', 
+    localField: 'VendorID', 
     foreignField: 'vendor', 
     justOne: false
 });

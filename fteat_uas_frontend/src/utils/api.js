@@ -124,19 +124,28 @@ export const api = {
     return response.json();
   },
 
+  getAllMenus: async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/menus`);
+      return response.json();
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  },
+
   getMenuById: async (id) => {
     const response = await fetch(`${API_URL}/api/menus/${id}`);
     return response.json();
   },
 
- getMenusByVendor: async (vendorId) => {
+ getMenusByVendor: async (VendorID) => {
     try {
-      const url = `${API_URL}/api/menus/vendor/${encodeURIComponent(vendorId)}`;
+      const url = `${API_URL}/api/menus/vendor/${encodeURIComponent(VendorID)}`;
        //debug
       console.log('=== GET MENUS BY VENDOR API CALL ===');
       console.log('Full URL:', url);
-      console.log('Vendor ID:', vendorId);
-      console.log('Encoded Vendor ID:', encodeURIComponent(vendorId));
+      console.log('Vendor ID:', VendorID);
+      console.log('Encoded Vendor ID:', encodeURIComponent(VendorID));
       
       const response = await fetch(url);
       
@@ -241,16 +250,16 @@ createMenu: async (menuData, token) => {
     return response.json();
   },
 
- getMenusByVendor: async (vendorId) => {
+ getMenusByVendor: async (VendorID) => {
   try {
     // URL encode the vendor ID to handle spaces and special characters
-    const encodedVendorId = encodeURIComponent(vendorId);
-    const url = `${API_URL}/api/menus/vendor/${encodedVendorId}`;
+    const encodedVendorID = encodeURIComponent(VendorID);
+    const url = `${API_URL}/api/menus/vendor/${encodedVendorID}`;
      //debug
     console.log('=== GET MENUS BY VENDOR API CALL ===');
     console.log('API_URL:', API_URL);
-    console.log('Original Vendor ID:', vendorId);
-    console.log('Encoded Vendor ID:', encodedVendorId);
+    console.log('Original Vendor ID:', VendorID);
+    console.log('Encoded Vendor ID:', encodedVendorID);
     console.log('Full URL:', url);
     
     const response = await fetch(url);
@@ -332,8 +341,8 @@ createMenu: async (menuData, token) => {
     return response.json();
   },
 
-  getOrdersByVendor: async (vendorId, token) => {
-    const response = await fetch(`${API_URL}/api/orders?vendorId=${vendorId}`, {
+  getOrdersByVendor: async (VendorID, token) => {
+    const response = await fetch(`${API_URL}/api/orders?VendorID=${VendorID}`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     return response.json();
@@ -357,9 +366,9 @@ createMenu: async (menuData, token) => {
     return response.json();
   },
 
-  getSalesReport: async (vendorId, date, token) => {
+  getSalesReport: async (VendorID, date, token) => {
     const response = await fetch(
-      `${API_URL}/api/vendors/${vendorId}/sales?date=${date}`,
+      `${API_URL}/api/vendors/${VendorID}/sales?date=${date}`,
       {
         headers: { 'Authorization': `Bearer ${token}` },
       }

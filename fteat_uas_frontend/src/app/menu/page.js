@@ -6,7 +6,9 @@ import Image from 'next/image';
 //import HomeNavbar from '../components/HomeNavbar';
 import Navbar from '../components/Navbar';
 import MenuCard from '../components/MenuCard';
-import { mockMenus, mockCategories } from '../../utils/mockData';
+//immenuList, mockCategories } from '../../utils/mockData';
+import { mockCategories } from '../../utils/mockData';
+import api from '../../utils/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 
@@ -15,6 +17,7 @@ export default function MenuPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [cart, setCart] = useState([]);
+  const [menuList, setMenuList] = useState([]);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -32,6 +35,24 @@ export default function MenuPage() {
     }
   }, [cart]);
 
+  useEffect(() => {
+    const loadMenus = async () => {
+      try {
+        const result = await api.getAllMenus();
+        if (result.success) {
+          setMenuList(result.data);
+        } else {
+          console.error("Gagal load menu:", result.message);
+        }
+      } catch (err) {
+        console.error("Error fetching menus:", err);
+      }
+    };
+
+    loadMenus();
+  }, []);
+
+
   const toggleCategory = (category) => {
     setSelectedCategories(prev => {
       if (prev.includes(category)) {
@@ -42,12 +63,12 @@ export default function MenuPage() {
     });
   };
 
-  const filteredMenus = mockMenus.filter(menu => {
+  const filteredMenus = menuList.filter(menu => {
     // Enhanced search: search in name, description, category, and vendor name
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = searchTerm === '' || 
                          menu.name.toLowerCase().includes(searchLower) ||
-                         menu.description.toLowerCase().includes(searchLower) ||
+                         (menu.description || '').toLowerCase().includes(searchLower) ||
                          menu.category.toLowerCase().includes(searchLower) ||
                          menu.vendorName.toLowerCase().includes(searchLower);
     
@@ -136,7 +157,7 @@ export default function MenuPage() {
             {filteredMenus.length > 0 ? (
               <Row className="menu-grid">
                 {filteredMenus.map(menu => (
-                  <Col key={menu.id} xl={4} lg={6} md={12} className="mb-4">
+                  <Col key={menu._id} xl={4} lg={6} md={12} className="mb-4">
                     <MenuCard 
                       menu={menu}
                       onAddToCart={handleAddToCart}
