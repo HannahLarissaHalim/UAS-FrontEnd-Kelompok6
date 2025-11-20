@@ -8,11 +8,11 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactCompiler: true,
   experimental: {
     appDir: true,
   },
+  reactCompiler: true,
 };
 
-export default nextConfig;
+module.exports = nextConfig;
 
