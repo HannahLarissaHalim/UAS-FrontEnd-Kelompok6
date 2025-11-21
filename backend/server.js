@@ -5,9 +5,21 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 
+// 1. Import Library untuk Cloudinary dan File Upload
+const cloudinary = require('cloudinary').v2;
+const fileUpload = require('express-fileupload');
+
 // Load environment variables FIRST
 dotenv.config();
 connectDB();
+
+// 2. Konfigurasi Cloudinary (Mengambil data dari .env)
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true
+});
 
 // Import Express routes
 const menuRoutes = require('./routes/menuRoutes');
@@ -36,6 +48,11 @@ const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 const app = express();
 
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
+// 3. Middleware express-fileupload
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: '/tmp/' // Direktori sementara untuk menyimpan file sebelum di-upload
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -160,7 +177,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     // menus
-     if (resource === 'menus') {
+      if (resource === 'menus') {
       //debug
       console.log('Menu route detected');
       console.log('Parts:', parts);
