@@ -1,12 +1,12 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Form, Card, Button, Badge } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-//import HomeNavbar from '../components/HomeNavbar';
 import Navbar from '../components/Navbar';
 import MenuCard from '../components/MenuCard';
-import { mockMenus, mockCategories } from '../../utils/mockData';
+
+import { mockCategories } from '../../utils/mockData'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 
@@ -16,11 +16,45 @@ export default function MenuPage() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [cart, setCart] = useState([]);
 
+  const [menus, setMenus] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+
+  // Fungsi untuk mengambil data dari API Express (http://localhost:5000)
+  const fetchMenus = useCallback(async () => {
+    setLoading(true);
+    try {
+      // ⚠️ PERBAIKAN UTAMA: Menggunakan URL ABSOLUT ke server Express
+      const response = await fetch('http://localhost:5000/api/menus'); 
+      
+      if (!response.ok) {
+        // Log error respons dari server jika status bukan 200
+        const errorText = await response.text();
+        console.error('API responded with error status:', response.status, errorText);
+        throw new Error('Gagal mengambil data menu dari server');
+      }
+      
+      const result = await response.json();
+      
+      setMenus(result.data || []); 
+
+    } catch (error) {
+      console.error('Fetch error:', error);
+      // Opsional: set menus ke array kosong jika fetch gagal
+      setMenus([]); 
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Effect 1: Load data menu saat komponen dimount
+  useEffect(() => {
+    fetchMenus();
+  }, [fetchMenus]); 
+  
   // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCart(JSON.parse(savedCart));
     }
   }, []);
@@ -42,38 +76,43 @@ export default function MenuPage() {
     });
   };
 
-  const filteredMenus = mockMenus.filter(menu => {
-    // Enhanced search: search in name, description, category, and vendor name
+  const filteredMenus = menus.filter(menu => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = searchTerm === '' || 
-                         menu.name.toLowerCase().includes(searchLower) ||
-                         menu.description.toLowerCase().includes(searchLower) ||
-                         menu.category.toLowerCase().includes(searchLower) ||
-                         menu.vendorName.toLowerCase().includes(searchLower);
+                          menu.name.toLowerCase().includes(searchLower) ||
+                          (menu.brand?.toLowerCase().includes(searchLower)) || 
+                          menu.category.toLowerCase().includes(searchLower) ||
+                          menu.vendor?.toLowerCase().includes(searchLower); 
     
     const matchesCategory = selectedCategories.length === 0 || 
-                           selectedCategories.includes(menu.category);
+                            selectedCategories.includes(menu.category);
     return matchesSearch && matchesCategory;
   });
+
+  // DEBUG LOG
+  useEffect(() => {
+    if (!loading) {
+      console.log(`Total Menu dari DB: ${menus.length}`);
+      console.log(`Total Menu setelah Filter: ${filteredMenus.length}`);
+    }
+  }, [loading, menus.length, filteredMenus.length]); 
 
   const handleAddToCart = (menuWithAdditionals) => {
     const newCart = [...cart, { ...menuWithAdditionals, quantity: 1 }];
     setCart(newCart);
     localStorage.setItem('cart', JSON.stringify(newCart));
-    // Dispatch custom event to update cart count in navbar
     window.dispatchEvent(new Event('cartUpdated'));
   };
 
   const handleBuyNow = (menuWithAdditionals) => {
-    // Prepare order data for payment page
     const orderData = {
-      vendor: menuWithAdditionals.vendorName || 'Kantin Lupa Namanya',
+      vendor: menuWithAdditionals.vendor || 'Kantin Lupa Namanya', 
       items: [{
         name: menuWithAdditionals.name,
         category: menuWithAdditionals.category,
         quantity: 1,
         price: menuWithAdditionals.totalPrice || menuWithAdditionals.price,
-        basePrice: menuWithAdditionals.price, // Store original menu price
+        basePrice: menuWithAdditionals.price, 
         image: menuWithAdditionals.image,
         toppings: menuWithAdditionals.selectedAdditionals?.map(a => `${a.name} (${a.quantity})`).join(', ') || ''
       }],
@@ -133,10 +172,21 @@ export default function MenuPage() {
 
           {/* Menu Grid */}
           <Col lg={9} md={8}>
-            {filteredMenus.length > 0 ? (
+            {/* Tampilkan loading state */}
+            {loading && (
+                <div className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <h4 className="mt-3">Memuat menu...</h4>
+                </div>
+            )}
+
+            {/* Tampilkan menu jika tidak loading dan ada data */}
+            {!loading && filteredMenus.length > 0 ? (
               <Row className="menu-grid">
                 {filteredMenus.map(menu => (
-                  <Col key={menu.id} xl={4} lg={6} md={12} className="mb-4">
+                  <Col key={menu._id} xl={4} lg={6} md={12} className="mb-4">
                     <MenuCard 
                       menu={menu}
                       onAddToCart={handleAddToCart}
@@ -146,16 +196,19 @@ export default function MenuPage() {
                 ))}
               </Row>
             ) : (
-              <div className="text-center py-5">
-                <div style={{ fontSize: '4rem' }}>🔍</div>
-                <h4 className="mt-3">Menu tidak ditemukan</h4>
-                <p className="text-muted">
-                  Coba ubah kata kunci pencarian atau filter kategori
-                </p>
-                <Button variant="primary" onClick={clearFilters}>
-                  Reset Filter
-                </Button>
-              </div>
+              // Tampilkan not found jika tidak loading dan menu kosong
+              !loading && (
+                <div className="text-center py-5">
+                  <div style={{ fontSize: '4rem' }}>🔍</div>
+                  <h4 className="mt-3">Menu tidak ditemukan</h4>
+                  <p className="text-muted">
+                    Coba ubah kata kunci pencarian atau filter kategori
+                  </p>
+                  <Button variant="primary" onClick={clearFilters}>
+                    Reset Filter
+                  </Button>
+                </div>
+              )
             )}
           </Col>
         </Row>
