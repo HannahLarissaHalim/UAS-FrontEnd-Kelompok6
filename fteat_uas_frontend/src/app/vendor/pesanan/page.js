@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Modal } from 'react-bootstrap';
-import VendorNavbar from '../components/VendorNavbar';
+import VendorNavbar from '../../components/VendorNavbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './vendor-pesanan.css';
 

@@ -43,11 +43,11 @@ export default function Home() {
           
             {/* Register / Login Section */}
             <div className="auth-section">
-              <Link href="/register" className="auth-text-link">
+              <Link href="/choose/register" className="auth-text-link">
                 Register
               </Link>
               <span className="auth-text"> | </span>
-              <Link href="/choose-login" className="auth-link-home">
+              <Link href="/choose/login" className="auth-link-home">
                 Login
               </Link>
             </div>
