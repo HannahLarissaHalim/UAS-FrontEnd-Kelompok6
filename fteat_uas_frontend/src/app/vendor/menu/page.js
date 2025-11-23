@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Container, Row, Col, Form, Modal, Button } from 'react-bootstrap';
-import VendorNavbar from '../components/VendorNavbar';
-import { mockCategories } from '../../utils/mockData';
-import api from '../../utils/api';
+import VendorNavbar from '../../components/VendorNavbar';
+import { mockCategories } from '../../../utils/mockData';
+import api from '../../../utils/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './vendor-menu.css';
 

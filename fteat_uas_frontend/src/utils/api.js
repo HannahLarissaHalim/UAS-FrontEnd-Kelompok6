@@ -47,45 +47,6 @@ export const api = {
     return response.json();
   },
 
-  // Auth endpoints
-  login: async (npm, password) => {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ npm, password }),
-    });
-    return response.json();
-  },
-
-  vendorLogin: async (email, password) => {
-    try {
-      const url = `${API_URL}/api/vendor/login`;
-      console.log('Attempting vendor login to:', url);
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-      
-      // Check if response is JSON
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        const text = await response.text();
-        console.error('Non-JSON response received:', text);
-        throw new Error('Server returned non-JSON response. Check if backend is running correctly.');
-      }
-      
-      return response.json();
-    } catch (error) {
-      console.error('Vendor login API error:', error);
-      throw error;
-    }
-  },
-
   register: async (userData) => {
     const response = await fetch(`${API_URL}/api/auth/register`, {
       method: 'POST',
@@ -95,7 +56,16 @@ export const api = {
     return response.json();
   },
 
-  /* PASSWORD RESET ENDPOINTS */
+  login: async (npm, password) => {
+    const response = await fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ npm, password }),
+    });
+    return response.json();
+  },
+
+   /* PASSWORD RESET ENDPOINTS */
 
   // Forgot password → User minta email reset
   requestResetPassword: async (email) => {
@@ -113,6 +83,77 @@ export const api = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ newPassword }),
+    });
+    return response.json();
+  },
+
+  // Vendor endpoints
+  vendorRegister: async (vendorData) => {
+    const response = await fetch(`${API_URL}/api/vendor/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(vendorData),
+    });
+    return response.json();
+  },
+
+  vendorLogin: async (email, password) => {
+    const response = await fetch(`${API_URL}/api/vendor/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    return response.json();
+  },
+
+  getVendors: async () => { // Frontend fetch vendor list
+    const response = await fetch(`${API_URL}/api/vendors`);
+    return response.json();
+  },
+
+  // admin endpoints
+
+  loginAdmin: async (email, password) => {
+    try {
+      const url = `${API_URL}/api/admin/login`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response received:", text);
+        throw new Error("Backend tidak mengembalikan format JSON.");
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error("Admin login API error:", error);
+      throw error;
+    }
+  },
+
+  getVendorsForAdmin: async (token) => { // <- baru untuk admin lihat daftar vendor
+    const response = await fetch(`${API_URL}/api/vendor/admin/vendors`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  },
+
+  approveVendor: async (vendorId, token) => { // <- baru untuk admin approve vendor
+    const response = await fetch(`${API_URL}/api/vendor/admin/vendors/${vendorId}/approve`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ isApproved: true }),
     });
     return response.json();
   },
@@ -357,6 +398,18 @@ createMenu: async (menuData, token) => {
     return response.json();
   },
 
+  updateVendorProfile: async (profileData, token) => {
+    const response = await fetch(`${API_URL}/api/vendor/me`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(profileData),
+    });
+    return response.json();
+  },
+
   getSalesReport: async (vendorId, date, token) => {
     const response = await fetch(
       `${API_URL}/api/vendors/${vendorId}/sales?date=${date}`,
@@ -367,5 +420,7 @@ createMenu: async (menuData, token) => {
     return response.json();
   },
 };
+
+
 
 export default api;

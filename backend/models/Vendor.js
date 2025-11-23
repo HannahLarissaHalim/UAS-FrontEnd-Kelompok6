@@ -2,9 +2,12 @@ const mongoose = require('mongoose');
 
 const vendorSchema = new mongoose.Schema({
     
-    name: {
+    vendorFirstName: { 
         type: String,
-        required: true,
+        required: true
+    },
+    vendorLastName: { 
+        type: String
     },
     stallName: { 
         type: String,
@@ -26,11 +29,23 @@ const vendorSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    password: { // hashed password
+        type: String,
+        required: true,
+    },
     status: { 
         type: String,
         enum: ['Available', 'Unavailable', 'Closed'],
         default: 'Unavailable'
+    },
+     isApproved: {
+        type: Boolean,
+        default: false
     },
     VendorId: {
         type: String,
@@ -42,8 +57,6 @@ const vendorSchema = new mongoose.Schema({
     toJSON: { virtuals: true }, 
     id: true 
 });
-
-
 
 vendorSchema.virtual('menus', {
     ref: 'Menu',

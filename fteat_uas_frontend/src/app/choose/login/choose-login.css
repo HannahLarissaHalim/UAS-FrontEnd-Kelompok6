@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+.choose-login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #FDF8F2;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Container tengah */
+.choose-login-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding-bottom: 60px;
+}
+
+.choose-login-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Container kartu */
+.role-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 70px;
+}
+
+/* ===== BASE CARD ===== */
+.role-card {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border: 3px solid transparent;
+  box-shadow: none;
+  color: white;
+  font-size: 20px;
+  transition:
+      width 0.35s ease,
+      background 0.3s ease,
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border 0.25s ease;
+}
+
+.role-card .icon {
+  font-size: 45px;
+  transition: transform 0.35s ease;
+}
+
+.role-card .text {
+  position: absolute;
+  white-space: nowrap;
+  opacity: 0;
+  font-size: 20px;
+  transition: opacity 0.3s ease, transform 0.35s ease;
+}
+
+/* ========================= MAHASISWA ========================= */
+.mahasiswa {
+  border-color: #9b162b;
+}
+
+.mahasiswa:hover {
+  width: 320px;
+  background: #cf1d3b;
+  box-shadow: 4px 4px 0 #891325;
+  border-color: transparent;
+}
+
+.mahasiswa:hover .icon {
+  transform: translateX(-60px);
+}
+
+.mahasiswa:hover .text {
+  opacity: 1;
+  transform: translateX(40px);
+}
+
+/* ========================= VENDOR ========================= */
+.vendor {
+  border-color: #153d92;
+}
+
+.vendor:hover {
+  width: 280px;
+  background: #1d56cf;
+  box-shadow: 4px 4px 0 #11347a;
+  border-color: transparent;
+}
+
+.vendor:hover .icon {
+  transform: translateX(-45px);
+}
+
+.vendor:hover .text {
+  opacity: 1;
+  transform: translateX(20px);
+}
+
+/* ========================= ADMIN ========================= */
+.admin {
+  border-color: #2c2c2c;
+}
+
+.admin:hover {
+  width: 280px;
+  background: #000;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  border-color: transparent;
+}
+
+.admin:hover .icon {
+  transform: translateX(-45px);
+}
+
+.admin:hover .text {
+  opacity: 1;
+  transform: translateX(20px);
+}

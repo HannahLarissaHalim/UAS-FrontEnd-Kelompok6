@@ -36,6 +36,7 @@ const vendorAuthController = require('./controllers/vendorAuthController');
 const kantinBursaController = require('./controllers/KantinBursaController');
 const indomieController = require('./controllers/IndomieController');
 const orderController = require('./controllers/orderController');
+const adminAuthRoutes = require("./routes/adminAuth");
 
 const PORT_EXPRESS = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
@@ -66,6 +67,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/usersRoutes'));
 app.use('/api/menus', menuRoutes); // <-- Route Menu Anda di sini
 app.use('/api/vendor', vendorAuthRoutes);
+app.use("/api/admin", adminAuthRoutes);
 
 app.get('/', (req, res) => {
   res.json({
