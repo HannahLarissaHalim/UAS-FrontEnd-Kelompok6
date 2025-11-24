@@ -41,11 +41,11 @@ export default function VendorWelcomePage() {
   }, [router]);
 
   const handleMenuClick = () => {
-    router.push('/vendor-menu');
+    router.push('/vendor/menu');
   };
 
   const handlePesananClick = () => {
-    router.push('/vendor-pesanan');
+    router.push('/vendor/pesanan');
   };
 
   const handleAccountSetup = () => {

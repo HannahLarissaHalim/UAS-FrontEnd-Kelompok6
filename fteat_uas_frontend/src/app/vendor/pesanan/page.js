@@ -18,21 +18,35 @@ export default function VendorPesananPage() {
   useEffect(() => {
     const user = localStorage.getItem('user');
 
-    // Always use dummy data for now (until backend is connected)
-    setVendorData({
-      vendorName: 'Kantin Bursa Lt.7',
-      email: 'fteat_kantinbursalt7@gmail.com',
-      role: 'vendor',
-      id: 'vendor123'
-    });
-    loadDummyOrders();
+    if (!user) {
+      // fallback to dummy vendor until user logs in
+      const dummy = {
+        vendorName: 'Kantin Bursa Lt.7',
+        email: 'fteat_kantinbursalt7@gmail.com',
+        role: 'vendor',
+        id: 'vendor123'
+      };
+      setVendorData(dummy);
+      loadDummyOrders();
+      return;
+    }
 
-    // TODO: Uncomment when backend is ready
-    // if (user) {
-    //   const userData = JSON.parse(user);
-    //   setVendorData(userData);
-    //   fetchOrders(userData.id);
-    // }
+    // Use real vendor data and fetch orders by vendor identifier
+    const userData = JSON.parse(user);
+    setVendorData(userData);
+
+    // Determine vendor identifier used by backend: prefer VendorId
+    const vendorIdentifier = userData?.VendorId || userData?.VendorID || userData?.vendorId || userData?._id || userData?.id || userData?.stallName || userData?.stallname || null;
+    console.log('[VendorPesanan] vendorData from localStorage:', userData);
+    console.log('[VendorPesanan] computed vendorIdentifier:', vendorIdentifier);
+
+    if (!vendorIdentifier) {
+      console.warn('[VendorPesanan] No vendor identifier found in stored user object, falling back to dummy orders');
+      loadDummyOrders();
+      return;
+    }
+
+    fetchOrders(String(vendorIdentifier));
   }, []);
 
   const loadDummyOrders = () => {
@@ -99,14 +113,21 @@ export default function VendorPesananPage() {
 
   const fetchOrders = async (vendorId) => {
     try {
-      const response = await fetch(`/api/orders/vendor/${vendorId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setOrders(data.data);
+      const token = localStorage.getItem('token');
+      // Use frontend api helper if available
+      const apiModule = await import('../../../utils/api');
+      const api = apiModule.api || apiModule.default || apiModule;
+
+      console.log('[VendorPesanan] calling getOrdersByVendor with vendorId=', vendorId);
+      const res = await api.getOrdersByVendor(encodeURIComponent(vendorId), token);
+      console.log('[VendorPesanan] getOrdersByVendor response:', res);
+
+      if (res && res.success) {
+        setOrders(res.data || []);
+      } else {
+        console.error('Failed to load orders for vendor', res);
+        // Show empty orders rather than breaking the UI
+        setOrders([]);
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -124,17 +145,34 @@ export default function VendorPesananPage() {
   };
 
   const handleVerifyPayment = async (orderId) => {
-    // For demo: Simulate verification without backend
-    const verifiedOrders = orders.filter(o => o.paymentStatus === 'verified');
-    const newQueueNumber = String(verifiedOrders.length + 1).padStart(3, '0');
+    try {
+      const token = localStorage.getItem('token');
+      const vendorIdentifier = vendorData?.VendorId || vendorData?.vendorId || vendorData?._id || vendorData?.id || vendorData?.VendorID;
+      const { api } = await import('../../../utils/api');
+      const res = await api.verifyOrder(orderId, vendorIdentifier, token);
+      console.log('[VendorPesanan] verifyOrder response:', res);
 
-    // Update local state
-    setOrders(orders.map(order =>
-      order._id === orderId
-        ? { ...order, paymentStatus: 'verified', queueNumber: newQueueNumber }
-        : order
-    ));
-    alert(`Pembayaran berhasil diverifikasi! Nomor antrian: ${newQueueNumber}`);
+      if (res && res.success) {
+        setOrders(orders.map(order => 
+          order._id === orderId 
+            ? { ...order, paymentStatus: 'verified', queueNumber: res.data.queueNumber || order.queueNumber }
+            : order
+        ));
+        alert(`Pembayaran berhasil diverifikasi! Nomor antrian: ${res.data.queueNumber || 'terbaru'}`);
+        // Notify other parts of the app (e.g., student's history page) to refresh
+        try {
+          window.dispatchEvent(new CustomEvent('orderVerified', { detail: { orderId } }));
+        } catch (e) {
+          // ignore if CustomEvent not supported
+          window.dispatchEvent(new Event('orderVerified'));
+        }
+      } else {
+        alert('Gagal memverifikasi pembayaran: ' + (res?.message || 'Unknown'));
+      }
+    } catch (err) {
+      console.error('Error verifying payment:', err);
+      alert('Terjadi kesalahan saat memverifikasi pembayaran');
+    }
 
     // TODO: Uncomment when backend is ready
     // try {
@@ -169,13 +207,32 @@ export default function VendorPesananPage() {
       return;
     }
 
-    // For demo: Simulate cancellation without backend
-    setOrders(orders.map(order =>
-      order._id === orderId
-        ? { ...order, paymentStatus: 'unpaid', queueNumber: null }
-        : order
-    ));
-    alert('Verifikasi pembayaran berhasil dibatalkan');
+    try {
+      const token = localStorage.getItem('token');
+      const { api } = await import('../../../utils/api');
+      const res = await api.cancelOrderVerification(orderId, token);
+      console.log('[VendorPesanan] cancelOrderVerification response:', res);
+
+      if (res && res.success) {
+        setOrders(orders.map(order =>
+          order._id === orderId
+            ? { ...order, paymentStatus: 'unpaid', queueNumber: null }
+            : order
+        ));
+        alert('Verifikasi pembayaran berhasil dibatalkan');
+        // Notify other parts of the app (e.g., student's history page) to refresh
+        try {
+          window.dispatchEvent(new CustomEvent('orderVerified', { detail: { orderId } }));
+        } catch (e) {
+          window.dispatchEvent(new Event('orderVerified'));
+        }
+      } else {
+        alert('Gagal membatalkan verifikasi: ' + (res?.message || 'Unknown'));
+      }
+    } catch (err) {
+      console.error('Error canceling verification:', err);
+      alert('Terjadi kesalahan saat membatalkan verifikasi');
+    }
 
     // TODO: Uncomment when backend is ready
     // try {

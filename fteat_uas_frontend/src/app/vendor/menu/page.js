@@ -94,8 +94,8 @@ useEffect(() => {
       
       setVendorData(userData);
       
-      // Load menus after vendor data is set
-      const vendorIdToUse = userData.vendorId || userData.vendorName || 'Kantin Teknik Bursa Lt.7';
+      // Load menus after vendor data is set. Prefer the backend's VendorId field.
+      const vendorIdToUse = userData?.VendorId || userData?.vendorId || userData?.vendorName || userData?._id || 'Kantin Teknik Bursa Lt.7';
       console.log('Loading menus for vendor:', vendorIdToUse);
       
       await loadMenus(vendorIdToUse);
@@ -171,13 +171,13 @@ const loadMenus = async (vendorId) => {
     
     if (!result.success) {
       // On failure, reload to get correct state
-      await loadMenus(vendorData.vendorId || vendorData.vendorName);
+      await loadMenus(vendorData?.VendorId || vendorData?.vendorId || vendorData?.vendorName || vendorData?._id);
       alert('Gagal menghapus menu: ' + result.message);
     }
   } catch (error) {
     console.error('Error deleting menus:', error);
     // On error, reload to get correct state
-    await loadMenus(vendorData.vendorId || vendorData.vendorName);
+    await loadMenus(vendorData?.VendorId || vendorData?.vendorId || vendorData?.vendorName || vendorData?._id);
     alert('Terjadi kesalahan saat menghapus menu');
   }
 };
@@ -402,8 +402,9 @@ const handleSaveNewMenu = async () => {
       hasTopping: newMenu.hasTopping,
       additionals: newMenu.additionals || [],
       stock: 'ada',
-      vendor: vendorData.vendorId || vendorData.vendorName || 'Kantin Teknik Bursa Lt.7',
-      vendorName: vendorData.vendorName || 'Kantin Teknik Bursa Lt.7'
+      // Prefer the Vendor unique identifier field returned by backend (VendorId)
+      vendor: vendorData?.VendorId || vendorData?.vendorId || vendorData?._id || vendorData?.stallName || 'Kantin Teknik Bursa Lt.7',
+      vendorName: vendorData?.stallName || vendorData?.vendorName || 'Kantin Teknik Bursa Lt.7'
     };
     
     const result = await api.createMenu(menuData, token);
@@ -421,7 +422,8 @@ const handleSaveNewMenu = async () => {
         additionals: result.data.additionals || [],
         image: result.data.image || '/images/icon_small.png',
         stock: result.data.statusKetersediaan === 'available' ? 'ada' : 'habis',
-        vendor: vendorData?.vendorName || 'Kantin Teknik Bursa Lt.7'
+        // Use the vendor string saved by backend (should be the VendorId or vendor identifier)
+        vendor: result.data.vendor || vendorData?.VendorId || vendorData?.stallName || 'Kantin Teknik Bursa Lt.7'
       };
       
       // Add to existing menu items immediately

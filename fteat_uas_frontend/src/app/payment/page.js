@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Modal, Button, ListGroup } from 'react-bootstrap';
 import Navbar from '../components/Navbar';
+import api from '../../utils/api';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
@@ -39,65 +40,78 @@ const instantNoodleAdditionals = [
 export default function PaymentPage() {
   const router = useRouter();
   const [orderData, setOrderData] = useState({});
+  const [vendorInfoMap, setVendorInfoMap] = useState({});
   const [renderKey, setRenderKey] = useState(0);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [selectedAdditionals, setSelectedAdditionals] = useState({});
 
   useEffect(() => {
-    // Get cart data from localStorage
-    const savedCart = localStorage.getItem('cart');
-    const savedOrder = localStorage.getItem('currentOrder');
-    
-    if (savedCart) {
-      const cartItems = JSON.parse(savedCart);
-      // Group items by vendor
-      const groupedByVendor = {};
-      
-      cartItems.forEach(item => {
-        const vendor = item.vendorName || 'Kantin Lupa Namanya';
-        if (!groupedByVendor[vendor]) {
-          groupedByVendor[vendor] = {
-            vendor: vendor,
-            items: [],
-            total: 0
-          };
-        }
-        groupedByVendor[vendor].items.push({
-          name: item.name,
-          quantity: item.quantity || 1,
-          price: item.totalPrice || item.price,
-          image: item.image,
-          toppings: item.selectedAdditionals?.map(a => `${a.name} (${a.quantity})`).join(', ') || ''
+    async function loadCartAndVendors() {
+      const savedCart = localStorage.getItem('cart');
+      const savedOrder = localStorage.getItem('currentOrder');
+
+      if (savedCart) {
+        const cartItems = JSON.parse(savedCart);
+        const groupedByVendor = {};
+
+        cartItems.forEach(item => {
+          const vendor = item.vendorName || item.vendor || 'Kantin Lupa Namanya';
+          const vendorId = item.vendorId || item.vendor || item.vendorName || '';
+          if (!groupedByVendor[vendor]) groupedByVendor[vendor] = { vendor, vendorId, items: [], total: 0 };
+
+          groupedByVendor[vendor].items.push({
+            menuItem: item._id || item.id || item.menuItem || null,
+            name: item.name,
+            quantity: item.quantity || 1,
+            price: item.totalPrice || item.price,
+            image: item.image,
+            toppings: item.selectedAdditionals?.map(a => `${a.name} (${a.quantity})`).join(', ') || ''
+          });
+
+          groupedByVendor[vendor].total += (item.totalPrice || item.price) * (item.quantity || 1);
         });
-        groupedByVendor[vendor].total += (item.totalPrice || item.price) * (item.quantity || 1);
-      });
-      
-      setOrderData(groupedByVendor);
-    } else if (savedOrder) {
-      // Single order from Buy Now
-      const order = JSON.parse(savedOrder);
-      setOrderData({
-        [order.vendor]: order
-      });
-    } else {
-      // Sample data for demo
+
+        setOrderData(groupedByVendor);
+
+        // load vendors for real payment info
+        try {
+          const vendorsRes = await api.getVendors();
+          if (vendorsRes && vendorsRes.data) {
+            const map = {};
+            vendorsRes.data.forEach(v => {
+              const key = (v.VendorId || v.vendorId || v._id || v.stallName || '').toString();
+              map[key] = v;
+              if (v.stallName) map[v.stallName] = v;
+            });
+            setVendorInfoMap(map);
+          }
+        } catch (err) {
+          console.error('Failed to load vendor info:', err);
+        }
+
+        return;
+      }
+
+      if (savedOrder) {
+        const order = JSON.parse(savedOrder);
+        setOrderData({ [order.vendor]: order });
+        return;
+      }
+
+      // sample fallback
       setOrderData({
         'Kantin Teknik Bursa Lt.7': {
           vendor: 'Kantin Teknik Bursa Lt.7',
           items: [
-            { 
-              name: 'Mie Goreng Sakura', 
-              quantity: 1, 
-              price: 8000, 
-              image: '/images/menus/indomie-goreng.jpg',
-              toppings: 'Telur (2), Kornet'
-            }
+            { name: 'Mie Goreng Sakura', quantity: 1, price: 8000, image: '/images/menus/indomie-goreng.jpg', toppings: 'Telur (2), Kornet' }
           ],
           total: 23000
         }
       });
     }
+
+    loadCartAndVendors();
   }, []);
 
   const formatPrice = (price) => {
@@ -108,16 +122,19 @@ export default function PaymentPage() {
     }).format(price);
   };
 
+  // show policy modal before sending proof/creating order
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
+  const [policyVendor, setPolicyVendor] = useState(null);
+  const [creatingOrder, setCreatingOrder] = useState(false);
+
+  const openPolicyForVendor = (vendor) => {
+    setPolicyVendor(vendor);
+    setShowPolicyModal(true);
+  };
+
   const handleWhatsAppClick = (vendor) => {
-    const vendorDetails = vendorPaymentDetails[vendor] || vendorPaymentDetails['Kantin Lupa Namanya'];
-    const whatsappNumber = vendorDetails.whatsapp;
-    const vendorOrder = orderData[vendor];
-    const message = encodeURIComponent(
-      `Halo, saya ingin konfirmasi pembayaran untuk pesanan:\n\n` +
-      vendorOrder.items.map(item => `${item.name} x${item.quantity}`).join('\n') +
-      `\n\nTotal: ${formatPrice(vendorOrder.total)}`
-    );
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+    // open policy modal for this vendor
+    openPolicyForVendor(vendor);
   };
 
   const handleEdit = (vendor, index) => {
@@ -286,11 +303,84 @@ export default function PaymentPage() {
       orderData[vendor].items.forEach(item => {
         cartItems.push({
           ...item,
-          vendorName: vendor
+          vendorName: vendor,
+          vendorId: orderData[vendor].vendorId || ''
         });
       });
     });
     localStorage.setItem('cart', JSON.stringify(cartItems));
+  };
+
+  // Create order for the selected vendor after user agrees to policy
+  const confirmAndCreateOrder = async () => {
+    if (!policyVendor) return;
+    const vendorGroup = orderData[policyVendor];
+    if (!vendorGroup) return;
+
+    try {
+      setCreatingOrder(true);
+      const token = localStorage.getItem('token');
+
+      // Build order payload expected by backend
+      const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = localUser.userId || localUser._id || localUser.id || null;
+
+      const itemsPayload = (vendorGroup.items || []).map(i => ({
+        menuItem: i.menuItem || i._id || i.id || null,
+        quantity: i.quantity || 1,
+        selectedAddOns: []
+      }));
+
+      const payload = {
+        user: userId,
+        vendor: vendorGroup.vendorId || policyVendor,
+        items: itemsPayload,
+        totalPrice: vendorGroup.total,
+        paymentMethod: 'transfer',
+        pickupLocation: policyVendor,
+        paymentStatus: 'unpaid'
+      };
+
+      const res = await api.createOrder(payload, token);
+      if (!res?.success) {
+        alert('Gagal membuat pesanan: ' + (res?.message || 'Unknown'));
+        return;
+      }
+
+      // Remove this vendor from currentOrder and update cart
+      const newOrderData = { ...orderData };
+      delete newOrderData[policyVendor];
+      setOrderData(newOrderData);
+      if (Object.keys(newOrderData).length === 0) {
+        localStorage.removeItem('currentOrder');
+        localStorage.removeItem('cart');
+      } else {
+        localStorage.setItem('currentOrder', JSON.stringify(newOrderData));
+        updateCartInLocalStorage(newOrderData);
+      }
+
+      // open WhatsApp to vendor for sending proof
+      const vendorObj = vendorInfoMap[vendorGroup.vendorId] || vendorInfoMap[policyVendor];
+      const vendorDetails = vendorObj ? { whatsapp: vendorObj.whatsapp || '081245678901' } : (vendorPaymentDetails[policyVendor] || vendorPaymentDetails['Kantin Lupa Namanya']);
+      const whatsappNumber = vendorDetails.whatsapp;
+      const message = encodeURIComponent(
+        `Halo, saya ingin konfirmasi pembayaran untuk pesanan:\n\n` +
+        vendorGroup.items.map(item => `${item.name} x${item.quantity}`).join('\n') +
+        `\n\nTotal: ${formatPrice(vendorGroup.total)}`
+      );
+      window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+
+      // notify cart updated
+      window.dispatchEvent(new Event('cartUpdated'));
+      alert('Pesanan berhasil dibuat dan pemberitahuan dikirim ke vendor.');
+    } catch (err) {
+      console.error('Error creating order:', err);
+      alert('Terjadi kesalahan saat membuat pesanan');
+    } finally {
+      setCreatingOrder(false);
+      setShowPolicyModal(false);
+      setPolicyVendor(null);
+    }
   };
 
   return (
@@ -356,16 +446,19 @@ export default function PaymentPage() {
               <div className="payment-order-details">
                 {Object.keys(orderData).length > 0 ? Object.keys(orderData).map((vendorName) => {
                   const vendorOrder = orderData[vendorName];
-                  // Get vendor details with proper fallback
-                  let vendorDetails = vendorPaymentDetails[vendorName];
-                  
-                  // If vendor not found, create default details
-                  if (!vendorDetails) {
+                  // Resolve vendor info: prefer vendorInfoMap (by VendorId or stallName), fallback to static map
+                  const vendorObj = vendorInfoMap[vendorOrder.vendorId] || vendorInfoMap[vendorName];
+                  let vendorDetails;
+                  if (vendorObj) {
+                    const bankAccount = `${vendorObj.bankName || ''} ${vendorObj.accountNumber || ''}`.trim();
+                    const accountHolder = vendorObj.accountHolder || vendorObj.accountHolderName || '';
                     vendorDetails = {
-                      bankAccount: 'BCA 1234567890 a/n Bpk. Asep',
-                      whatsapp: '081245678901',
-                      location: vendorName
+                      bankAccount: bankAccount ? `${bankAccount} a/n ${accountHolder}` : 'BCA 1234567890 a/n Bpk. Asep',
+                      whatsapp: vendorObj.whatsapp || '081245678901',
+                      location: vendorObj.stallName || vendorName
                     };
+                  } else {
+                    vendorDetails = vendorPaymentDetails[vendorName] || { bankAccount: 'BCA 1234567890 a/n Bpk. Asep', whatsapp: '081245678901', location: vendorName };
                   }
                   
                   return (
@@ -548,6 +641,27 @@ export default function PaymentPage() {
             <Button variant="primary" onClick={handleSaveEdit} className="modal-btn-buy">
               Simpan
             </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Payment Policy Modal shown before sending proof */}
+        <Modal show={showPolicyModal} onHide={() => setShowPolicyModal(false)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Konfirmasi Pembayaran & Kebijakan</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Dengan menekan <strong>Setuju</strong>, Anda menyatakan bahwa:</p>
+            <ul>
+              <li>Anda telah melakukan transfer sesuai nominal ke rekening yang tertera.</li>
+              <li>Anda akan mengirim bukti pembayaran melalui WhatsApp kepada vendor.</li>
+              <li>Semua informasi pembayaran yang diberikan adalah benar dan dapat diverifikasi.</li>
+              <li>Vendor berhak menolak atau meminta bukti tambahan jika verifikasi tidak sesuai.</li>
+            </ul>
+            <p className="small text-muted">Kami sarankan menyimpan bukti transfer hingga pesanan dikonfirmasi.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowPolicyModal(false)}>Batal</Button>
+            <Button variant="success" onClick={confirmAndCreateOrder} disabled={creatingOrder}>{creatingOrder ? 'Memproses...' : 'Setuju'}</Button>
           </Modal.Footer>
         </Modal>
       </div>

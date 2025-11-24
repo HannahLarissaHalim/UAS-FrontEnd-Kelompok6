@@ -98,7 +98,16 @@ export default function MenuPage() {
   }, [loading, menus.length, filteredMenus.length]); 
 
   const handleAddToCart = (menuWithAdditionals) => {
-    const newCart = [...cart, { ...menuWithAdditionals, quantity: 1 }];
+    // Ensure vendor identifier is preserved on cart items
+    const vendorId = menuWithAdditionals.vendor || menuWithAdditionals.VendorID || menuWithAdditionals.vendorId || menuWithAdditionals.vendorName || '';
+    const vendorName = menuWithAdditionals.vendorName || menuWithAdditionals.stallName || menuWithAdditionals.vendor || '';
+    const cartItem = {
+      ...menuWithAdditionals,
+      quantity: 1,
+      vendorId: vendorId,
+      vendorName: vendorName
+    };
+    const newCart = [...cart, cartItem];
     setCart(newCart);
     localStorage.setItem('cart', JSON.stringify(newCart));
     window.dispatchEvent(new Event('cartUpdated'));
