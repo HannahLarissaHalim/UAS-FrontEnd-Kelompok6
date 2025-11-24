@@ -5,6 +5,7 @@ import { Modal } from 'react-bootstrap';
 import Image from 'next/image';
 import Navbar from '../components/Navbar';
 import ProtectedRoute from '../components/ProtectedRoute';
+import api from '../../utils/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
 
@@ -24,83 +25,41 @@ export default function HistoryOrderPage() {
     const parsedUser = JSON.parse(userData);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setUser(parsedUser);
-
-    // Mock orders data - replace with actual API call
-    const mockOrders = [
-      {
-        id: 1,
-        date: '27 Okt, jam 13.05',
-        vendor: 'Stand A',
-        vendorIcon: '/images/ikon_indomie.png',
-        items: [
-          { name: 'Nasi Goreng', quantity: 2, price: 25000, image: '/images/ikon_gorengan.png' },
-          { name: 'Es Teh', quantity: 2, price: 5000, image: '/images/ikon_indomie.png' }
-        ],
-        total: 70000,
-        status: 'authorized', // authorized or pending
-        paymentMethod: 'Cash',
-        pickupLocation: 'Kantin Utara'
-      },
-      {
-        id: 2,
-        date: '5 Nov, jam 14.05',
-        vendor: 'Stand B',
-        vendorIcon: '/images/ikon_gorengan.png',
-        items: [
-          { name: 'Mie Ayam', quantity: 1, price: 30000, image: '/images/ikon_indomie.png' }
-        ],
-        total: 30000,
-        status: 'authorized',
-        paymentMethod: 'E-Wallet',
-        pickupLocation: 'Kantin Selatan'
-      },
-      {
-        id: 3,
-        date: '10 Nov, jam 11.05',
-        vendor: 'Stand C',
-        vendorIcon: '/images/ikon_indomie.png',
-        items: [
-          { name: 'Soto Ayam', quantity: 1, price: 35000, image: '/images/ikon_gorengan.png' },
-          { name: 'Es Jeruk', quantity: 1, price: 5000, image: '/images/ikon_indomie.png' }
-        ],
-        total: 70000,
-        status: 'authorized',
-        paymentMethod: 'Cash',
-        pickupLocation: 'Kantin Barat'
-      },
-      {
-        id: 4,
-        date: '5 Nov, jam 13.05',
-        vendor: 'Stand D',
-        vendorIcon: '/images/ikon_gorengan.png',
-        items: [
-          { name: 'Bakso', quantity: 1, price: 30000, image: '/images/ikon_indomie.png' }
-        ],
-        total: 30000,
-        status: 'authorized',
-        paymentMethod: 'Transfer',
-        pickupLocation: 'Kantin Timur'
-      },
-      {
-        id: 5,
-        date: '5 Nov, jam 13.05',
-        vendor: 'Stand E',
-        vendorIcon: '/images/ikon_indomie.png',
-        items: [
-          { name: 'Ayam Geprek', quantity: 1, price: 30000, image: '/images/ikon_gorengan.png' }
-        ],
-        total: 30000,
-        status: 'authorized',
-        paymentMethod: 'Cash',
-        pickupLocation: 'Kantin Utara'
+    // fetch real orders for this user
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        // user id field may be _id or id
+        const userId = parsedUser?._id || parsedUser?.id || parsedUser?.userId || parsedUser?.npm;
+        console.log('[HistoryOrder] fetching orders for userId=', userId, 'token present=', !!token);
+        const res = await api.getOrdersByUser(userId, token);
+        console.log('[HistoryOrder] getOrdersByUser response:', res);
+        if (res && res.success) {
+          setOrders(res.data || []);
+        } else {
+          console.error('Failed to fetch user orders', res);
+          setOrders([]);
+        }
+      } catch (err) {
+        console.error('Error fetching orders for user:', err);
+        setOrders([]);
       }
-    ];
+    };
 
-    setOrders(mockOrders);
+    fetchOrders();
+
+    // listen for vendor verification events to refresh history
+    const onOrderVerified = () => {
+      fetchOrders();
+    };
+    window.addEventListener('orderVerified', onOrderVerified);
+    return () => window.removeEventListener('orderVerified', onOrderVerified);
   }, [router]);
 
   const handleShowDetails = (order) => {
-    if (order.status === 'authorized') {
+    // allow showing details when order is verified/paid
+    const isVerified = order.paymentStatus === 'verified' || order.status === 'paid' || order.paymentStatus === 'paid';
+    if (isVerified) {
       setSelectedOrder(order);
       setShowModal(true);
     } else {
@@ -124,6 +83,18 @@ export default function HistoryOrderPage() {
   if (!user) {
     return null;
   }
+
+  const formatDateFromISO = (iso) => {
+    try {
+      const d = new Date(iso);
+      const day = d.getDate();
+      const month = d.toLocaleString('id-ID', { month: 'short' });
+      const time = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      return `${day} ${month}, jam ${time}`;
+    } catch (e) {
+      return iso;
+    }
+  };
 
   return (
     <ProtectedRoute> 
@@ -155,44 +126,56 @@ export default function HistoryOrderPage() {
 
         {/* Order Cards Grid */}
         <div className="history-orders-grid">
-          {orders.map((order) => (
-            <div key={order.id} className="history-order-card">
-              <div className="order-card-header">
-                <span className="order-date">kamu pada tanggal</span>
-                <span className="order-date-time">{order.date} di</span>
-              </div>
-              
-              <div className="order-card-items">
-                {order.items.map((item, idx) => (
-                  <div key={idx} className="order-item-icon">
-                    <Image 
-                      src={item.image} 
-                      alt={item.name} 
-                      width={80}
-                      height={80}
-                      unoptimized
-                    />
-                  </div>
-                ))}
-              </div>
+          {orders.map((order) => {
+            const id = order._id || order.id;
+            const createdAt = order.createdAt || order.date;
+            const total = order.totalPrice || order.total || order.totalAmount;
+            const paymentStatus = order.paymentStatus || order.status;
+            const queueNumber = order.queueNumber || null;
+            return (
+              <div key={id} className="history-order-card">
+                <div className="order-card-header">
+                  <span className="order-date">kamu pada tanggal</span>
+                  <span className="order-date-time">{formatDateFromISO(createdAt)} di</span>
+                </div>
 
-              <div className="order-card-vendor">
-                <span className="order-vendor-text">menghabiskan</span>
-              </div>
+                <div className="order-card-items">
+                  {(order.items || []).map((item, idx) => {
+                    const itemName = item.name || item.menuItem?.name || 'Item';
+                    const itemImage = item.image || item.menuItem?.image || '/images/ikon_indomie.png';
+                    return (
+                      <div key={idx} className="order-item-icon">
+                        <Image 
+                          src={itemImage} 
+                          alt={itemName} 
+                          width={80}
+                          height={80}
+                          unoptimized
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
 
-              <div className="order-card-total">
-                <span className="order-total-amount">{formatPrice(order.total)}</span>
-              </div>
+                <div className="order-card-vendor">
+                  <span className="order-vendor-text">Total</span>
+                </div>
 
-              <button 
-                className="order-details-btn"
-                onClick={() => handleShowDetails(order)}
-                disabled={order.status !== 'authorized'}
-              >
-                Details
-              </button>
-            </div>
-          ))}
+                <div className="order-card-total">
+                  <span className="order-total-amount">{formatPrice(total)}</span>
+                  {queueNumber && <div className="order-queue">No. Antrian: {queueNumber}</div>}
+                </div>
+
+                <button 
+                  className="order-details-btn"
+                  onClick={() => handleShowDetails(order)}
+                  disabled={!(paymentStatus === 'verified' || paymentStatus === 'paid')}
+                >
+                  Details
+                </button>
+              </div>
+            );
+          })}
         </div>
 
         {/* Footer */}
@@ -212,53 +195,67 @@ export default function HistoryOrderPage() {
                 <div className="modal-order-info">
                   <div className="modal-info-row">
                     <span className="modal-label">Order ID:</span>
-                    <span className="modal-value">#{selectedOrder.id}</span>
+                    <span className="modal-value">#{selectedOrder._id || selectedOrder.id}</span>
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Date:</span>
-                    <span className="modal-value">{selectedOrder.date}</span>
+                    <span className="modal-value">{formatDateFromISO(selectedOrder.createdAt || selectedOrder.date)}</span>
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Vendor:</span>
-                    <span className="modal-value">{selectedOrder.vendor}</span>
+                    <span className="modal-value">{selectedOrder.vendor || selectedOrder.vendorName || (selectedOrder.vendor?.stallName) || '-'}</span>
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Pickup Location:</span>
-                    <span className="modal-value">{selectedOrder.pickupLocation}</span>
+                    <span className="modal-value">{selectedOrder.pickupLocation || selectedOrder.location || '-'}</span>
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Payment Method:</span>
-                    <span className="modal-value">{selectedOrder.paymentMethod}</span>
+                    <span className="modal-value">{selectedOrder.paymentMethod || selectedOrder.payment_method || '-'}</span>
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Status:</span>
-                    <span className="modal-value modal-status-authorized">Authorized</span>
+                    <span className={`modal-value ${selectedOrder.paymentStatus === 'verified' ? 'modal-status-verified' : 'modal-status-unpaid'}`}>
+                      {selectedOrder.paymentStatus === 'verified' ? 'Verified' : (selectedOrder.paymentStatus || selectedOrder.status || 'Unknown')}
+                    </span>
                   </div>
+                  {selectedOrder.queueNumber && (
+                    <div className="modal-info-row">
+                      <span className="modal-label">No. Antrian:</span>
+                      <span className="modal-value">{selectedOrder.queueNumber}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="modal-items-section">
                   <h5 className="modal-section-title">Items Ordered:</h5>
                   <div className="modal-items-list">
-                    {selectedOrder.items.map((item, idx) => (
-                      <div key={idx} className="modal-item-row">
-                        <div className="modal-item-image">
-                          <Image 
-                            src={item.image} 
-                            alt={item.name} 
-                            width={60}
-                            height={60}
-                            unoptimized
-                          />
-                        </div>
-                        <div className="modal-item-details">
-                          <span className="modal-item-name">{item.name}</span>
-                          <span className="modal-item-quantity">x{item.quantity}</span>
-                        </div>
-                        <div className="modal-item-price">
-                          {formatPrice(item.price * item.quantity)}
-                        </div>
-                      </div>
-                    ))}
+                    {(selectedOrder.items || []).map((item, idx) => {
+                          const name = item.name || item.menuItem?.name || 'Item';
+                          const qty = item.quantity || item.qty || 1;
+                          const price = item.price || item.menuItem?.price || item.unitPrice || 0;
+                          const img = item.image || item.menuItem?.image || '/images/ikon_indomie.png';
+                          return (
+                            <div key={idx} className="modal-item-row">
+                              <div className="modal-item-image">
+                                <Image 
+                                  src={img} 
+                                  alt={name} 
+                                  width={60}
+                                  height={60}
+                                  unoptimized
+                                />
+                              </div>
+                              <div className="modal-item-details">
+                                <span className="modal-item-name">{name}</span>
+                                <span className="modal-item-quantity">x{qty}</span>
+                              </div>
+                              <div className="modal-item-price">
+                                {formatPrice(price * qty)}
+                              </div>
+                            </div>
+                          );
+                        })}
                   </div>
                 </div>
 

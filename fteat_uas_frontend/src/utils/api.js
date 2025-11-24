@@ -355,29 +355,99 @@ createMenu: async (menuData, token) => {
 
   // Order endpoints
   createOrder: async (orderData, token) => {
-    const response = await fetch(`${API_URL}/api/orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(orderData),
-    });
-    return response.json();
+    const url = `${API_URL}/api/orders/create`;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      // handle non-JSON response gracefully
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await response.text();
+        return { success: false, message: text || 'Non-JSON response from server' };
+      }
+
+      return await response.json();
+    } catch (err) {
+      console.error('createOrder API error:', err);
+      // Return structured error so frontend can show a useful message instead of throwing
+      return { success: false, message: err.message || 'Failed to create order', error: String(err) };
+    }
   },
 
   getOrdersByUser: async (userId, token) => {
-    const response = await fetch(`${API_URL}/api/orders?userId=${userId}`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
-    return response.json();
+    try {
+      const url = `${API_URL}/api/orders/user/${encodeURIComponent(userId)}`;
+      const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+
+      console.log('[api.getOrdersByUser] url=', url, 'status=', response.status, 'ok=', response.ok);
+
+      const contentType = response.headers.get('content-type') || '';
+      let parsed;
+      if (contentType.includes('application/json')) {
+        try {
+          parsed = await response.json();
+        } catch (e) {
+          const text = await response.text().catch(() => '');
+          console.error('[api.getOrdersByUser] failed to parse JSON, text=', text, 'err=', e);
+          return { success: false, message: 'Failed to parse JSON response', raw: text };
+        }
+      } else {
+        const text = await response.text().catch(() => '');
+        console.error('[api.getOrdersByUser] non-JSON response:', text);
+        return { success: false, message: text || 'Non-JSON response from server' };
+      }
+
+      // Normalize response shape: ensure we always return an object with `success` and `data` fields
+      if (!parsed || typeof parsed !== 'object') {
+        return { success: false, message: 'Invalid response format', raw: parsed };
+      }
+      if (typeof parsed.success === 'undefined') parsed.success = response.ok;
+      return parsed;
+    } catch (err) {
+      console.error('getOrdersByUser API error:', err);
+      return { success: false, message: err.message || 'Failed to fetch user orders', error: String(err) };
+    }
   },
 
   getOrdersByVendor: async (vendorId, token) => {
-    const response = await fetch(`${API_URL}/api/orders?vendorId=${vendorId}`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
-    return response.json();
+    try {
+      const url = `${API_URL}/api/orders/vendor/${encodeURIComponent(vendorId)}`;
+      const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+
+      console.log('[api.getOrdersByVendor] url=', url, 'status=', response.status, 'ok=', response.ok);
+
+      const contentType = response.headers.get('content-type') || '';
+      let parsed;
+      if (contentType.includes('application/json')) {
+        try {
+          parsed = await response.json();
+        } catch (e) {
+          const text = await response.text().catch(() => '');
+          console.error('[api.getOrdersByVendor] failed to parse JSON, text=', text, 'err=', e);
+          return { success: false, message: 'Failed to parse JSON response', raw: text };
+        }
+      } else {
+        const text = await response.text().catch(() => '');
+        console.error('[api.getOrdersByVendor] non-JSON response:', text);
+        return { success: false, message: text || 'Non-JSON response from server' };
+      }
+
+      if (!parsed || typeof parsed !== 'object') {
+        return { success: false, message: 'Invalid response format', raw: parsed };
+      }
+      if (typeof parsed.success === 'undefined') parsed.success = response.ok;
+      return parsed;
+    } catch (err) {
+      console.error('getOrdersByVendor API error:', err);
+      return { success: false, message: err.message || 'Failed to fetch vendor orders', error: String(err) };
+    }
   },
 
   updateOrderStatus: async (orderId, status, token) => {
@@ -390,6 +460,57 @@ createMenu: async (menuData, token) => {
       body: JSON.stringify({ status }),
     });
     return response.json();
+  },
+
+  verifyOrder: async (orderId, vendorIdentifier, token) => {
+    try {
+      const url = `${API_URL}/api/orders/${orderId}/verify`;
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ vendorId: vendorIdentifier }),
+      });
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('verifyOrder non-JSON response:', text);
+        return { success: false, message: text || 'Non-JSON response from server' };
+      }
+
+      return await response.json();
+    } catch (err) {
+      console.error('verifyOrder API error:', err);
+      return { success: false, message: err.message || 'Failed to verify order', error: String(err) };
+    }
+  },
+
+  cancelOrderVerification: async (orderId, token) => {
+    try {
+      const url = `${API_URL}/api/orders/${orderId}/cancel-verification`;
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('cancelOrderVerification non-JSON response:', text);
+        return { success: false, message: text || 'Non-JSON response from server' };
+      }
+
+      return await response.json();
+    } catch (err) {
+      console.error('cancelOrderVerification API error:', err);
+      return { success: false, message: err.message || 'Failed to cancel verification', error: String(err) };
+    }
   },
 
   // Vendor endpoints

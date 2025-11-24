@@ -57,6 +57,7 @@ export default function RegisterVendor() {
     accountNumber: '',    
     whatsapp: '',         
     email: '',
+    VendorId: '',
     password: '',
     confirmPassword: ''
   });
@@ -97,7 +98,7 @@ export default function RegisterVendor() {
       return setError('Password minimal 6 karakter');
     }
 
-    const requiredFields = ['vendorFirstName', 'stallName', 'accountHolder', 'bankName', 'accountNumber', 'whatsapp', 'email', 'password'];
+    const requiredFields = ['vendorFirstName', 'stallName', 'VendorId', 'accountHolder', 'bankName', 'accountNumber', 'whatsapp', 'email', 'password'];
     for (let field of requiredFields) {
         if (!formData[field]) {
             setError(`${field} harus diisi`); // EDIT: tampilkan field yg kosong
@@ -109,10 +110,11 @@ export default function RegisterVendor() {
 
     try {
 
+        // Use the provided VendorId (trimmed) — backend will validate uniqueness
         const payload = {
-                ...formData,
-                VendorId: `VEND-${Date.now()}` // EDIT: auto-generate ID
-            };
+          ...formData,
+          VendorId: (formData.VendorId || '').toString().trim()
+        };
 
         const data = await api.vendorRegister(payload); 
         
@@ -254,15 +256,28 @@ export default function RegisterVendor() {
               <>
 
                 <Form.Group className="mb-3">
-                  <Form.Label>Nama Stand</Form.Label>  {/* EDIT */}
+                  <Form.Label>Nama Stand</Form.Label>
                   <Form.Control
                     type="text"
-                    name="stallName"   // EDIT
-                    value={formData.stallName} // EDIT
+                    name="stallName"
+                    value={formData.stallName}
                     onChange={handleChange}
                     placeholder="Nama Stand"
                     required
                   />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Vendor ID</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="VendorId"
+                    value={formData.VendorId}
+                    onChange={handleChange}
+                    placeholder="Masukkan Vendor ID (unik) atau gunakan format VEND-123"
+                    required
+                  />
+                  <Form.Text className="text-muted">Vendor ID akan menjadi penghubung antara akun vendor dan field <code>vendor</code> pada menu makanan. Harus unik.</Form.Text>
                 </Form.Group>
 
                 <Form.Group className="mb-3">

@@ -23,12 +23,30 @@ exports.protect = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (decoded.role === 'admin') {
-      req.user = await Admin.findById(decoded.id).select('-password');
-    } else if (decoded.role === 'user') {
-      req.user = await User.findById(decoded.id).select('-password');
-    } else if (decoded.role === 'vendor') {
-      req.user = await Vendor.findById(decoded.id).select('-password');
+    console.log('[auth.protect] decoded token:', decoded);
+
+    if (decoded && decoded.role) {
+      if (decoded.role === 'admin') {
+        req.user = await Admin.findById(decoded.id).select('-password');
+      } else if (decoded.role === 'vendor') {
+        req.user = await Vendor.findById(decoded.id).select('-password');
+      } else if (decoded.role === 'user' || decoded.role === 'customer') {
+        // Support both 'user' and 'customer' roles in tokens
+        req.user = await User.findById(decoded.id).select('-password');
+      }
+    } else {
+      // Backwards-compatibility: tokens without a 'role' claim
+      // Try to find the id in User -> Vendor -> Admin collections
+      console.warn('[auth.protect] token missing role claim; attempting fallback lookups for id=', decoded && decoded.id);
+      if (decoded && decoded.id) {
+        req.user = await User.findById(decoded.id).select('-password');
+        if (!req.user) {
+          req.user = await Vendor.findById(decoded.id).select('-password');
+        }
+        if (!req.user) {
+          req.user = await Admin.findById(decoded.id).select('-password');
+        }
+      }
     }
 
     if (!req.user) {

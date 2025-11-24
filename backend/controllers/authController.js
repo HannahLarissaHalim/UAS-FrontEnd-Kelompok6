@@ -4,9 +4,9 @@ const { validationResult } = require('express-validator');
 const crypto = require("crypto");
 const { sendVerificationEmail, sendResetPasswordEmail } = require("../services/emailService");
 
-// Generate JWT Token
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+// Generate JWT Token (includes role)
+const generateToken = (userId, role = 'customer') => {
+  return jwt.sign({ id: userId, role }, process.env.JWT_SECRET, {
     expiresIn: '30d'
   });
 };
@@ -120,8 +120,8 @@ exports.register = async (req, res) => {
     // Send email verification
     await sendVerificationEmail(user.email, verificationToken);
 
-    // Generate JWT token
-    const token = generateToken(user._id);
+    // Generate JWT token (include role)
+    const token = generateToken(user._id, user.role || 'customer');
 
     res.status(201).json({
       success: true,
@@ -201,8 +201,8 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Generate token
-    const token = generateToken(user._id);
+    // Generate token (include role)
+    const token = generateToken(user._id, user.role || 'customer');
 
     res.json({
       success: true,
@@ -280,8 +280,8 @@ exports.verifyEmail = async (req, res) => {
     user.verificationTokenExpires = undefined;
     await user.save();
 
-    // Generate JWT token for auto-login after verification
-    const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    // Generate JWT token for auto-login after verification (include role)
+    const jwtToken = jwt.sign({ id: user._id, role: user.role || 'customer' }, process.env.JWT_SECRET, {
       expiresIn: '30d'
     });
 

@@ -13,6 +13,16 @@ const {
 } = require('../controllers/orderController');
 const { protect } = require('../middleware/auth'); 
 
+// Debug middleware for orders routes (development only)
+router.use((req, res, next) => {
+    try {
+        console.log(`[orders] ${req.method} ${req.originalUrl} - Authorization: ${req.headers.authorization || 'none'}`);
+    } catch (e) {
+        console.error('Orders route logger error:', e);
+    }
+    next();
+});
+
 router.get('/', protect, getOrders); 
 
 router.get('/:id', protect, getOrderById); 

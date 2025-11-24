@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
 
@@ -19,7 +19,7 @@ export default function ProtectedRoute({ children }) {
       return;
     }
 
-    if (allowedRoles.length > 0 && !allowedRoles.includes(role)) { 
+    if (Array.isArray(allowedRoles) && allowedRoles.length > 0 && !allowedRoles.includes(role)) { 
       // user mencoba akses bukan haknya
       setTimeout(() => {
         if (role === "vendor") router.replace("/vendor/welcome");
@@ -31,7 +31,7 @@ export default function ProtectedRoute({ children }) {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAuthorized(true);
-  }, [router]);
+  }, [router, allowedRoles]);
 
   if (!authorized) return null; // cegah render sebelum dicek
 
