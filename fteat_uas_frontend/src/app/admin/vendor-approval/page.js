@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { api } from '../../utils/api';
+import api from '../../utils/api'; // <-- Perbaikan untuk Default Import
 
 export default function AdminVendorApproval() {
   const router = useRouter();
@@ -27,6 +27,7 @@ export default function AdminVendorApproval() {
   const toggleApprove = async (v) => {
     try {
       const token = localStorage.getItem('token');
+      // Catatan: Asumsi fungsi approveVendor di api.js sudah diupdate untuk menerima 3 parameter
       const res = await api.approveVendor(v._id, !v.isApproved, token);
       if (res && res.success) {
         // update local list
