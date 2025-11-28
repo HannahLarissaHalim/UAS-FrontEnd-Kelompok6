@@ -1,0 +1,217 @@
+/* ===============================
+      STAND PAGE (NEW VERSION)
+   =============================== */
+
+   .stand-page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: #FDF8F2;
+  }
+  
+  /* NAVBAR */
+  .stand-navbar {
+    width: 100%;
+    height: 80px;
+    background: #FDF8F2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+  }
+  
+  .stand-navbar-logo {
+    height: 60px;
+    object-fit: contain;
+  }
+  
+  .stand-navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  
+  .stand-navbar-links a {
+    color: var(--primary-blue);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  
+  /* BRAND BANNER */
+  .stand-brand-section {
+    width: 100%;
+    padding: 4rem 3rem 2rem;
+    margin-top: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .stand-brand-text {
+    color: var(--primary-blue);
+    font-family: 'Montserrat Alternates', sans-serif;
+  }
+  
+  .stand-brand-title {
+    font-size: 3rem;
+    font-weight: 800;
+  }
+  
+  .stand-brand-sub {
+    font-size: 1.2rem;
+    opacity: 0.8;
+  }
+  
+  /* STAND GRID */
+  .stand-grid {
+    padding: 2rem 3rem 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 2rem;
+  }
+  
+  /* STAND CARD */
+  .stand-card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.1);
+    overflow: hidden;
+    transition: .3s ease;
+  }
+  
+  .stand-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stand-card-image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+  }
+  
+  .stand-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .stand-card-body {
+    padding: 1.5rem;
+  }
+  
+  .stand-card-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+  }
+  
+  .stand-card-desc {
+    font-size: .9rem;
+    margin-bottom: 1rem;
+    color: #666;
+  }
+  
+  .stand-card-btn {
+    width: 100%;
+    padding: .7rem;
+    background: var(--primary-blue);
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    text-align: center;
+  }
+  
+  
+  /* ===============================
+        STAND PAGE (OLD VERSION)
+     =============================== */
+  
+  .stand-container {
+    padding: 2.5rem 3rem;
+  }
+  
+  .stand-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin-bottom: 2rem;
+  }
+  
+  /* CATEGORY BADGES */
+  .stand-category-badges {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stand-badge {
+    background: rgba(10,73,136,0.1);
+    color: var(--primary-blue);
+    padding: .6rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  
+  /* MENU CARD (OLD STAND) */
+  .menu-card-stand {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.1);
+    overflow: hidden;
+    transition: .3s;
+  }
+  
+  .menu-card-stand:hover {
+    transform: translateY(-4px);
+  }
+  
+  .menu-card-stand-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+  }
+  
+  .menu-card-stand-body {
+    padding: 1.5rem;
+  }
+  
+  .menu-card-stand-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+  }
+  
+  .menu-card-stand-price {
+    font-size: 1.2rem;
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .menu-card-stand-btn {
+    width: 100%;
+    padding: .7rem;
+    background: var(--primary-blue);
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .stand-brand-section {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+  
+    .stand-grid {
+      padding: 1rem 1.2rem 3rem;
+      grid-template-columns: repeat(auto-fill, minmax(210px,1fr));
+    }
+  }
+  

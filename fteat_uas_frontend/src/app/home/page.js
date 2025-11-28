@@ -1,6 +1,6 @@
 'use client';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../custom.css';
+import '/home.css';
 import Navbar from '../components/Navbar';
 import Image from 'next/image';
 import Link from 'next/link';

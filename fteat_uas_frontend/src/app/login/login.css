@@ -1,0 +1,58 @@
+/* ================================
+            LOGIN PAGE
+================================ */
+
+.login-page {
+    min-height: 100vh;
+    background: #FDF8F2;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-container {
+    background: #fff;
+    width: 100%;
+    max-width: 480px;
+    padding: 2.7rem 2.4rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.15);
+  }
+  
+  .login-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .login-input {
+    width: 100%;
+    padding: .85rem 1rem;
+    border-radius: 12px;
+    border: 2px solid var(--primary-blue);
+    margin-bottom: 1.2rem;
+    font-size: 1rem;
+  }
+  
+  .login-btn {
+    margin-top: .5rem;
+    width: 100%;
+    padding: .9rem;
+    border-radius: 12px;
+    background: var(--primary-blue);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+  }
+  
+  .login-extra {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: .95rem;
+    opacity: .8;
+  }
+  
