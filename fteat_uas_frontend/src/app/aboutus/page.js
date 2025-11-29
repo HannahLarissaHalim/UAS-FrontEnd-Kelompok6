@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Navbar from '../components/Navbar';
-import '../custom.css';
+import '/aboutuss.css';
 
 export default function AboutPage() {
   const [visibleParagraphs, setVisibleParagraphs] = useState([]);

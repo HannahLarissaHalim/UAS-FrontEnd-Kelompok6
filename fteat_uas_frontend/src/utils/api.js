@@ -11,7 +11,7 @@ if (typeof window !== 'undefined') {
   console.log('API_URL configured as:', API_URL);
 }
 
-export const api = {
+export const api = { // <-- Named Export (diekspor juga sebagai Default di akhir)
   // User endpoints
   deleteAccount: async (token) => {
     const response = await fetch(`${API_URL}/api/users/delete-account`, {
@@ -146,14 +146,14 @@ export const api = {
     return response.json();
   },
 
-  approveVendor: async (vendorId, token) => { // <- baru untuk admin approve vendor
+  approveVendor: async (vendorId, token) => { // <- perlu diperbaiki agar menerima isApprovedValue
     const response = await fetch(`${API_URL}/api/vendor/admin/vendors/${vendorId}/approve`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ isApproved: true }),
+      body: JSON.stringify({ isApproved: true }), // <-- BARIS INI HARUS DINAMIS
     });
     return response.json();
   },
@@ -178,17 +178,17 @@ export const api = {
       console.log('Full URL:', url);
       console.log('Vendor ID:', vendorId);
       console.log('Encoded Vendor ID:', encodeURIComponent(vendorId));
-      
+
       const response = await fetch(url);
-      
+
       console.log('Response status:', response.status);
       console.log('Response ok:', response.ok);
       console.log('Response URL:', response.url);
-      
+
       const result = await response.json();
       console.log('Response data:', result);
       console.log('Number of menus:', result.data?.length || 0);
-      
+
       return result;
     } catch (error) {
       console.error('Get menus by vendor API error:', error);
@@ -204,7 +204,7 @@ createMenu: async (menuData, token) => {
     console.log('URL:', url);
     console.log('Token:', token ? 'Present' : 'Missing');
     console.log('Menu data:', JSON.stringify(menuData, null, 2));
-    
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -213,18 +213,18 @@ createMenu: async (menuData, token) => {
       },
       body: JSON.stringify(menuData),
     });
-    
+
     console.log('Response status:', response.status);
     console.log('Response ok:', response.ok);
-    
+
     const result = await response.json();
     console.log('Response data:', result);
-    
+
     if (result.success && result.data) {
       console.log('Created menu ID:', result.data._id);
       console.log('Created menu vendor:', result.data.vendor);
     }
-    
+
     return result;
   } catch (error) {
     console.error('Create menu API error:', error);
@@ -241,7 +241,7 @@ createMenu: async (menuData, token) => {
       console.log('URL:', url);
       console.log('Menu ID:', id);
       console.log('Update data:', JSON.stringify(menuData, null, 2));
-      
+
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -250,11 +250,11 @@ createMenu: async (menuData, token) => {
         },
         body: JSON.stringify(menuData),
       });
-      
+
       console.log('Response status:', response.status);
       const result = await response.json();
       console.log('Response data:', result);
-      
+
       return result;
     } catch (error) {
       console.error('Update menu API error:', error);
@@ -293,13 +293,13 @@ createMenu: async (menuData, token) => {
     console.log('Original Vendor ID:', vendorId);
     console.log('Encoded Vendor ID:', encodedVendorId);
     console.log('Full URL:', url);
-    
+
     const response = await fetch(url);
-    
+
     console.log('Response status:', response.status);
     console.log('Response ok:', response.ok);
     console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-    
+
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
@@ -307,15 +307,15 @@ createMenu: async (menuData, token) => {
       console.error('Non-JSON response received:', text);
       throw new Error('Server returned non-JSON response');
     }
-    
+
     const result = await response.json();
     console.log('Response data:', result);
     console.log('Number of menus:', result.data?.length || 0);
-    
+
     if (result.data && result.data.length > 0) {
       console.log('First menu sample:', result.data[0]);
     }
-    
+
     return result;
   } catch (error) {
     console.error('Get menus by vendor API error:', error);
@@ -332,7 +332,7 @@ createMenu: async (menuData, token) => {
       console.log('URL:', url);
       console.log('Menu ID:', id);
       console.log('New stock status:', stock);
-      
+
       const response = await fetch(url, {
         method: 'PATCH',
         headers: {
@@ -341,11 +341,11 @@ createMenu: async (menuData, token) => {
         },
         body: JSON.stringify({ stock }),
       });
-      
+
       console.log('Response status:', response.status);
       const result = await response.json();
       console.log('Response data:', result);
-      
+
       return result;
     } catch (error) {
       console.error('Update stock status API error:', error);
@@ -544,4 +544,4 @@ createMenu: async (menuData, token) => {
 
 
 
-export default api;
+export default api; // <-- Default Export (Ini yang dipanggil di page.js sekarang)

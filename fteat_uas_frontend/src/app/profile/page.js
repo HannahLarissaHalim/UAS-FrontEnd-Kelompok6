@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Navbar from '../components/Navbar';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../custom.css';
+import '/profile.css';
 
 export default function ProfilePage() {
   const router = useRouter();
