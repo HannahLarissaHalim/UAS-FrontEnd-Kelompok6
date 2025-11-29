@@ -5,11 +5,13 @@ import Image from 'next/image';
 import { Container, Row, Col, Form, Modal, Button } from 'react-bootstrap';
 import VendorNavbar from '../../components/VendorNavbar';
 import { mockCategories } from '../../../utils/mockData';
+import ProtectedVendorRoute from '../../components/ProtectedVendorRoute';
 import api from '../../../utils/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './vendor-menu.css';
 
 export default function VendorMenuPage() {
+  
   const router = useRouter();
   const [vendorData, setVendorData] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -470,6 +472,7 @@ const handleSaveNewMenu = async () => {
   }
 
   return (
+    <ProtectedVendorRoute>
     <div className="vendor-menu-page">
       <VendorNavbar />
 
@@ -1051,5 +1054,7 @@ const handleSaveNewMenu = async () => {
         </Modal>
       )}
     </div>
+    </ProtectedVendorRoute>
   );
 }
+

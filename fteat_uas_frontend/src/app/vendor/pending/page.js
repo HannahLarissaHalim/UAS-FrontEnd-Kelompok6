@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import { api } from '../../../utils/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ProtectedVendorRoute from '../../components/ProtectedVendorRoute';
 
 export default function VendorPendingPage() {
   const router = useRouter();
@@ -50,6 +51,7 @@ export default function VendorPendingPage() {
   }, [email, router]);
 
   return (
+    <ProtectedVendorRoute>
     <div>
       <Navbar />
       <div style={{ padding: 24 }}>
@@ -76,5 +78,6 @@ export default function VendorPendingPage() {
         )}
       </div>
     </div>
+    </ProtectedVendorRoute>
   );
 }
