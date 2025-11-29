@@ -6,7 +6,7 @@ import { Form, Alert } from 'react-bootstrap';
 import Image from 'next/image';
 import Navbar from '../../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '/changepassword.css';
+import '../../custom.css';
 import { api } from '../../../utils/api';
 
 export default function ChangePasswordPage() {

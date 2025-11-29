@@ -4,7 +4,6 @@ import { Container, Row, Col, Card, ListGroup, Button, Form, Alert } from 'react
 import { useRouter } from 'next/navigation';
 import HomeNavbar from '../components/HomeNavbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '/order.css'
 
 export default function OrderPage() {
   const router = useRouter();

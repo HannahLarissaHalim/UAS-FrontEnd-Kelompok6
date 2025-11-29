@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Navbar from '../components/Navbar';
 import { mockMenus } from '../../utils/mockData';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '/stand.css';
+import '../custom.css';
 
 export default function StandPage() {
   const [showModal, setShowModal] = useState(false);

@@ -7,7 +7,7 @@ import Navbar from '../components/Navbar';
 import api from '../../utils/api';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '/payment.css';
+import '../custom.css';
 
 // Vendor payment details - same bank account, different WhatsApp numbers
 const vendorPaymentDetails = {
