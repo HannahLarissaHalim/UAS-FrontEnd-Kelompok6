@@ -56,24 +56,24 @@ export default function VendorNavbar() {
                 {/* Navigation links - Vendor specific */}
                 <div className={`navbar-links ${isMenuOpen ? 'mobile-open' : ''}`}>
                     <Link
-                        href="/vendor-welcome"
-                        className={isActive("/vendor-welcome")}
+                        href="/vendor/welcome"
+                        className={isActive("/vendor/welcome")}
                         onClick={closeMenu}
                     >
                         Home
                     </Link>
 
                     <Link
-                        href="/vendor-pesanan"
-                        className={isActive("/vendor-pesanan")}
+                        href="/vendor/pesanan"
+                        className={isActive("/vendor/pesanan")}
                         onClick={closeMenu}
                     >
                         Pesanan
                     </Link>
 
                     <Link
-                        href="/vendor-menu"
-                        className={isActive("/vendor-menu")}
+                        href="/vendor/menu"
+                        className={isActive("/vendor/menu")}
                         onClick={closeMenu}
                     >
                         Menu
