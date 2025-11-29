@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Navbar from '../components/Navbar';
 import { mockFaculties, mockMajors } from '../../utils/mockData';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '/register.css';
+import '../custom.css';
 import { api } from '../../utils/api';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 

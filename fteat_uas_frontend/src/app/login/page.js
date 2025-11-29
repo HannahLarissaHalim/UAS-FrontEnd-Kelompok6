@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './login.css';
+import '../custom.css';
 import { api } from '../../utils/api';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 

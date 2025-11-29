@@ -6,7 +6,7 @@ import Navbar from '../components/Navbar';
 import { api } from '../../utils/api';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '/accountsettings.css';
+import '../custom.css';
 
 export default function AccountSettingsPage() {
   const router = useRouter();

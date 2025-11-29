@@ -7,7 +7,7 @@ import Navbar from '../components/Navbar';
 import ProtectedRoute from '../components/ProtectedRoute';
 import api from '../../utils/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '/historyorder.css';
+import '../custom.css';
 
 export default function HistoryOrderPage() {
   const router = useRouter();
