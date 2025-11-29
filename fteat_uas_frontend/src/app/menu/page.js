@@ -8,7 +8,7 @@ import MenuCard from '../components/MenuCard';
 
 import { mockCategories } from '../../utils/mockData'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../custom.css';
+import '/menu.css';
 
 export default function MenuPage() {
   const router = useRouter();

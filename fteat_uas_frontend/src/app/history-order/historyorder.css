@@ -1,0 +1,51 @@
+/* ================================
+       HISTORY ORDER PAGE
+================================ */
+
+.history-page {
+    background: #FDF8F2;
+    min-height: 100vh;
+    padding: 3rem 3rem 5rem;
+  }
+  
+  .history-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin-bottom: 2rem;
+  }
+  
+  .history-card {
+    background: #fff;
+    padding: 1.5rem 2rem;
+    border-radius: 15px;
+    margin-bottom: 1.4rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,.1);
+    border-left: 6px solid var(--primary-blue);
+  }
+  
+  .history-card h5 {
+    font-weight: 700;
+    color: var(--primary-blue);
+  }
+  
+  .history-status {
+    padding: .4rem .8rem;
+    border-radius: 10px;
+    font-size: .9rem;
+    font-weight: 600;
+  }
+  
+  .history-status.success {
+    background: #d1f7d6;
+    color: #0a8a38;
+  }
+  .history-status.pending {
+    background: #fff2c6;
+    color: #b38200;
+  }
+  .history-status.cancel {
+    background: #ffd1d1;
+    color: #b30021;
+  }
+  
