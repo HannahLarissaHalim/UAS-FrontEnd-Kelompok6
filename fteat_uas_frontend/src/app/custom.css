@@ -4867,3 +4867,47 @@ select option:first-child {
   filter: brightness(0.82);       
   transition: transform 0.1s ease, filter 0.1s ease;
 }
+
+/* navbar vendor */
+/* Basic link style */
+.navbar-links a {
+  padding: 6px 12px;
+  border-radius: 12px;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+/* Hover effect */
+.navbar-links a:hover {
+  background-color: rgba(116, 215, 251, 0.25);
+  color: #0A4988;
+}
+
+/* ACTIVE page effect */
+.navbar-links a.active {
+  background-color: rgba(116, 215, 251, 0.25) !important;
+  color: #0A4988 !important;
+  font-weight: 500;
+}
+
+/* IMPORTANT — hover TIDAK boleh menghapus active */
+.navbar-links a.active:hover {
+  background-color: rgba(116, 215, 251, 0.25) !important;
+  color: #0A4988 !important;
+}
+
+.navbar-links {
+  display: flex;
+  justify-content: center;  /* center horizontal */
+  align-items: center;       /* center vertical */
+  gap: 24px;                 /* jarak antar menu */
+  width: 100%;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
