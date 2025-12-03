@@ -8,6 +8,7 @@ import api from '../../utils/api';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
+import "./payment.css";
 
 // Vendor payment details - same bank account, different WhatsApp numbers
 const vendorPaymentDetails = {
@@ -463,10 +464,11 @@ export default function PaymentPage() {
                   
                   return (
                     <div key={vendorName} className="payment-vendor-section">
-                      {/* Vendor Header */}
+                      
+                      {/* Vendor Header
                       <div className="payment-vendor-header">
                         <h2 className="payment-vendor-name">{vendorName}</h2>
-                      </div>
+                      </div> */}
 
                       {/* Vendor Items */}
                       {vendorOrder.items && vendorOrder.items.map((item, index) => (
@@ -527,7 +529,7 @@ export default function PaymentPage() {
                 {/* Total Section for this vendor */}
                 <div className="payment-total-card">
                   <div className="payment-total-row">
-                    <span className="payment-total-label">Total Pembayaran {vendorName}:</span>
+                    <span className="payment-total-label">Total Pembayaran:</span>
                     <span className="payment-total-amount">{formatPrice(vendorOrder.total)}</span>
                   </div>
                 </div>

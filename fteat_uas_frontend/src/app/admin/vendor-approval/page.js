@@ -28,7 +28,6 @@ export default function AdminVendorApproval() {
   const toggleApprove = async (v) => {
     try {
       const token = localStorage.getItem('token');
-      // Catatan: Asumsi fungsi approveVendor di api.js sudah diupdate untuk menerima 3 parameter
       const res = await api.approveVendor(v._id, !v.isApproved, token);
       if (res && res.success) {
         // update local list
