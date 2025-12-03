@@ -6,6 +6,7 @@ import { Modal } from 'react-bootstrap';
 import VendorNavbar from '../../components/VendorNavbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './vendor-pesanan.css';
+import ProtectedVendorRoute from '../../components/ProtectedVendorRoute';
 
 export default function VendorPesananPage() {
   const router = useRouter();
@@ -291,6 +292,7 @@ export default function VendorPesananPage() {
   }
 
   return (
+    <ProtectedVendorRoute>
     <div className="vendor-page">
       <VendorNavbar />
 
@@ -470,5 +472,6 @@ export default function VendorPesananPage() {
         </Modal.Footer>
       </Modal>
     </div>
+    </ProtectedVendorRoute>
   );
 }
