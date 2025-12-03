@@ -300,13 +300,30 @@ exports.getOrdersByUser = async (req, res) => {
 exports.getOrdersByVendor = async (req, res) => {
     try {
         const vendorId = req.params.vendorId || req.query.vendorId;
-        const orders = await Order.find({ vendor: vendorId }).populate('user', 'name npm email').sort({ createdAt: -1 });
+        const orders = await Order.find({ vendor: vendorId })
+            .populate('user', 'name npm email')
+            .populate('items.menuItem', 'name price image') // Populate menu details
+            .sort({ createdAt: -1 });
 
         // Attach vendor info (single vendorId)
         const vendorDoc = await Vendor.findOne({ VendorId: vendorId }).catch(() => null);
         const ordersWithVendor = orders.map(o => {
             const obj = o.toObject ? o.toObject() : o;
             obj.vendorInfo = vendorDoc || null;
+            
+            // Flatten menu item data into items for easier frontend consumption
+            if (obj.items && Array.isArray(obj.items)) {
+                obj.items = obj.items.map(item => {
+                    const menuData = item.menuItem || {};
+                    return {
+                        ...item,
+                        name: menuData.name || 'Menu tidak ditemukan',
+                        price: menuData.price || 0,
+                        image: menuData.image || '/images/ikon_indomie.png',
+                        menuItem: menuData._id || item.menuItem // Keep reference
+                    };
+                });
+            }
             return obj;
         });
 

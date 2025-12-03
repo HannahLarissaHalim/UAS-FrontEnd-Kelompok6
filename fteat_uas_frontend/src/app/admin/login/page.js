@@ -48,7 +48,7 @@ export default function AdminLoginPage() {
       localStorage.setItem("user", JSON.stringify(data.data));
       localStorage.setItem("role", "admin"); 
 
-      router.push("/admin/dashboard"); 
+      router.push("/admin/stand"); 
 
     } catch (err) {
       setError("Gagal login admin.");

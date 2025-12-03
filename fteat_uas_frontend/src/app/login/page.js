@@ -82,6 +82,16 @@ export default function LoginPage() {
       }
 
       localStorage.setItem('user', JSON.stringify(userData));
+      
+      // IMPORTANT: Store role separately for Navbar to detect
+      // Mahasiswa don't have role, so DON'T set role in localStorage
+      // Only vendor and admin should have role
+      if (userData.role === 'vendor') {
+        localStorage.setItem('role', 'vendor');
+      } else {
+        // Mahasiswa - remove role if exists from previous login
+        localStorage.removeItem('role');
+      }
 
       // Redirect based on role
       if (userData.role === 'vendor') {

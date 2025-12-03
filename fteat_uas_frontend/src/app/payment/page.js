@@ -38,10 +38,30 @@ const instantNoodleAdditionals = [
   { name: "Bakso 3pcs", price: 6000 },
 ];
 
+// Normalize WhatsApp number to international format required by wa.me
+// Example: "0895600740915" -> "62895600740915"
+const normalizeWhatsappNumber = (rawNumber) => {
+  if (!rawNumber) return '';
+  // Keep only digits
+  let digits = String(rawNumber).replace(/\D/g, '');
+
+  // If already starts with country code 62, keep as is
+  if (digits.startsWith('62')) return digits;
+
+  // If starts with 0 (Indonesian local format), replace leading 0 with 62
+  if (digits.startsWith('0')) {
+    return '62' + digits.slice(1);
+  }
+
+  // Fallback: return digits as-is
+  return digits;
+};
+
 export default function PaymentPage() {
   const router = useRouter();
   const [orderData, setOrderData] = useState({});
   const [vendorInfoMap, setVendorInfoMap] = useState({});
+  const [vendorsLoaded, setVendorsLoaded] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -49,20 +69,65 @@ export default function PaymentPage() {
 
   useEffect(() => {
     async function loadCartAndVendors() {
+      // Load vendors FIRST
+      let vendorMap = {};
+      try {
+        console.log('Fetching vendors...');
+        const vendorsRes = await api.getVendors();
+        console.log('Vendors API raw response:', vendorsRes);
+        
+        // Handle both {data: [...]} and direct array response
+        const vendorsList = vendorsRes?.data || vendorsRes || [];
+        console.log('Vendors list:', vendorsList);
+        
+        if (Array.isArray(vendorsList) && vendorsList.length > 0) {
+          vendorsList.forEach(v => {
+            const vendorId = (v.VendorId || v.vendorId || '').toString();
+            const mongoId = (v._id || '').toString();
+            const stallName = v.stallName || '';
+            
+            // Store vendor by all possible keys
+            if (vendorId) vendorMap[vendorId] = v;
+            if (mongoId) vendorMap[mongoId] = v;
+            if (stallName) vendorMap[stallName] = v;
+            if (vendorId) vendorMap[vendorId.toLowerCase()] = v;
+            if (stallName) vendorMap[stallName.toLowerCase()] = v;
+            
+            console.log('Mapped vendor:', { vendorId, stallName, whatsapp: v.whatsapp, bankName: v.bankName, accountNumber: v.accountNumber, accountHolder: v.accountHolder });
+          });
+          console.log('VendorMap keys:', Object.keys(vendorMap));
+        } else {
+          console.warn('No vendors returned from API');
+        }
+      } catch (err) {
+        console.error('Failed to load vendor info:', err);
+      }
+      
+      setVendorInfoMap(vendorMap);
+      setVendorsLoaded(true);
+
+      // Then load cart
       const savedCart = localStorage.getItem('cart');
       const savedOrder = localStorage.getItem('currentOrder');
 
       if (savedCart) {
         const cartItems = JSON.parse(savedCart);
+        console.log('Cart items:', cartItems);
         const groupedByVendor = {};
 
         cartItems.forEach(item => {
           const vendor = item.vendorName || item.vendor || 'Kantin Lupa Namanya';
           const vendorId = item.vendorId || item.vendor || item.vendorName || '';
+          console.log('Cart item vendor info:', { vendor, vendorId });
           if (!groupedByVendor[vendor]) groupedByVendor[vendor] = { vendor, vendorId, items: [], total: 0 };
 
+          // Preserve the menu item ID for order creation
+          const menuItemId = item._id || item.id || item.menuItem || item.menuId || null;
+          console.log('Grouping cart item:', { name: item.name, _id: item._id, id: item.id, menuItem: item.menuItem, resolved: menuItemId });
+          
           groupedByVendor[vendor].items.push({
-            menuItem: item._id || item.id || item.menuItem || null,
+            menuItem: menuItemId,
+            _id: menuItemId, // Keep _id as backup
             name: item.name,
             quantity: item.quantity || 1,
             price: item.totalPrice || item.price,
@@ -74,23 +139,6 @@ export default function PaymentPage() {
         });
 
         setOrderData(groupedByVendor);
-
-        // load vendors for real payment info
-        try {
-          const vendorsRes = await api.getVendors();
-          if (vendorsRes && vendorsRes.data) {
-            const map = {};
-            vendorsRes.data.forEach(v => {
-              const key = (v.VendorId || v.vendorId || v._id || v.stallName || '').toString();
-              map[key] = v;
-              if (v.stallName) map[v.stallName] = v;
-            });
-            setVendorInfoMap(map);
-          }
-        } catch (err) {
-          console.error('Failed to load vendor info:', err);
-        }
-
         return;
       }
 
@@ -326,11 +374,19 @@ export default function PaymentPage() {
       const localUser = JSON.parse(localStorage.getItem('user') || '{}');
       const userId = localUser.userId || localUser._id || localUser.id || null;
 
-      const itemsPayload = (vendorGroup.items || []).map(i => ({
-        menuItem: i.menuItem || i._id || i.id || null,
-        quantity: i.quantity || 1,
-        selectedAddOns: []
-      }));
+      // Debug: log items to see what IDs are available
+      console.log('Creating order for items:', vendorGroup.items);
+      
+      const itemsPayload = (vendorGroup.items || []).map(i => {
+        // Try multiple possible ID fields
+        const menuItemId = i.menuItem || i._id || i.id || i.menuId || null;
+        console.log('Item ID resolution:', { name: i.name, menuItem: i.menuItem, _id: i._id, id: i.id, resolved: menuItemId });
+        return {
+          menuItem: menuItemId,
+          quantity: i.quantity || 1,
+          selectedAddOns: []
+        };
+      });
 
       const payload = {
         user: userId,
@@ -363,7 +419,7 @@ export default function PaymentPage() {
       // open WhatsApp to vendor for sending proof
       const vendorObj = vendorInfoMap[vendorGroup.vendorId] || vendorInfoMap[policyVendor];
       const vendorDetails = vendorObj ? { whatsapp: vendorObj.whatsapp || '081245678901' } : (vendorPaymentDetails[policyVendor] || vendorPaymentDetails['Kantin Lupa Namanya']);
-      const whatsappNumber = vendorDetails.whatsapp;
+      const whatsappNumber = normalizeWhatsappNumber(vendorDetails.whatsapp);
       const message = encodeURIComponent(
         `Halo, saya ingin konfirmasi pembayaran untuk pesanan:\n\n` +
         vendorGroup.items.map(item => `${item.name} x${item.quantity}`).join('\n') +
@@ -401,35 +457,35 @@ export default function PaymentPage() {
                 <div className="payment-step">
                   <div className="payment-step-number">1</div>
                   <div className="payment-step-content">
-                    <p className="payment-step-text">Setiap vendor memiliki rekening pembayaran dan nomor WhatsApp yang berbeda.</p>
+                    <p className="payment-step-text">Pastikan pesanan yang Anda pilih sudah benar sebelum menekan tombol &quot;Buat Pesanan&quot;.</p>
                   </div>
                 </div>
 
                 <div className="payment-step">
                   <div className="payment-step-number">2</div>
                   <div className="payment-step-content">
-                    <p className="payment-step-text">Lakukan transfer ke nomor rekening yang tertera, dan kirim bukti pembayaran melalui WhatsApp vendor terkait.</p>
+                    <p className="payment-step-text">Setiap vendor memiliki rekening pembayaran dan nomor WhatsApp yang berbeda.</p>
                   </div>
                 </div>
 
                 <div className="payment-step">
                   <div className="payment-step-number">3</div>
                   <div className="payment-step-content">
-                    <p className="payment-step-text">Setelah vendor memverifikasi pembayaran Anda, pesanan akan muncul di halaman &quot;History Order&quot;.</p>
+                    <p className="payment-step-text">Anda akan menerima instruksi pembayaran per vendor sesuai dengan daftar pesanan Anda.</p>
                   </div>
                 </div>
 
                 <div className="payment-step">
                   <div className="payment-step-number">4</div>
                   <div className="payment-step-content">
-                    <p className="payment-step-text">Pesanan Anda siap diambil.</p>
+                    <p className="payment-step-text">Lakukan transfer ke nomor rekening yang tertera, dan kirim bukti pembayaran melalui WhatsApp vendor terkait.</p>
                   </div>
                 </div>
 
                 <div className="payment-step">
                   <div className="payment-step-number">5</div>
                   <div className="payment-step-content">
-                    <p className="payment-step-text">Pesanan Anda siap diambil.</p>
+                    <p className="payment-step-text">Setelah vendor memverifikasi pembayaran Anda, pesanan akan muncul di halaman &quot;History Order&quot;.</p>
                   </div>
                 </div>
 
@@ -447,8 +503,31 @@ export default function PaymentPage() {
               <div className="payment-order-details">
                 {Object.keys(orderData).length > 0 ? Object.keys(orderData).map((vendorName) => {
                   const vendorOrder = orderData[vendorName];
-                  // Resolve vendor info: prefer vendorInfoMap (by VendorId or stallName), fallback to static map
-                  const vendorObj = vendorInfoMap[vendorOrder.vendorId] || vendorInfoMap[vendorName];
+                  
+                  // Try multiple lookup strategies
+                  const lookupKeys = [
+                    vendorOrder.vendorId,
+                    vendorName,
+                    vendorName.toLowerCase(),
+                    vendorOrder.vendorId?.toLowerCase()
+                  ].filter(Boolean);
+                  
+                  let vendorObj = null;
+                  for (const key of lookupKeys) {
+                    if (vendorInfoMap[key]) {
+                      vendorObj = vendorInfoMap[key];
+                      break;
+                    }
+                  }
+                  
+                  console.log('Vendor lookup:', { 
+                    vendorName, 
+                    vendorId: vendorOrder.vendorId, 
+                    lookupKeys,
+                    found: !!vendorObj,
+                    vendorObj: vendorObj ? { whatsapp: vendorObj.whatsapp, bankName: vendorObj.bankName } : null
+                  });
+                  
                   let vendorDetails;
                   if (vendorObj) {
                     const bankAccount = `${vendorObj.bankName || ''} ${vendorObj.accountNumber || ''}`.trim();
@@ -458,8 +537,10 @@ export default function PaymentPage() {
                       whatsapp: vendorObj.whatsapp || '081245678901',
                       location: vendorObj.stallName || vendorName
                     };
+                    console.log('Using REAL vendor details:', vendorDetails);
                   } else {
                     vendorDetails = vendorPaymentDetails[vendorName] || { bankAccount: 'BCA 1234567890 a/n Bpk. Asep', whatsapp: '081245678901', location: vendorName };
+                    console.log('FALLBACK to dummy details:', vendorDetails);
                   }
                   
                   return (

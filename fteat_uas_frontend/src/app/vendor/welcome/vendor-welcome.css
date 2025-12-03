@@ -1,448 +1,609 @@
-/* Vendor Welcome Page Styles */
+/* Vendor Welcome Page Styles - Similar to Account Settings */
 .vendor-welcome-page {
   position: relative;
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   background: #FDF8F2;
   overflow-x: hidden;
 }
 
-/* Background Logo */
-.background-logo {
-  position: absolute;
-  width: 722px;
-  height: 722px;
-  left: -102px;
-  top: 123px;
-  z-index: 0;
-  opacity: 0.9;
-}
-
-/* Welcome Content */
-.welcome-content {
-  position: relative;
-  z-index: 5;
-  padding-top: 102px;
-}
-
-.welcome-title {
-  position: absolute;
-  width: 653px;
-  height: 82px;
-  left: 700px;
-  top: 100px;
-  font-family: 'Offside', cursive;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 64px;
-  line-height: 81px;
-  color: #0A4988;
-  z-index: 10;
-}
-
-/* Vendor Info Section */
-.vendor-info-section {
-  position: absolute;
-  left: 615px;
-  top: 250px;
+/* Wrapper - Centered Layout */
+.vendor-welcome-wrapper {
   display: flex;
-  gap: 28px;
-  z-index: 10;
-}
-
-/* Vendor Icon */
-.vendor-icon-container {
-  position: relative;
-  width: 265px;
-  height: 217.6px;
-}
-
-.vendor-icon-circle {
-  position: absolute;
-  width: 300px;
-  height: 180px;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  padding: 20px 40px 60px 40px;
+  min-height: calc(100vh - 80px);
+  position: relative;
 }
 
-.vendor-icon-circle img {
-  width: 200px;
-  height: 200px;
+/* Background Logo - Large Centered */
+.vendor-bg-logo {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.12;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.vendor-bg-logo img {
+  width: 600px;
+  height: 600px;
   object-fit: contain;
 }
 
-/* Vendor Details */
-.vendor-details {
-  position: relative;
-  width: 520px;
-}
-
-.vendor-name-box {
-  position: relative;
-  width: 520px;
-  height: 67px;
-  border: 1px solid #000000;
-  border-radius: 17px;
+/* Back Button */
+.vendor-back-button {
+  position: absolute;
+  top: 20px;
+  left: 40px;
   display: flex;
   align-items: center;
-  padding-left: 23px;
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-  background: #FDF8F2;
-  box-sizing: border-box;
-}
-
-.vendor-name {
+  gap: 8px;
+  background: #FFFFFF;
+  border: 2px solid #0A4988;
+  border-radius: 25px;
+  padding: 10px 20px;
   font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 40px;
-  line-height: 49px;
+  font-size: 16px;
+  font-weight: 500;
   color: #0A4988;
-  margin: 0;
-}
-
-/* Email Section */
-.vendor-email-section {
-  margin-top: 42px;
-}
-
-.email-label {
-  position: relative;
-  display: block;
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 29px;
-  color: #0A4988;
-  margin-bottom: 12px;
-  margin-left: 14px;
-}
-
-.vendor-email-box {
-  position: relative;
-  width: 520px;
-  height: 61px;
-  border: 1px solid #000000;
-  border-radius: 17px;
-  display: flex;
-  align-items: center;
-  padding-left: 23px;
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-  background: #FDF8F2;
-  box-sizing: border-box;
-}
-
-.vendor-email {
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 28px;
-  line-height: 34px;
-  color: #0A4988;
-  margin: 0;
-}
-
-/* Action Buttons */
-.action-buttons {
-  display: flex;
-  gap: 51px;
-  margin-top: 53px;
-}
-
-.menu-button {
-  position: relative;
-  width: 215px;
-  height: 79px;
-  background: #EAF1FF;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 20px;
-  border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
+  z-index: 10;
   transition: all 0.3s ease;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.menu-button:hover {
-  background: #d5e3f7;
-  transform: translateY(-2px);
-  box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.3);
-}
-
-.menu-button span {
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 700;
-  font-size: 28px;
-  line-height: 34px;
-  color: #1E2767;
-}
-
-.button-icon {
-  width: 64px;
-  height: 62px;
-  filter: drop-shadow(0px 4px 4px rgba(255, 255, 255, 0.25));
-}
-
-.pesanan-button {
-  position: relative;
-  width: 248px;
-  height: 80px;
-  background: #1D56CF;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  transition: all 0.3s ease;
-}
-
-.pesanan-button:hover {
-  background: #164ab3;
-  transform: translateY(-2px);
-  box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.3);
-}
-
-.pesanan-button span {
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 700;
-  font-size: 32px;
-  line-height: 39px;
+.vendor-back-button:hover {
+  background: #0A4988;
   color: #FFFFFF;
 }
 
-.order-icon {
-  width: 51px;
-  height: 51px;
+.vendor-back-button:hover svg path {
+  stroke: #FFFFFF;
 }
 
-/* Footer - Using stand-footer from custom.css */
+/* Welcome Header */
+.vendor-welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  z-index: 5;
+}
 
-/* Responsive Design */
-@media (max-width: 1440px) {
-  .vendor-welcome-page {
-    width: 100%;
+.vendor-welcome-icon {
+  width: 50px;
+  height: 50px;
+}
+
+.vendor-welcome-title {
+  font-family: 'Offside', cursive;
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 1.2;
+  color: #0A4988;
+  margin: 0;
+}
+
+/* Profile Section */
+.vendor-profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  z-index: 5;
+}
+
+/* Profile Image Wrapper */
+.vendor-profile-wrapper {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.vendor-profile-image {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #0A4988;
+  background: #FDF8F2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vendor-profile-img {
+  width: 140px !important;
+  height: 140px !important;
+  object-fit: contain;
+}
+
+/* Name Box */
+.vendor-name-box {
+  width: 100%;
+  max-width: 450px;
+  height: 60px;
+  border: 2px solid #0A4988;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 25px;
+}
+
+.vendor-user-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: #0A4988;
+}
+
+/* Form Group */
+.vendor-form-group {
+  width: 100%;
+  max-width: 450px;
+  margin-bottom: 20px;
+}
+
+.vendor-form-label {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #0A4988;
+  margin-bottom: 8px;
+  margin-left: 5px;
+}
+
+.vendor-form-input-box {
+  width: 100%;
+  height: 55px;
+  border: 2px solid #0A4988;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background: #FFFFFF;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.vendor-form-input-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Action Buttons */
+.vendor-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 30px;
+  z-index: 5;
+}
+
+.vendor-btn-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: calc(50% - 8px);
+  height: 60px;
+  background: #EAF1FF;
+  border: 2px solid #0A4988;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.vendor-btn-menu:hover {
+  background: #d5e3f7;
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.vendor-btn-menu span {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #1E2767;
+}
+
+.vendor-btn-pesanan {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: calc(50% - 8px);
+  height: 60px;
+  background: #1D56CF;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.vendor-btn-pesanan:hover {
+  background: #164ab3;
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.vendor-btn-pesanan span {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #FFFFFF;
+}
+
+.vendor-btn-account {
+  width: calc(50% - 8px);
+  height: 60px;
+  background: #FFFFFF;
+  border: 2px solid #0A4988;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.vendor-btn-account:hover {
+  background: #0A4988;
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.vendor-btn-account:hover span {
+  color: #FFFFFF;
+}
+
+.vendor-btn-account span {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #0A4988;
+  transition: color 0.3s ease;
+}
+
+.vendor-btn-logout {
+  width: calc(50% - 8px);
+  height: 60px;
+  background: #DC3545;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.vendor-btn-logout:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.vendor-btn-logout span {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #FFFFFF;
+}
+
+/* Footer */
+.vendor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 40px;
+  z-index: 5;
+}
+
+.vendor-footer-text {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  color: #000000;
+}
+
+.vendor-footer-held {
+  font-family: 'Montserrat Subrayada', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: #000000;
+}
+
+/* ===== TABLET RESPONSIVE (769px - 1024px) ===== */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .vendor-welcome-wrapper {
+    padding: 15px 30px 50px 30px;
   }
 
-  .welcome-title {
-    left: 60%;
-    transform: translateX(-28%);
-  }
-
-  .vendor-info-section {
+  .vendor-bg-logo {
     left: 50%;
-    transform: translateX(-50%);
-  }
-}
-
-@media (max-width: 1024px) {
-
-  .welcome-title {
-    font-size: 40px;
-    width: auto;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.1;
   }
 
-  .vendor-name {
-    font-size: 32px;
+  .vendor-bg-logo img {
+    width: 500px;
+    height: 500px;
   }
 
-  .vendor-email {
-    font-size: 22px;
+  .vendor-back-button {
+    padding: 8px 16px;
+    font-size: 14px;
   }
 
-  .vendor-name-box,
-  .vendor-email-box {
-    width: 600px;
+  .vendor-welcome-header {
+    margin-top: 50px;
+    margin-bottom: 25px;
   }
 
-  .action-buttons {
-    flex-direction: column;
-    gap: 25px;
+  .vendor-welcome-icon {
+    width: 40px;
+    height: 40px;
   }
 
-  .menu-button,
-  .pesanan-button {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-
-  /* Hide background logo on mobile */
-  .background-logo {
-    display: none;
+  .vendor-welcome-title {
+    font-size: 36px;
   }
 
-  .welcome-content {
-    padding: 40px 20px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: calc(100vh - 80px);
+  .vendor-profile-image {
+    width: 150px;
+    height: 150px;
   }
 
-  .welcome-title {
-    position: static;
-    font-size: 40px;
-    text-align: center;
-    width: 100%;
-    max-width: 100%;
-    margin-bottom: 30px;
-    margin-left: 278px;
-  }
-
-  .vendor-info-section {
-    position: static;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-    width: 100%;
-    transform: none;
-    margin-bottom: 40px;
-  }
-
-  .vendor-icon-container {
-    width: 250px;
-    height: 195px;
-    order: -1;
-    margin: 0 auto;
-  }
-
-  .vendor-icon-circle {
-    width: 250px;
-    height: 170px;
-  }
-
-  .vendor-icon-circle img {
-    width: 200px;
-    height: 200px;
-    margin: 0;
-  }
-
-  .vendor-details {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .vendor-profile-img {
+    width: 110px !important;
+    height: 110px !important;
   }
 
   .vendor-name-box {
-    position: static;
-    width: 90%;
-    max-width: 400px;
-    height: 60px;
-    text-align: center;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    height: 55px;
   }
 
-  .vendor-name {
-    font-size: 28px;
-    line-height: 34px;
+  .vendor-user-name {
+    font-size: 20px;
   }
 
-  .vendor-email-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 30px;
+  .vendor-form-label {
+    font-size: 16px;
   }
 
-  .email-label {
-    position: static;
-    width: 90%;
-    max-width: 460px;
-    text-align: left;
-    font-size: 24px;
-    margin: 0 auto 10px auto;
-    line-height: 29px;
-    padding-left: 5%;
+  .vendor-form-input-box {
+    height: 50px;
   }
 
-  .vendor-email-box {
-    position: static;
-    width: 90%;
-    max-width: 400px;
-    height: 48px;
-    text-align: center;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .vendor-form-input-text {
+    font-size: 14px;
   }
 
-  .vendor-email {
-    font-size: 18px;
-    line-height: 24px;
+  .vendor-action-buttons {
+    gap: 12px;
+    margin-top: 25px;
   }
 
-  .action-buttons {
-    position: static;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
+  .vendor-btn-menu,
+  .vendor-btn-pesanan,
+  .vendor-btn-account,
+  .vendor-btn-logout {
+    height: 55px;
+  }
+
+  .vendor-btn-menu span,
+  .vendor-btn-pesanan span {
+    font-size: 16px;
+  }
+
+  .vendor-btn-account span,
+  .vendor-btn-logout span {
+    font-size: 14px;
+  }
+
+  .vendor-footer-text,
+  .vendor-footer-held {
+    font-size: 20px;
+  }
+}
+
+/* ===== MOBILE RESPONSIVE (max 768px) ===== */
+@media (max-width: 768px) {
+  .vendor-welcome-wrapper {
+    padding: 10px 20px 40px 20px;
+  }
+
+  .vendor-bg-logo img {
+    width: 350px;
+    height: 350px;
+  }
+
+  .vendor-back-button {
+    position: relative;
+    top: auto;
+    left: auto;
+    align-self: flex-start;
+    padding: 8px 15px;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .vendor-welcome-header {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  .vendor-welcome-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .vendor-welcome-title {
+    font-size: 26px;
+  }
+
+  .vendor-profile-section {
     max-width: 100%;
-    margin: 60px auto 0 auto;
-    align-items: center;
   }
 
-  .menu-button {
-    width: 90%;
-    max-width: 300px;
-    height: 80px;
-    margin: 0;
+  .vendor-profile-wrapper {
+    margin-bottom: 20px;
   }
 
-  .menu-button span {
-    font-size: 28px;
-    line-height: 34px;
+  .vendor-profile-image {
+    width: 120px;
+    height: 120px;
+    border-width: 3px;
   }
 
-  .pesanan-button {
-    width: 90%;
-    max-width: 300px;
-    height: 80px;
-    margin: 0;
+  .vendor-profile-img {
+    width: 90px !important;
+    height: 90px !important;
   }
 
-  .pesanan-button span {
-    font-size: 28px;
-    line-height: 34px;
+  .vendor-name-box {
+    max-width: 100%;
+    height: 50px;
+    margin-bottom: 20px;
   }
 
-  .menu-icon,
-  .order-icon {
-    width: 64px;
-    height: 62px;
+  .vendor-user-name {
+    font-size: 18px;
+  }
+
+  .vendor-form-group {
+    max-width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .vendor-form-label {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .vendor-form-input-box {
+    height: 45px;
+    padding: 0 15px;
+  }
+
+  .vendor-form-input-text {
+    font-size: 13px;
+  }
+
+  .vendor-action-buttons {
+    max-width: 100%;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .vendor-btn-menu,
+  .vendor-btn-pesanan,
+  .vendor-btn-account,
+  .vendor-btn-logout {
+    width: calc(50% - 5px);
+    height: 50px;
+    border-radius: 12px;
+  }
+
+  .vendor-btn-menu img {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .vendor-btn-menu span {
+    font-size: 14px;
+  }
+
+  .vendor-btn-pesanan svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .vendor-btn-pesanan span {
+    font-size: 14px;
+  }
+
+  .vendor-btn-account span {
+    font-size: 13px;
+  }
+
+  .vendor-btn-logout span {
+    font-size: 13px;
   }
 
   .vendor-footer {
-    position: relative;
-    margin-top: auto;
-    padding: 40px 20px 20px 20px;
-    text-align: center;
-    width: 100%;
+    padding-top: 30px;
   }
 
-  .vendor-footer p {
-    font-size: 30px;
-    line-height: 37px;
+  .vendor-footer-text,
+  .vendor-footer-held {
+    font-size: 16px;
+  }
+}
+
+/* ===== SMALL MOBILE (max 480px) ===== */
+@media (max-width: 480px) {
+  .vendor-welcome-wrapper {
+    padding: 10px 15px 30px 15px;
   }
 
-  .vendor-footer strong {
-    font-family: 'Montserrat Subrayada', cursive;
-    font-size: 30px;
-    line-height: 37px;
+  .vendor-welcome-title {
+    font-size: 22px;
+  }
+
+  .vendor-profile-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .vendor-profile-img {
+    width: 75px !important;
+    height: 75px !important;
+  }
+
+  .vendor-user-name {
+    font-size: 16px;
+  }
+
+  .vendor-form-input-text {
+    font-size: 12px;
+  }
+
+  .vendor-btn-menu,
+  .vendor-btn-pesanan,
+  .vendor-btn-account,
+  .vendor-btn-logout {
+    height: 45px;
+  }
+
+  .vendor-btn-menu span,
+  .vendor-btn-pesanan span {
+    font-size: 12px;
+  }
+
+  .vendor-btn-account span,
+  .vendor-btn-logout span {
+    font-size: 12px;
+  }
+
+  .vendor-footer-text,
+  .vendor-footer-held {
+    font-size: 14px;
   }
 }

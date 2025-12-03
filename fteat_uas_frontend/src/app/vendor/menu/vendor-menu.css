@@ -435,53 +435,67 @@
 }
 
 /* Add Menu Modal */
+.add-menu-modal .modal-dialog {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
 .add-menu-modal .modal-content {
   background: #FFFFFF;
-  border: 1px solid #000000;
-  border-radius: 24px;
+  border: 2px solid #0A4988;
+  border-radius: 20px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .add-modal-body {
-  padding: 40px;
+  padding: 30px;
 }
 
 .add-menu-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .form-group label {
   font-family: 'Montserrat', sans-serif;
-  font-size: 24px;
-  line-height: 29px;
-  letter-spacing: 0.01em;
-  color: #1D56CF;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #0A4988;
 }
 
 .form-input,
 .form-select {
-  border: 1px solid #000000;
-  border-radius: 20px;
-  padding: 12px 20px;
+  border: 2px solid #0A4988;
+  border-radius: 12px;
+  padding: 12px 16px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 20px;
-  line-height: 24px;
-  letter-spacing: 0.01em;
-  color: #000000;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
   background: #FFFFFF;
   width: 100%;
   box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #1D56CF;
+  box-shadow: 0 0 0 3px rgba(29, 86, 207, 0.1);
 }
 
 .form-input::placeholder {
-  color: rgba(29, 86, 207, 0.4);
+  color: #999;
 }
 
 .form-select {
@@ -492,8 +506,8 @@
   -moz-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230A4988' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 20px center;
-  padding-right: 50px;
+  background-position: right 16px center;
+  padding-right: 40px;
 }
 
 /* Native select dropdown options styling */
@@ -532,45 +546,54 @@
 }
 
 .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  display: flex;
+  gap: 16px;
   width: 100%;
 }
 
 .form-row .form-group {
+  flex: 1;
   min-width: 0;
 }
 
 .image-upload {
-  border: 1px solid #000000;
-  border-radius: 20px;
-  height: 196px;
+  border: 2px dashed #0A4988;
+  border-radius: 12px;
+  height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #FFFFFF;
+  background: #f8fafc;
   cursor: pointer;
   overflow: hidden;
   position: relative;
+  transition: all 0.3s ease;
 }
 
 .image-upload:hover {
-  background: #F5F5F5;
+  background: #e8f4fc;
+  border-color: #1D56CF;
 }
 
 .upload-placeholder {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   cursor: pointer;
+}
+
+.upload-placeholder svg {
+  width: 50px;
+  height: 50px;
 }
 
 .image-preview {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 20px;
+  border-radius: 10px;
 }
 
 .topping-note {
@@ -845,25 +868,280 @@
     padding: 80px 20px 60px 20px;
   }
 
+  .search-and-actions-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .menu-search-box-top {
+    max-width: 100%;
+  }
+
+  .action-buttons-section {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  .add-menu-btn,
+  .delete-menu-btn {
+    flex: 1;
+    width: auto;
+    font-size: 16px;
+    height: 50px;
+    padding: 10px 15px;
+  }
+
+  /* Modal Tablet */
+  .add-menu-modal .modal-dialog {
+    max-width: 90%;
+    margin: 15px auto;
+  }
+
+  .add-modal-body {
+    padding: 25px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .image-upload {
+    height: 130px;
+  }
+
+  .delete-confirm-text {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .delete-no-btn,
+  .delete-yes-btn {
+    width: 120px;
+    height: 45px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-container {
+    padding: 80px 15px 50px 15px;
+  }
+
+  .menu-sidebar {
+    position: relative;
+    top: 0;
+    padding: 20px;
+  }
+
+  .menu-filter-header h5 {
+    font-size: 16px;
+  }
+
+  .menu-search-box-top .menu-search-input {
+    height: 45px;
+    font-size: 14px;
+    padding-left: 50px;
+  }
+
+  .menu-search-box-top .search-icon {
+    font-size: 18px;
+    left: 15px;
+  }
+
   .action-buttons-section {
     flex-direction: column;
+    gap: 10px;
   }
 
   .add-menu-btn,
   .delete-menu-btn {
     width: 100%;
+    font-size: 14px;
+    height: 45px;
+    gap: 8px;
+  }
+
+  .add-menu-btn svg,
+  .delete-menu-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Modal Mobile */
+  .add-menu-modal .modal-dialog {
+    max-width: 95%;
+    margin: 10px auto;
+  }
+
+  .add-menu-modal .modal-content {
+    border-radius: 15px;
+    max-height: 85vh;
+  }
+
+  .add-modal-body {
+    padding: 20px;
+  }
+
+  .add-menu-form {
+    gap: 15px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+  }
+
+  .form-input,
+  .form-select {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .image-upload {
+    height: 120px;
+    border-radius: 10px;
+  }
+
+  .upload-placeholder svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .topping-select-section {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .add-new-topping-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .available-toppings-section {
+    padding: 12px;
+  }
+
+  .available-toppings-title {
+    font-size: 13px;
+  }
+
+  .available-topping-chip {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .toppings-list {
+    padding: 12px;
+  }
+
+  .toppings-list-title {
+    font-size: 14px;
+  }
+
+  .topping-item {
+    padding: 10px 12px;
+  }
+
+  .topping-name,
+  .topping-price {
+    font-size: 13px;
+  }
+
+  .stock-toggle-section .stock-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .save-menu-btn {
+    height: 45px;
+    font-size: 16px;
+    border-radius: 25px;
+  }
+
+  /* Delete Modal Mobile */
+  .delete-modal-body {
+    padding: 25px;
+  }
+
+  .delete-confirm-text {
+    font-size: 18px;
+    line-height: 26px;
+    margin-bottom: 20px;
+  }
+
+  .delete-modal-buttons {
+    gap: 15px;
+  }
+
+  .delete-no-btn,
+  .delete-yes-btn {
+    width: 100px;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
+  /* Add Topping Modal Mobile */
+  .add-topping-modal .modal-dialog {
+    max-width: 90%;
+    margin: 20px auto;
+  }
+
+  .add-topping-modal-body {
+    padding: 20px;
+  }
+
+  .add-topping-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .add-topping-modal-buttons {
+    gap: 10px;
+  }
+
+  .cancel-topping-btn,
+  .save-topping-btn {
+    height: 40px;
+    font-size: 14px;
+    border-radius: 10px;
   }
 }
 
-@media (max-width: 768px) {
-  .menu-sidebar {
-    position: relative;
-    top: 0;
+/* Small Mobile */
+@media (max-width: 480px) {
+  .menu-container {
+    padding: 75px 10px 40px 10px;
   }
 
   .add-menu-btn,
   .delete-menu-btn {
-    font-size: 20px;
-    height: 50px;
+    font-size: 13px;
+    height: 42px;
+  }
+
+  .add-modal-body {
+    padding: 15px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  .form-input,
+  .form-select {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .image-upload {
+    height: 100px;
+  }
+
+  .save-menu-btn {
+    height: 42px;
+    font-size: 14px;
   }
 }

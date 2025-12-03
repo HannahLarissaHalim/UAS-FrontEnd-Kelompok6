@@ -119,6 +119,21 @@ exports.setVendorApproval = async (req, res) => {
   }
 };
 
+// Delete vendor (admin only)
+exports.deleteVendor = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const vendor = await Vendor.findByIdAndDelete(id);
+    if (!vendor) return res.status(404).json({ success: false, message: 'Vendor tidak ditemukan' });
+
+    res.json({ success: true, message: 'Vendor berhasil dihapus' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });
+  }
+};
+
 // Update vendor profile (self)
 exports.updateVendorProfile = async (req, res) => {
   try {

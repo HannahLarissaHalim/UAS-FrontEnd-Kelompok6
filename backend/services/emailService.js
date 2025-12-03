@@ -11,7 +11,10 @@ exports.sendVerificationEmail = async (toEmail, token) => {
     auth: {
       user: process.env.SMTP_USER, // sender email
       pass: process.env.SMTP_PASS  // app password
-    }
+    },
+    tls: {
+    rejectUnauthorized: false
+  }
   });
 
   const mailOptions = {
@@ -34,7 +37,7 @@ exports.sendVerificationEmail = async (toEmail, token) => {
 exports.sendResetPasswordEmail = async (toEmail, token) => {
   const baseUrl = process.env.CLIENT_URL || "http://localhost:3000";
 
-  // FIX FORMAT URL
+  //reset password
   const resetLink = `${baseUrl}/change-password/${token}`;
 
   const transporter = nodemailer.createTransport({
@@ -42,6 +45,9 @@ exports.sendResetPasswordEmail = async (toEmail, token) => {
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
+    },
+    tls: {
+      rejectUnauthorized: false
     }
   });
 
