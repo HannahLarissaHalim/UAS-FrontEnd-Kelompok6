@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { api } from '../../../utils/api';
+import ProtectedAdminRoute from '../../components/ProtectedAdminRoute';
 
 export default function AdminVendorApproval() {
   const router = useRouter();
@@ -43,6 +44,7 @@ export default function AdminVendorApproval() {
   if (loading) return <div style={{padding:40}}>Loading...</div>;
 
   return (
+    // <ProtectedAdminRoute>
     <div>
       <Navbar />
       <div style={{ padding: 24 }}>
@@ -72,5 +74,6 @@ export default function AdminVendorApproval() {
         </table>
       </div>
     </div>
+    // </ProtectedAdminRoute>
   );
 }

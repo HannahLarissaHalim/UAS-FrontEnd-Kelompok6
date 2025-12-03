@@ -5,6 +5,7 @@ import { Card, Button, Alert, Spinner } from "react-bootstrap";
 import Navbar from "../../components/Navbar";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../custom.css';
+import ProtectedAdminRoute from '../../components/ProtectedAdminRoute';
 
 export default function AdminDashboard() {
   const [vendors, setVendors] = useState([]);
@@ -65,6 +66,7 @@ export default function AdminDashboard() {
   if (loading) return <Spinner animation="border" className="m-5" />;
 
   return (
+    // <ProtectedAdminRoute>
     <div>
       <Navbar />
       <div className="container my-5">
@@ -93,6 +95,7 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
-    </div>
+    </div> 
+    // </ProtectedAdminRoute> 
   );
 }

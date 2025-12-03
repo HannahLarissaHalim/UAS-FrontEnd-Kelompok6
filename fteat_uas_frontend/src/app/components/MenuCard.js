@@ -7,13 +7,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
   // Safety Check: Jika menu kosong, return null atau placeholder
   if (!menu) {
-      return (
-          <Card className="menu-card text-center p-3">
-              <p className="text-muted">Memuat data menu...</p>
-          </Card>
-      );
+    return (
+      <Card className="menu-card text-center p-3">
+        <p className="text-muted">Memuat data menu...</p>
+      </Card>
+    );
   }
-    
+
   const [showModal, setShowModal] = useState(false);
   const [selectedAdditionals, setSelectedAdditionals] = useState({});
 
@@ -27,12 +27,12 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
     setSelectedAdditionals(prev => {
       const currentQty = prev[additionalName] || 0;
       const newQty = Math.max(0, currentQty + change);
-      
+
       if (newQty === 0) {
         const { [additionalName]: removed, ...rest } = prev;
         return rest;
       }
-      
+
       return { ...prev, [additionalName]: newQty };
     });
   };
@@ -40,25 +40,25 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
   const calculateTotal = () => {
     let additionalsTotal = 0;
     if (menu.additionals) {
-        Object.entries(selectedAdditionals).forEach(([name, qty]) => {
-          const additional = menu.additionals.find(a => a.name === name);
-          if (additional) {
-            additionalsTotal += additional.price * qty;
-          }
-        });
+      Object.entries(selectedAdditionals).forEach(([name, qty]) => {
+        const additional = menu.additionals.find(a => a.name === name);
+        if (additional) {
+          additionalsTotal += additional.price * qty;
+        }
+      });
     }
     return menu.price + additionalsTotal;
   };
-  
+
   const getSelectedAdditionalsList = () => {
     const list = [];
     if (menu.additionals) {
-        Object.entries(selectedAdditionals).forEach(([name, qty]) => {
-          const additional = menu.additionals.find(a => a.name === name);
-          if (additional && qty > 0) {
-            list.push({ ...additional, quantity: qty });
-          }
-        });
+      Object.entries(selectedAdditionals).forEach(([name, qty]) => {
+        const additional = menu.additionals.find(a => a.name === name);
+        if (additional && qty > 0) {
+          list.push({ ...additional, quantity: qty });
+        }
+      });
     }
     return list;
   };
@@ -90,8 +90,8 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
   };
 
   // Gunakan properti DB di sini:
-  const displayVendor = menu.vendor || 'Kantin Teknik Bursa Lt.7'; 
-  const displayTime = menu.time || '5-10 menit'; 
+  const displayVendor = menu.vendor || 'Kantin Teknik Bursa Lt.7';
+  const displayTime = menu.time || '5-10 menit';
   const hasAdditionals = menu.additionals && menu.additionals.length > 0;
 
 
@@ -100,7 +100,7 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
       <Card className="menu-card">
         <div className="menu-card-image">
           {menu.image ? (
-            <Image 
+            <Image
               src={menu.image}
               alt={menu.name}
               fill
@@ -118,46 +118,52 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
             {menu.brand && menu.category === "Instant Noodles" && (
               <Badge className="menu-badge-brand">{menu.brand}</Badge>
             )}
-            <span className="menu-time">⏱️ {displayTime}</span> 
+            <span className="menu-time">⏱️ {displayTime}</span>
           </div>
-          
+
           <h5 className="menu-card-title">{menu.name}</h5>
-          
+
           <div className="menu-price-section">
             <span className="menu-price-label">Harga</span>
             <h4 className="menu-price">{formatPrice(menu.price)}</h4>
           </div>
-          
-          <p className="menu-vendor">{displayVendor}</p> 
-          
+
+          <p className="menu-vendor">{displayVendor}</p>
+
           <div className="menu-card-actions">
-            <Button 
+            <Button
               className="menu-btn-buy"
-              onClick={hasAdditionals ? handleShowModal : handleBuyNow} 
+              onClick={hasAdditionals ? handleShowModal : handleBuyNow}
             >
               Buy Now
             </Button>
-            <Button 
+            <Button
               className="menu-btn-cart"
-              onClick={hasAdditionals ? handleShowModal : handleAddToCart} 
+              onClick={hasAdditionals ? handleShowModal : handleAddToCart}
             >
               🛒 Add to cart
             </Button>
           </div>
-          
-          {hasAdditionals && (
-            <Button 
-              className="menu-btn-additionals"
-              onClick={handleShowModal}
-            >
-              + Additionals
-            </Button>
-          )}
+
+          <div className="menu-additionals-container">
+            {hasAdditionals ? (
+              <Button
+                className="menu-btn-additionals"
+                onClick={handleShowModal}
+              >
+                + Additionals
+              </Button>
+            ) : (
+              <div className="no-additionals-box">
+                No Additionals
+              </div>
+            )}
+          </div>
         </Card.Body>
       </Card>
 
       {/* Additionals Modal */}
-      <Modal show={showModal} onHide={handleCloseModal} centered className="additionals-modal">
+      <Modal show={showModal} onHide={handleCloseModal} centered className="additionals-modal" >
         <Modal.Header closeButton className="additionals-modal-header">
           <Modal.Title className="additionals-modal-title">{menu.name}</Modal.Title>
         </Modal.Header>
@@ -169,7 +175,7 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
                 {menu.additionals.map((additional, index) => {
                   const quantity = selectedAdditionals[additional.name] || 0;
                   return (
-                    <ListGroup.Item 
+                    <ListGroup.Item
                       key={index}
                       className="additionals-list-item"
                     >
@@ -178,7 +184,7 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
                         <span className="additionals-price">{formatPrice(additional.price)}</span>
                       </div>
                       <div className="additionals-quantity-controls">
-                        <Button 
+                        <Button
                           variant="outline-secondary"
                           size="sm"
                           className="qty-btn qty-minus"
@@ -188,7 +194,7 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
                           -
                         </Button>
                         <span className="qty-display">{quantity}</span>
-                        <Button 
+                        <Button
                           variant="outline-primary"
                           size="sm"
                           className="qty-btn qty-plus"
@@ -201,7 +207,7 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
                   );
                 })}
               </ListGroup>
-              
+
               {/* Selected Additionals Summary */}
               {Object.keys(selectedAdditionals).length > 0 && (
                 <div className="selected-additionals-summary">
