@@ -11,32 +11,46 @@ export default function VendorWelcomePage() {
   const [vendorData, setVendorData] = useState(null);
 
   useEffect(() => {
-    // Check if user is logged in and is a vendor
-    const user = localStorage.getItem('user');
+    const loadVendorData = () => {
+      // Check if user is logged in and is a vendor
+      const user = localStorage.getItem('user');
 
-    // If no user found, redirect to vendor login (no dummy data)
-    if (!user) {
-      router.push('/vendor/login');
-      return;
-    }
-
-    try {
-      const userData = JSON.parse(user);
-      if (userData.role !== 'vendor') {
-        // not a vendor -> redirect to login
+      // If no user found, redirect to vendor login (no dummy data)
+      if (!user) {
         router.push('/vendor/login');
         return;
       }
 
-      // Use real stored vendor data
-      setVendorData(userData);
-    } catch (err) {
-      // If parsing fails, clear and redirect
-      console.error('Invalid user in localStorage:', err);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      router.push('/vendor/login');
-    }
+      try {
+        const userData = JSON.parse(user);
+        if (userData.role !== 'vendor') {
+          // not a vendor -> redirect to login
+          router.push('/vendor/login');
+          return;
+        }
+
+        // Use real stored vendor data
+        setVendorData(userData);
+      } catch (err) {
+        // If parsing fails, clear and redirect
+        console.error('Invalid user in localStorage:', err);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        router.push('/vendor/login');
+      }
+    };
+
+    loadVendorData();
+
+    // Listen for user updates (from account page)
+    const handleUserUpdate = () => {
+      loadVendorData();
+    };
+    window.addEventListener('userUpdated', handleUserUpdate);
+
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+    };
   }, [router]);
 
   const handleMenuClick = () => {
@@ -105,16 +119,21 @@ export default function VendorWelcomePage() {
 
         {/* Profile Section */}
         <div className="vendor-profile-section">
-          {/* Vendor Icon - Not Editable */}
+          {/* Vendor Profile Image */}
           <div className="vendor-profile-wrapper">
             <div className="vendor-profile-image">
-              <Image
-                src="/images/ikon_indomie.png"
-                alt="Vendor Icon"
+              <img
+                src={vendorData.profileImage || '/images/navbar_icons/profile.png'}
+                alt="Vendor Profile"
                 width={180}
                 height={180}
-                unoptimized
                 className="vendor-profile-img"
+                style={{
+                  width: '180px',
+                  height: '180px',
+                  borderRadius: '50%',
+                  objectFit: 'cover'
+                }}
               />
             </div>
           </div>

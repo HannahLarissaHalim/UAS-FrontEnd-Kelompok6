@@ -14,6 +14,9 @@ export default function AdminStandPage() {
   const [loading, setLoading] = useState(true);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editedStallName, setEditedStallName] = useState('');
+  const [editedProfileImage, setEditedProfileImage] = useState('');
 
   const loadVendors = async () => {
     try {
@@ -62,12 +65,68 @@ export default function AdminStandPage() {
 
   const handleVendorClick = (vendor) => {
     setSelectedVendor(vendor);
+    setEditedStallName(vendor.stallName || vendor.namaKantin || '');
+    setEditedProfileImage(vendor.profileImage || '');
+    setEditMode(false);
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedVendor(null);
+    setEditMode(false);
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('File harus berupa gambar');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Ukuran gambar maksimal 2MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setEditedProfileImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedVendor) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const payload = {
+        namaKantin: editedStallName,
+        stallName: editedStallName,
+        profileImage: editedProfileImage,
+      };
+
+      const res = await api.updateVendorByAdmin(selectedVendor._id, payload, token);
+      if (res && res.success) {
+        // Update vendors list
+        setVendors(prev => prev.map(v => 
+          v._id === selectedVendor._id 
+            ? { ...v, stallName: editedStallName, namaKantin: editedStallName, profileImage: editedProfileImage }
+            : v
+        ));
+        setSelectedVendor({ ...selectedVendor, stallName: editedStallName, namaKantin: editedStallName, profileImage: editedProfileImage });
+        setEditMode(false);
+        alert('Profil vendor berhasil diperbarui');
+      } else {
+        alert(res?.message || 'Gagal memperbarui profil vendor');
+      }
+    } catch (err) {
+      console.error('Error updating vendor:', err);
+      alert('Error memperbarui profil vendor');
+    }
   };
 
   const handleDeleteVendor = async (vendor) => {
@@ -189,10 +248,71 @@ export default function AdminStandPage() {
         <Modal.Body className="order-modal-body">
           {selectedVendor && (
             <div className="modal-order-info">
+              {/* Profile Image Section */}
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <img 
+                    src={editedProfileImage || '/images/navbar_icons/profile.png'} 
+                    alt="Vendor Profile"
+                    style={{
+                      width: '120px',
+                      height: '120px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '3px solid #0A4988'
+                    }}
+                  />
+                  {editMode && (
+                    <label style={{
+                      position: 'absolute',
+                      bottom: '0',
+                      right: '0',
+                      background: '#0A4988',
+                      borderRadius: '50%',
+                      width: '35px',
+                      height: '35px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer'
+                    }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 17C14.2091 17 16 15.2091 16 13C16 10.7909 14.2091 9 12 9C9.79086 9 8 10.7909 8 13C8 15.2091 9.79086 17 12 17Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Nama Kantin - Editable */}
               <div className="modal-info-row">
                 <span className="modal-label">Nama Kantin:</span>
-                <span className="modal-value">{selectedVendor.stallName || '-'}</span>
+                {editMode ? (
+                  <input 
+                    type="text"
+                    value={editedStallName}
+                    onChange={(e) => setEditedStallName(e.target.value)}
+                    style={{
+                      fontFamily: 'Montserrat',
+                      fontSize: '0.95rem',
+                      padding: '5px 10px',
+                      border: '2px solid #0A4988',
+                      borderRadius: '5px',
+                      flex: 1
+                    }}
+                  />
+                ) : (
+                  <span className="modal-value">{selectedVendor.stallName || '-'}</span>
+                )}
               </div>
+
               <div className="modal-info-row">
                 <span className="modal-label">Vendor ID:</span>
                 <span className="modal-value">{selectedVendor.VendorId || '-'}</span>
@@ -241,9 +361,43 @@ export default function AdminStandPage() {
           <button className="delete-vendor-btn" onClick={() => handleDeleteVendor(selectedVendor)}>
             Hapus Vendor
           </button>
-          <button className="modal-close-btn" onClick={handleCloseModal}>
-            Tutup
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {editMode ? (
+              <>
+                <button 
+                  className="modal-close-btn" 
+                  onClick={() => {
+                    setEditMode(false);
+                    setEditedStallName(selectedVendor.stallName || selectedVendor.namaKantin || '');
+                    setEditedProfileImage(selectedVendor.profileImage || '');
+                  }}
+                  style={{ background: '#6c757d' }}
+                >
+                  Batal
+                </button>
+                <button 
+                  className="modal-close-btn" 
+                  onClick={handleSaveEdit}
+                  style={{ background: '#28a745' }}
+                >
+                  Simpan
+                </button>
+              </>
+            ) : (
+              <>
+                <button 
+                  className="modal-close-btn" 
+                  onClick={() => setEditMode(true)}
+                  style={{ background: '#0A4988' }}
+                >
+                  Edit Profil
+                </button>
+                <button className="modal-close-btn" onClick={handleCloseModal}>
+                  Tutup
+                </button>
+              </>
+            )}
+          </div>
         </Modal.Footer>
       </Modal>
     </div>

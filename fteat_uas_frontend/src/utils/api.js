@@ -168,6 +168,18 @@ export const api = {
     return response.json();
   },
 
+  updateVendorByAdmin: async (vendorId, payload, token) => {
+    const response = await fetch(`${API_URL}/api/vendor/admin/vendors/${vendorId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    return response.json();
+  },
+
   // Menu endpoints
   getMenus: async (filters = {}) => {
     const queryParams = new URLSearchParams(filters).toString();

@@ -146,6 +146,10 @@ exports.updateVendorProfile = async (req, res) => {
     delete update.role;
     delete update.isApproved;
     delete update.password;
+    // Prevent vendor from changing their own profile image and stall name
+    delete update.profileImage;
+    delete update.namaKantin;
+    delete update.stallName;
 
     const vendor = await Vendor.findByIdAndUpdate(vendorId, update, { new: true, runValidators: true }).select('-password');
     if (!vendor) return res.status(404).json({ success: false, message: 'Vendor tidak ditemukan' });
@@ -153,6 +157,30 @@ exports.updateVendorProfile = async (req, res) => {
     res.json({ success: true, message: 'Profil vendor diperbarui', data: vendor });
   } catch (err) {
     console.error('Update vendor profile error:', err);
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ success: false, message: messages.join(', ') });
+    }
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });
+  }
+};
+
+// Admin updates vendor profile (including profile image and stall name)
+exports.updateVendorByAdmin = async (req, res) => {
+  try {
+    const vendorId = req.params.id;
+    const update = req.body || {};
+
+    // Prevent role or password being changed
+    delete update.role;
+    delete update.password;
+
+    const vendor = await Vendor.findByIdAndUpdate(vendorId, update, { new: true, runValidators: true }).select('-password');
+    if (!vendor) return res.status(404).json({ success: false, message: 'Vendor tidak ditemukan' });
+
+    res.json({ success: true, message: 'Profil vendor berhasil diperbarui oleh admin', data: vendor });
+  } catch (err) {
+    console.error('Update vendor by admin error:', err);
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(e => e.message);
       return res.status(400).json({ success: false, message: messages.join(', ') });

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Form, Alert } from 'react-bootstrap';
 import Image from 'next/image';
@@ -10,7 +10,6 @@ import './vendor-account.css';
 
 export default function VendorAccountPage() {
   const router = useRouter();
-  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     stallName: '',
     whatsapp: '',
@@ -45,35 +44,6 @@ export default function VendorAccountPage() {
     }
   }, [router]);
 
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setError('File harus berupa gambar');
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      setError('Ukuran gambar maksimal 2MB');
-      return;
-    }
-
-    // Convert to base64
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setProfileImage(reader.result);
-      setError('');
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
@@ -86,14 +56,12 @@ export default function VendorAccountPage() {
       if (!token) return router.push('/vendor/login');
 
       const payload = {
-        stallName: formData.stallName,
         whatsapp: formData.whatsapp,
         bankName: formData.bankName,
         accountNumber: formData.accountNumber,
         accountHolder: formData.accountHolder,
         vendorFirstName: formData.vendorFirstName,
         vendorLastName: formData.vendorLastName,
-        profileImage: profileImage,
       };
 
       const res = await api.updateVendorProfile(payload, token);
@@ -104,6 +72,10 @@ export default function VendorAccountPage() {
 
       // update localStorage user
       localStorage.setItem('user', JSON.stringify(res.data));
+      
+      // Dispatch event to update other pages (e.g., welcome page)
+      window.dispatchEvent(new Event('userUpdated'));
+      
       setSuccess('Profil berhasil diperbarui');
     } catch (err) {
       console.error('Update profile error', err);
@@ -167,29 +139,18 @@ export default function VendorAccountPage() {
           {success && <Alert variant="success" className="vendor-alert">{success}</Alert>}
 
           <Form onSubmit={handleSubmit} className="vendor-account-form">
-            {/* Profile Image Upload */}
+            {/* Profile Image - Read Only */}
             <div className="vendor-profile-upload">
-              <div className="vendor-profile-image-wrapper" onClick={handleImageClick}>
+              <div className="vendor-profile-image-wrapper">
                 <img 
                   src={profileImage} 
                   alt="Profile" 
                   className="vendor-profile-image"
                 />
-                <div className="vendor-profile-overlay">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 17C14.2091 17 16 15.2091 16 13C16 10.7909 14.2091 9 12 9C9.79086 9 8 10.7909 8 13C8 15.2091 9.79086 17 12 17Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <input 
-                  type="file" 
-                  ref={fileInputRef}
-                  onChange={handleImageChange}
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                />
               </div>
-              <p className="vendor-profile-hint">Klik untuk ganti foto profil kantin</p>
+              <p className="vendor-profile-hint" style={{ color: '#888', fontStyle: 'italic' }}>
+                Foto profil dan nama kantin hanya dapat diubah oleh Admin
+              </p>
             </div>
 
             <div className="vendor-form-group">
@@ -198,8 +159,8 @@ export default function VendorAccountPage() {
             </div>
 
             <div className="vendor-form-group">
-              <label className="vendor-form-label">Nama Stand</label>
-              <input type="text" name="stallName" value={formData.stallName} onChange={handleChange} className="vendor-form-input" />
+              <label className="vendor-form-label">Nama Stand (tidak dapat diubah)</label>
+              <input type="text" name="stallName" value={formData.stallName} readOnly className="vendor-form-input readonly" />
             </div>
 
             <div className="vendor-form-row">
