@@ -12,7 +12,7 @@ exports.sendVerificationEmail = async (toEmail, token) => {
     port: smtpPort,
     secure: smtpPort === 465, // true for 465, false for 587
     auth: {
-      user: process.env.SMTP_USER, // sender email
+      user: process.env.SMTP_USER, //sender email
       pass: process.env.SMTP_PASS  // app password
     },
     tls: {
