@@ -110,16 +110,14 @@ exports.register = async (req, res) => {
       role: 'customer'
     });
 
-    // TEMPORARILY DISABLED: Email verification
-    // TODO: Re-enable when SMTP is fixed
-    // const verificationToken = crypto.randomBytes(32).toString("hex");
-    // user.verificationToken = verificationToken;
-    // user.verificationTokenExpires = Date.now() + 5 * 60 * 1000;
-    // await sendVerificationEmail(user.email, verificationToken);
-    
-    // Auto-verify user for now
-    user.isVerified = true;
+    // Generate verification token and send email
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpires = Date.now() + 5 * 60 * 1000;
     await user.save();
+    
+    // Send verification email via Resend
+    await sendVerificationEmail(user.email, verificationToken);
 
     // Generate JWT token (include role)
     const token = generateToken(user._id, user.role || 'customer');
