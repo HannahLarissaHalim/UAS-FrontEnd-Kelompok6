@@ -8,7 +8,7 @@ const cloudinary = require('cloudinary').v2;
 const fileUpload = require('express-fileupload');
 
 // Load environment variables FIRST
-// dotenv.config(); tes
+dotenv.config();
 connectDB();
 
 // 2. Konfigurasi Cloudinary (Mengambil data dari .env)
