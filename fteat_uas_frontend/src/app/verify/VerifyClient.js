@@ -19,12 +19,9 @@ export default function VerifyClient() {
         const data = await res.json();
 
         if (data.success) {
-          localStorage.setItem("token", data.data.token);
-          localStorage.setItem("npm", data.data.npm);
-          localStorage.setItem("name", data.data.name);
-          localStorage.setItem("role", data.data.role);
-
-          router.push("/dashboard/customer");
+          // Redirect to login page after successful verification
+          // User needs to login with their credentials
+          router.push("/login");
         } else {
           router.push("/login");
         }
