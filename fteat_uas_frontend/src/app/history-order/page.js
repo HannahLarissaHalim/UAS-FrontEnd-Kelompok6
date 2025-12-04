@@ -24,6 +24,7 @@ export default function HistoryOrderPage() {
       return;
     }
     const parsedUser = JSON.parse(userData);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUser(parsedUser);
     
     const fetchOrders = async () => {
