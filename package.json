@@ -4,9 +4,10 @@
   "private": true,
   "main": "backend/server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "start:backend": "node backend/server.js",
-    "dev:backend": "cd backend && nodemon server.js",
+    "postinstall": "cd backend && npm install",
+    "start": "cd backend && npm start",
+    "start:backend": "cd backend && npm start",
+    "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd fteat_uas_frontend && npm run dev"
   },
   "dependencies": {

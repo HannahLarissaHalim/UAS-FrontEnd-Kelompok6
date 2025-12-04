@@ -22,7 +22,9 @@ git push origin main
 2. Click **"New Project"**
 3. Select **"Deploy from GitHub repo"**
 4. Choose your repository
-5. **Important:** Set root directory to `backend`
+5. **Important:** Railway will auto-detect the monorepo
+   - If asked, keep root directory as `/` (root)
+   - The `railway.toml` file will handle the backend setup
 6. Click **"Deploy"**
 
 ### 1.3 Add Environment Variables
