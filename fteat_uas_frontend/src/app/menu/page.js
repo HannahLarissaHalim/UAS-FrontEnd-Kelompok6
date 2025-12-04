@@ -133,6 +133,33 @@ export default function MenuPage() {
   };
 
   const handleBuyNow = (menuWithAdditionals) => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Save intended purchase to localStorage for after login
+      const orderData = {
+        vendor: menuWithAdditionals.vendor || 'Kantin Lupa Namanya', 
+        items: [{
+          _id: menuWithAdditionals._id || menuWithAdditionals.id,
+          menuItem: menuWithAdditionals._id || menuWithAdditionals.id,
+          name: menuWithAdditionals.name,
+          category: menuWithAdditionals.category,
+          quantity: 1,
+          price: menuWithAdditionals.totalPrice || menuWithAdditionals.price,
+          basePrice: menuWithAdditionals.price, 
+          image: menuWithAdditionals.image,
+          toppings: menuWithAdditionals.selectedAdditionals?.map(a => `${a.name} (${a.quantity})`).join(', ') || '',
+          vendorId: menuWithAdditionals.vendor || menuWithAdditionals.vendorId || '',
+          vendorName: menuWithAdditionals.vendor || menuWithAdditionals.vendorName || ''
+        }],
+        total: menuWithAdditionals.totalPrice || menuWithAdditionals.price
+      };
+      localStorage.setItem('currentOrder', JSON.stringify(orderData));
+      localStorage.setItem('redirectAfterLogin', '/payment');
+      router.push('/login');
+      return;
+    }
+
     const orderData = {
       vendor: menuWithAdditionals.vendor || 'Kantin Lupa Namanya', 
       items: [{

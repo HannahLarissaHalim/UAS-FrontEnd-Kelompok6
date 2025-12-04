@@ -226,7 +226,7 @@ export default function AccountSettingsPage() {
     localStorage.removeItem('role');
     localStorage.removeItem('cart');
     localStorage.removeItem('currentOrder');
-    router.push('/login');
+    router.push('/');
   };
 
   const handleDeleteAccount = async () => {
@@ -235,7 +235,7 @@ export default function AccountSettingsPage() {
       const token = localStorage.getItem('token');
       if (!token) {
         setAlertModal({ show: true, title: 'Error', message: 'Kamu tidak memiliki akun. Harap login untuk menghapus akun', variant: 'error' });
-        setTimeout(() => router.push('/login'), 1500);
+        setTimeout(() => router.push('/'), 1500);
         return;
       }
 
@@ -245,8 +245,11 @@ export default function AccountSettingsPage() {
         // Clear all local storage data
         localStorage.removeItem('user');
         localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('cart');
+        localStorage.removeItem('currentOrder');
         setAlertModal({ show: true, title: 'Berhasil', message: 'Akunmu telah berhasil dihapus', variant: 'success' });
-        setTimeout(() => router.push('/register'), 1500);
+        setTimeout(() => router.push('/'), 1500);
       } else {
         setAlertModal({ show: true, title: 'Gagal', message: response.message || 'Gagal untuk menghapus akun', variant: 'error' });
       }

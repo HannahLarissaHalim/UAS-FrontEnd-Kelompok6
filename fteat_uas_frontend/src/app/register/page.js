@@ -187,10 +187,9 @@ export default function RegisterPage() {
       }
       */
 
-      //const data = await response.json();
-      localStorage.setItem("email", formData.email);
-      
-      router.push(`/check-email?email=${encodeURIComponent(formData.email)}`);
+      // Email verification temporarily disabled - redirect to login
+      // User is auto-verified, can login immediately
+      router.push('/login');
     } catch (err) {
       setError(err.message || 'Connection failed');
     } finally {
