@@ -5,6 +5,7 @@ import { Form, Alert } from 'react-bootstrap';
 import Image from 'next/image';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import VendorNavbar from '../../components/VendorNavbar';
+import ConfirmModal from '../../components/ConfirmModal';
 import { api } from '../../../utils/api';
 import './vendor-account.css';
 
@@ -24,6 +25,7 @@ export default function VendorAccountPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const userStr = localStorage.getItem('user');
@@ -86,9 +88,12 @@ export default function VendorAccountPage() {
   };
 
   const handleLogout = () => {
+    setShowLogoutModal(false);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('role');
+    localStorage.removeItem('cart');
+    localStorage.removeItem('currentOrder');
     router.push('/vendor/login');
   };
 
@@ -199,18 +204,24 @@ export default function VendorAccountPage() {
               <button type="submit" className="vendor-btn-save" disabled={loading}>
                 {loading ? 'Menyimpan...' : 'Simpan'}
               </button>
-              <button type="button" className="vendor-btn-logout" onClick={handleLogout}>
+              <button type="button" className="vendor-btn-logout" onClick={() => setShowLogoutModal(true)}>
                 Logout
               </button>
             </div>
           </Form>
         </div>
 
-        {/* Footer */}
-        <div className="vendor-account-footer">
-          <span className="vendor-footer-text">Developed by </span>
-          <span className="vendor-footer-held">HELD</span>
-        </div>
+        {/* Logout Confirmation Modal */}
+        <ConfirmModal
+          show={showLogoutModal}
+          onHide={() => setShowLogoutModal(false)}
+          onConfirm={handleLogout}
+          title="Konfirmasi Logout"
+          message="Apakah kamu yakin ingin keluar dari akun ini?"
+          confirmText="Ya, Logout"
+          cancelText="Batal"
+          variant="warning"
+        />
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Navbar from '../components/Navbar';
+import ConfirmModal from '../components/ConfirmModal';
 import { api } from '../../utils/api';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -22,6 +23,8 @@ export default function AccountSettingsPage() {
     password: '••••••••'
   });
   const fileInputRef = useRef(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -214,36 +217,39 @@ export default function AccountSettingsPage() {
   };
 
   const handleLogout = () => {
+    setShowLogoutModal(false);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('cart');
+    localStorage.removeItem('currentOrder');
     router.push('/login');
   };
 
   const handleDeleteAccount = async () => {
-    if (confirm('Apakah kamu yakin untuk menghapus akun ini? Akunmu tidak akan bisa dikembalikan')) {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('Kamu tidak memiliki akun. Harap login untuk menghapus akun');
-          router.push('/login');
-          return;
-        }
-
-        const response = await api.deleteAccount(token);
-
-        if (response.success) {
-          // Clear all local storage data
-          localStorage.removeItem('user');
-          localStorage.removeItem('token');
-          alert('Akunmu telah berhasil dihapus');
-          router.push('/register');
-        } else {
-          alert(response.message || 'Gagal untuk menghapus akun');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error terjadi saat menghapus akunmu, Coba lagi nanti');
+    setShowDeleteModal(false);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Kamu tidak memiliki akun. Harap login untuk menghapus akun');
+        router.push('/login');
+        return;
       }
+
+      const response = await api.deleteAccount(token);
+
+      if (response.success) {
+        // Clear all local storage data
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        alert('Akunmu telah berhasil dihapus');
+        router.push('/register');
+      } else {
+        alert(response.message || 'Gagal untuk menghapus akun');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error terjadi saat menghapus akunmu, Coba lagi nanti');
     }
   };
 
@@ -380,6 +386,19 @@ export default function AccountSettingsPage() {
                   readOnly
                 />
               </div>
+
+              {/* Save Button - Centered */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem', marginBottom: '1rem' }}>
+                <button 
+                  className="account-btn-save" 
+                  onClick={handleSave}
+                  disabled={uploading}
+                  style={{ width: 'auto', minWidth: '200px' }}
+                >
+                  {uploading ? 'Saving' : 'Save'}
+                </button>
+              </div>
+
             {/* </div> */}
 
           </div>
@@ -408,23 +427,16 @@ export default function AccountSettingsPage() {
             </div> */}
           
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Logout and Delete Only */}
           <div className="account-action-buttons">
-            <button className="account-btn-logout" onClick={handleLogout}>
+            <button className="account-btn-logout" onClick={() => setShowLogoutModal(true)}>
               Logout
             </button>
-            <button className="account-btn-delete" onClick={handleDeleteAccount}>
+            <button className="account-btn-delete" onClick={() => setShowDeleteModal(true)}>
               <svg width="33" height="33" viewBox="0 0 33 33" fill="none">
                 <path d="M8.25 9.625H24.75M11 9.625V6.875C11 6.34674 11.2107 5.84002 11.5858 5.46495C11.9609 5.08988 12.4674 4.875 13 4.875H20C20.5326 4.875 21.0391 5.08988 21.4142 5.46495C21.7893 5.84002 22 6.34674 22 6.875V9.625M13.75 15.125V22.125M19.25 15.125V22.125M9.625 9.625H23.375V25.625C23.375 26.1533 23.1643 26.66 22.7892 27.0351C22.4141 27.4101 21.9076 27.625 21.375 27.625H11.625C11.0924 27.625 10.5859 27.4101 10.2108 27.0351C9.83571 26.66 9.625 26.1533 9.625 25.625V9.625Z" fill="#FFFFFF"/>
               </svg>
               Delete account
-            </button>
-            <button 
-              className="account-btn-save" 
-              onClick={handleSave}
-              disabled={uploading}
-            >
-              {uploading ? 'Saving' : 'Save'}
             </button>
           </div>
 
@@ -435,6 +447,29 @@ export default function AccountSettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modals */}
+      <ConfirmModal
+        show={showLogoutModal}
+        onHide={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+        title="Konfirmasi Logout"
+        message="Apakah kamu yakin ingin keluar dari akun ini?"
+        confirmText="Ya, Logout"
+        cancelText="Batal"
+        variant="warning"
+      />
+
+      <ConfirmModal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteAccount}
+        title="Konfirmasi Hapus Akun"
+        message="Apakah kamu yakin ingin menghapus akun ini? Akun yang sudah dihapus tidak dapat dikembalikan!"
+        confirmText="Ya, Hapus Akun"
+        cancelText="Batal"
+        variant="danger"
+      />
     </ProtectedRoute>
   );
 }
