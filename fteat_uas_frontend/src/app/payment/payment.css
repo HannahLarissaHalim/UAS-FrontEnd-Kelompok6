@@ -245,68 +245,7 @@
   box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
-/* Payment Page Mobile Responsive */
-@media (max-width: 768px) {
-  .payment-container {
-    padding: 2rem 1rem;
-  }
-
-  .payment-content {
-    flex-direction: column;
-  }
-
-  .payment-logo {
-    width: 300px;
-    height: 300px;
-  }
-
-  .payment-fork,
-  .payment-spoon {
-    width: 50px;
-    height: 180px;
-  }
-
-  .payment-fork {
-    left: -20px;
-  }
-
-  .payment-spoon {
-    right: -20px;
-  }
-
-  .payment-card {
-    padding: 1.5rem;
-  }
-
-  .payment-title {
-    font-size: 2rem;
-  }
-
-  .payment-section-title {
-    font-size: 1.3rem;
-  }
-
-  .payment-order-row {
-    font-size: 0.95rem;
-  }
-
-  .payment-item-price,
-  .payment-additional-price {
-    min-width: 90px;
-  }
-
-  .payment-total-label {
-    font-size: 1.5rem;
-  }
-
-  .payment-total-amount {
-    font-size: 2rem;
-  }
-
-  .payment-actions {
-    flex-direction: column;
-  }
-}
+/* Legacy styles removed - using new responsive styles at bottom */
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -549,5 +488,579 @@
 .payment-whatsapp-number {
   margin: 0;
   font-weight: 600;
+}
+
+/* WhatsApp Card */
+.payment-whatsapp-card {
+  background: #25D366 !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+  border: none !important;
+  box-shadow:
+    2px 0px 0px rgba(0,0,0,0.10),
+    0px 4px 0px rgba(0,0,0,0.15),
+    -2px 2px 4px rgba(0,0,0,0.03),
+    0px -2px 4px rgba(0,0,0,0.025) !important;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.payment-whatsapp-card:hover {
+  transform: translateY(-2px);
+}
+
+.payment-whatsapp-icon {
+  color: #FFFFFF;
+}
+
+.payment-whatsapp-label,
+.payment-whatsapp-number {
+  color: #FFFFFF;
+}
+
+/* Order Card Content */
+.payment-order-header {
+  margin-bottom: 1rem;
+}
+
+.payment-order-location {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #0A4988;
+  background: #EAF1FF;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.payment-order-content {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.payment-order-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.payment-order-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.payment-order-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.payment-order-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.payment-order-toppings {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 0.5rem 0;
+}
+
+.payment-order-price {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #0A4988;
+  margin: 0;
+}
+
+.payment-order-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.payment-edit-btn {
+  background: #EAF1FF;
+  border: 2px solid #0A4988;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #0A4988;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.payment-edit-btn:hover {
+  background: #0A4988;
+  color: #FFFFFF;
+}
+
+.payment-quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.payment-qty-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #0A4988;
+  background: #FFFFFF;
+  color: #0A4988;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.payment-qty-btn:hover {
+  background: #0A4988;
+  color: #FFFFFF;
+}
+
+.payment-qty-display {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #000;
+  min-width: 30px;
+  text-align: center;
+}
+
+/* Empty State */
+.payment-empty-state {
+  text-align: center;
+  padding: 3rem;
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.payment-empty-state p {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: #666;
+}
+
+/* Footer */
+.payment-footer {
+  text-align: center;
+  padding: 2rem;
+  font-family: 'Montserrat', sans-serif;
+  color: #000;
+}
+
+.payment-footer strong {
+  font-family: 'Montserrat Subrayada', sans-serif;
+}
+
+/* ===== TABLET RESPONSIVE (769px - 1024px) ===== */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .payment-container {
+    padding: 1.5rem;
+  }
+
+  .payment-main-title {
+    font-size: 36px;
+    margin: 1.5rem 0;
+  }
+
+  .payment-layout {
+    grid-template-columns: 45% 55%;
+    gap: 1.5rem;
+  }
+
+  .payment-left-section {
+    padding: 1.5rem;
+    top: 120px;
+  }
+
+  .payment-instructions-title {
+    font-size: 22px;
+    margin-bottom: 1.5rem;
+  }
+
+  .payment-step-number {
+    min-width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+
+  .payment-step-text {
+    font-size: 14px;
+  }
+
+  .payment-order-card {
+    padding: 20px !important;
+  }
+
+  .payment-order-name {
+    font-size: 16px;
+  }
+
+  .payment-order-price {
+    font-size: 16px;
+  }
+
+  .payment-bank-card,
+  .payment-whatsapp-card {
+    padding: 18px !important;
+  }
+}
+
+/* ===== MOBILE RESPONSIVE (max 768px) ===== */
+@media (max-width: 768px) {
+  .payment-page {
+    padding-bottom: 60px;
+  }
+
+  .payment-container {
+    padding: 1rem;
+  }
+
+  .payment-main-title {
+    font-size: 28px;
+    margin: 1rem 0;
+    text-align: center;
+  }
+
+  .payment-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  /* Tata Cara di ATAS */
+  .payment-left-section {
+    position: relative;
+    top: 0;
+    padding: 1.25rem;
+    order: 1;
+  }
+
+  /* Order details di BAWAH */
+  .payment-right-section {
+    order: 2;
+  }
+
+  .payment-instructions-title {
+    font-size: 18px;
+    margin-bottom: 1.25rem;
+  }
+
+  .payment-step {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .payment-step-number {
+    min-width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .payment-step-text {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* Order Card - Centered & Larger for Mobile */
+  .payment-order-card {
+    padding: 20px !important;
+    border-radius: 15px !important;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .payment-order-header {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .payment-order-location {
+    display: inline-block;
+  }
+
+  .payment-order-content {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .payment-order-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+  }
+
+  .payment-order-info {
+    text-align: center;
+    align-items: center;
+  }
+
+  .payment-order-name {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .payment-order-toppings {
+    font-size: 14px;
+  }
+
+  .payment-order-price {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .payment-order-actions {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    padding-top: 1rem;
+  }
+
+  .payment-edit-btn {
+    width: 100%;
+    max-width: 200px;
+    text-align: center;
+    padding: 12px 20px;
+  }
+
+  .payment-quantity-controls {
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .payment-qty-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+
+  .payment-qty-display {
+    font-size: 20px;
+    min-width: 40px;
+  }
+
+  .payment-total-card {
+    padding: 1.25rem;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .payment-total-row {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .payment-total-label {
+    font-size: 16px;
+  }
+
+  .payment-total-amount {
+    font-size: 24px;
+  }
+
+  .payment-bank-card,
+  .payment-whatsapp-card {
+    padding: 20px !important;
+    border-radius: 15px !important;
+    margin-bottom: 12px;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .payment-bank-icon,
+  .payment-whatsapp-icon {
+    font-size: 2.5rem;
+  }
+
+  .payment-bank-info,
+  .payment-whatsapp-info {
+    text-align: center;
+  }
+
+  .payment-bank-label,
+  .payment-whatsapp-label {
+    font-size: 14px;
+  }
+
+  .payment-bank-account,
+  .payment-whatsapp-number {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .payment-empty-state {
+    padding: 2rem 1rem;
+    border-radius: 15px;
+  }
+
+  .payment-empty-state p {
+    font-size: 14px;
+  }
+
+  .payment-footer {
+    padding: 1.5rem;
+    font-size: 14px;
+  }
+
+  /* Modal Mobile */
+  .additionals-modal .modal-dialog {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+
+  .additionals-modal .modal-content {
+    border-radius: 15px;
+  }
+
+  .additionals-modal-header {
+    padding: 15px;
+  }
+
+  .additionals-modal-title {
+    font-size: 18px;
+  }
+
+  .additionals-modal-body {
+    padding: 15px;
+  }
+
+  .additionals-subtitle {
+    font-size: 14px;
+  }
+
+  .additionals-list-item {
+    padding: 12px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .additionals-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .additionals-name {
+    font-size: 14px;
+  }
+
+  .additionals-price {
+    font-size: 14px;
+  }
+
+  .additionals-quantity-controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .selected-additionals-summary {
+    padding: 12px;
+    margin-top: 15px;
+  }
+
+  .summary-title {
+    font-size: 14px;
+  }
+
+  .summary-item {
+    font-size: 13px;
+  }
+
+  .additionals-modal-footer {
+    padding: 15px;
+    gap: 10px;
+  }
+
+  .modal-btn-cancel,
+  .modal-btn-buy {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+/* ===== SMALL MOBILE (max 480px) ===== */
+@media (max-width: 480px) {
+  .payment-container {
+    padding: 0.75rem;
+  }
+
+  .payment-main-title {
+    font-size: 24px;
+  }
+
+  .payment-left-section {
+    padding: 1rem;
+  }
+
+  .payment-instructions-title {
+    font-size: 16px;
+  }
+
+  .payment-step-number {
+    min-width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .payment-step-text {
+    font-size: 12px;
+  }
+
+  .payment-order-card {
+    padding: 12px !important;
+  }
+
+  .payment-order-image {
+    width: 70px;
+    height: 70px;
+  }
+
+  .payment-order-name {
+    font-size: 14px;
+  }
+
+  .payment-order-price {
+    font-size: 14px;
+  }
+
+  .payment-qty-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .payment-total-amount {
+    font-size: 18px;
+  }
+
+  .payment-bank-card,
+  .payment-whatsapp-card {
+    padding: 12px !important;
+  }
 }
 

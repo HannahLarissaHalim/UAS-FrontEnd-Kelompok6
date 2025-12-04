@@ -52,6 +52,10 @@ const vendorSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    profileImage: {
+        type: String,
+        default: null,
+    },
 }, { 
     timestamps: true,
     toJSON: { virtuals: true }, 

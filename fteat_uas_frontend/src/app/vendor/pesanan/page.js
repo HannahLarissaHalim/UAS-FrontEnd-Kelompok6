@@ -391,7 +391,7 @@ export default function VendorPesananPage() {
       </div>
 
       {/* Order Details Modal */}
-      <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
+      <Modal show={showModal} onHide={handleCloseModal} centered className="order-details-modal">
         <Modal.Header closeButton className="order-modal-header">
           <Modal.Title className="order-modal-title">Order Details</Modal.Title>
         </Modal.Header>
@@ -401,7 +401,7 @@ export default function VendorPesananPage() {
               <div className="modal-order-info">
                 <div className="modal-info-row">
                   <span className="modal-label">Order ID:</span>
-                  <span className="modal-value">#{selectedOrder._id}</span>
+                  <span className="modal-value">#{selectedOrder._id?.slice(-6).toUpperCase() || '------'}</span>
                 </div>
                 <div className="modal-info-row">
                   <span className="modal-label">Date:</span>
@@ -428,31 +428,41 @@ export default function VendorPesananPage() {
               <div className="modal-items-section">
                 <h5 className="modal-section-title">Items Ordered:</h5>
                 <div className="modal-items-list">
-                  {selectedOrder.items.map((item, idx) => (
-                    <div key={idx} className="modal-item-row">
-                      <div className="modal-item-image">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          width={60}
-                          height={60}
-                          unoptimized
-                        />
+                  {selectedOrder.items.map((item, idx) => {
+                    const itemImage = item.image || '/images/ikon_indomie.png';
+                    const itemName = item.name || 'Menu';
+                    const itemPrice = item.price || 0;
+                    return (
+                      <div key={idx} className="modal-item-row">
+                        <div className="modal-item-image" style={{ minWidth: '80px', width: '80px', height: '80px' }}>
+                          {itemImage ? (
+                            <Image
+                              src={itemImage}
+                              alt={itemName}
+                              width={80}
+                              height={80}
+                              style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+                              unoptimized
+                            />
+                          ) : (
+                            <div style={{ width: 80, height: 80, background: '#eee', borderRadius: 8 }} />
+                          )}
+                        </div>
+                        <div className="modal-item-details">
+                          <span className="modal-item-name">{itemName}</span>
+                          <span className="modal-item-quantity">x{item.quantity}</span>
+                          {item.additionals && item.additionals.length > 0 && (
+                            <span className="modal-item-additionals">
+                              + {item.additionals.join(', ')}
+                            </span>
+                          )}
+                        </div>
+                        <div className="modal-item-price">
+                          {formatPrice(itemPrice * item.quantity)}
+                        </div>
                       </div>
-                      <div className="modal-item-details">
-                        <span className="modal-item-name">{item.name}</span>
-                        <span className="modal-item-quantity">x{item.quantity}</span>
-                        {item.additionals && item.additionals.length > 0 && (
-                          <span className="modal-item-additionals">
-                            + {item.additionals.join(', ')}
-                          </span>
-                        )}
-                      </div>
-                      <div className="modal-item-price">
-                        {formatPrice(item.price * item.quantity)}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 

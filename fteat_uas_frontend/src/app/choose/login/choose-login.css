@@ -131,3 +131,177 @@
   opacity: 1;
   transform: translateX(20px);
 }
+
+/* ========================= RESPONSIVE ========================= */
+
+/* Tablet (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .choose-login-body {
+    gap: 30px;
+    padding: 2rem;
+  }
+
+  .choose-login-title {
+    font-size: 26px;
+  }
+
+  .role-container {
+    gap: 50px;
+  }
+
+  .role-card {
+    width: 110px;
+    height: 110px;
+  }
+
+  .role-card .icon {
+    font-size: 40px;
+  }
+
+  .mahasiswa:hover {
+    width: 280px;
+  }
+
+  .vendor:hover,
+  .admin:hover {
+    width: 250px;
+  }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+  .choose-login-body {
+    gap: 25px;
+    padding: 1.5rem 1rem;
+  }
+
+  .choose-login-title {
+    font-size: 22px;
+    text-align: center;
+  }
+
+  /* Stack cards vertically */
+  .role-container {
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  /* Make cards full width on mobile */
+  .role-card {
+    width: 100%;
+    height: 80px;
+    border-radius: 8px;
+    justify-content: flex-start;
+    padding-left: 20px;
+  }
+
+  .role-card .icon {
+    font-size: 35px;
+    position: absolute;
+    left: 20px;
+  }
+
+  .role-card .text {
+    position: static;
+    opacity: 1;
+    transform: translateX(60px);
+    font-size: 18px;
+  }
+
+  /* Remove hover effects on mobile, show text by default */
+  .mahasiswa,
+  .vendor,
+  .admin {
+    background: transparent;
+    border: 3px solid;
+  }
+
+  .mahasiswa {
+    border-color: #9b162b;
+    color: #9b162b;
+  }
+
+  .vendor {
+    border-color: #153d92;
+    color: #153d92;
+  }
+
+  .admin {
+    border-color: #2c2c2c;
+    color: #2c2c2c;
+  }
+
+  /* Active/tap state for mobile */
+  .mahasiswa:active {
+    background: #cf1d3b;
+    border-color: #cf1d3b;
+    color: white;
+    box-shadow: 2px 2px 0 #891325;
+  }
+
+  .vendor:active {
+    background: #1d56cf;
+    border-color: #1d56cf;
+    color: white;
+    box-shadow: 2px 2px 0 #11347a;
+  }
+
+  .admin:active {
+    background: #000;
+    border-color: #000;
+    color: white;
+    box-shadow: 2px 2px 0 #1a1a1a;
+  }
+
+  /* Disable hover effects on mobile */
+  .role-card:hover {
+    width: 100%;
+    transform: none;
+  }
+
+  .role-card:hover .icon {
+    transform: none;
+  }
+
+  .role-card:hover .text {
+    transform: translateX(60px);
+  }
+
+  .homepage-footer {
+    position: relative;
+    text-align: center;
+    padding: 1rem;
+  }
+}
+
+/* Small mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .choose-login-title {
+    font-size: 20px;
+  }
+
+  .role-container {
+    max-width: 280px;
+  }
+
+  .role-card {
+    height: 70px;
+    padding-left: 15px;
+  }
+
+  .role-card .icon {
+    font-size: 30px;
+    left: 15px;
+  }
+
+  .role-card .text {
+    font-size: 16px;
+    transform: translateX(50px);
+  }
+
+  .role-card:hover .text {
+    transform: translateX(50px);
+  }
+}

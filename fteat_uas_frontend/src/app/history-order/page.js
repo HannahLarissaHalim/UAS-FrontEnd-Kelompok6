@@ -8,6 +8,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import api from '../../utils/api';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../custom.css';
+import './history-order.css';
 
 export default function HistoryOrderPage() {
   const router = useRouter();
@@ -23,21 +24,22 @@ export default function HistoryOrderPage() {
       return;
     }
     const parsedUser = JSON.parse(userData);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUser(parsedUser);
-    // fetch real orders for this user
+    
     const fetchOrders = async () => {
       try {
         const token = localStorage.getItem('token');
-        // user id field may be _id or id
         const userId = parsedUser?._id || parsedUser?.id || parsedUser?.userId || parsedUser?.npm;
-        console.log('[HistoryOrder] fetching orders for userId=', userId, 'token present=', !!token);
         const res = await api.getOrdersByUser(userId, token);
-        console.log('[HistoryOrder] getOrdersByUser response:', res);
         if (res && res.success) {
-          setOrders(res.data || []);
+          // Only show orders that have been verified/paid by vendor
+          const verifiedOrders = (res.data || []).filter(order => 
+            order.paymentStatus === 'verified' || 
+            order.paymentStatus === 'paid' || 
+            order.status === 'paid'
+          );
+          setOrders(verifiedOrders);
         } else {
-          console.error('Failed to fetch user orders', res);
           setOrders([]);
         }
       } catch (err) {
@@ -48,23 +50,14 @@ export default function HistoryOrderPage() {
 
     fetchOrders();
 
-    // listen for vendor verification events to refresh history
-    const onOrderVerified = () => {
-      fetchOrders();
-    };
+    const onOrderVerified = () => fetchOrders();
     window.addEventListener('orderVerified', onOrderVerified);
     return () => window.removeEventListener('orderVerified', onOrderVerified);
   }, [router]);
 
   const handleShowDetails = (order) => {
-    // allow showing details when order is verified/paid
-    const isVerified = order.paymentStatus === 'verified' || order.status === 'paid' || order.paymentStatus === 'paid';
-    if (isVerified) {
-      setSelectedOrder(order);
-      setShowModal(true);
-    } else {
-      alert('Payment is still pending vendor authorization');
-    }
+    setSelectedOrder(order);
+    setShowModal(true);
   };
 
   const handleCloseModal = () => {
@@ -80,10 +73,6 @@ export default function HistoryOrderPage() {
     }).format(price);
   };
 
-  if (!user) {
-    return null;
-  }
-
   const formatDateFromISO = (iso) => {
     try {
       const d = new Date(iso);
@@ -96,96 +85,77 @@ export default function HistoryOrderPage() {
     }
   };
 
+  // Get user display name
+  const getUserName = () => {
+    if (!user) return '';
+    return user.name || user.fullName || user.firstName || user.email?.split('@')[0] || 'User';
+  };
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <ProtectedRoute> 
       <div className="history-order-page">
         <Navbar />
         
-        {/* Back Button */}
-        <button 
-          className="back-button"
-          onClick={() => router.push('/profile')}
-          aria-label="Back to profile"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M15 18L9 12L15 6" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span>Back</span>
-        </button>
-        
-        {/* History Order Title */}
-        <div className="history-order-header">
-          <svg className="history-icon" width="68" height="68" viewBox="0 0 68 68" fill="none">
-            <rect x="14" y="14" width="40" height="48" stroke="#0A4988" strokeWidth="4" rx="2"/>
-            <line x1="22" y1="26" x2="46" y2="26" stroke="#0A4988" strokeWidth="3"/>
-            <line x1="22" y1="36" x2="46" y2="36" stroke="#0A4988" strokeWidth="3"/>
-            <line x1="22" y1="46" x2="38" y2="46" stroke="#0A4988" strokeWidth="3"/>
-          </svg>
-          <h1 className="history-order-title">History Order</h1>
+        <div className="history-order-container">
+          {/* Title Section */}
+          <h1 className="history-main-title">Nomor Antrian kamu!</h1>
+          
+          {/* User Name Badge */}
+          <div className="history-user-badge">
+            <span>{getUserName()}</span>
+          </div>
+
+          {/* Queue Cards Grid */}
+          <div className="queue-cards-grid">
+            {orders.length === 0 ? (
+              <p className="no-orders-message">Belum ada pesanan yang terverifikasi</p>
+            ) : (
+              orders.map((order) => {
+                const id = order._id || order.id;
+                const queueNumber = order.queueNumber || '---';
+                // Get first item image or default
+                const firstItem = order.items?.[0];
+                const itemImage = firstItem?.image || firstItem?.menuItem?.image || '/images/ikon_indomie.png';
+                
+                return (
+                  <div key={id} className="queue-card">
+                    <div className="queue-card-image">
+                      <Image 
+                        src={itemImage}
+                        alt="Order"
+                        width={100}
+                        height={100}
+                        style={{ objectFit: 'contain' }}
+                        unoptimized
+                      />
+                    </div>
+                    <div className="queue-number-display">
+                      {queueNumber}
+                    </div>
+                    <button 
+                      className="queue-details-btn"
+                      onClick={() => handleShowDetails(order)}
+                    >
+                      Details
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="homepage-footer">
+            <p>Developed by <strong>HELD</strong></p>
+          </div>
         </div>
 
-        {/* Order Cards Grid */}
-        <div className="history-orders-grid">
-          {orders.map((order) => {
-            const id = order._id || order.id;
-            const createdAt = order.createdAt || order.date;
-            const total = order.totalPrice || order.total || order.totalAmount;
-            const paymentStatus = order.paymentStatus || order.status;
-            const queueNumber = order.queueNumber || null;
-            return (
-              <div key={id} className="history-order-card">
-                <div className="order-card-header">
-                  <span className="order-date">kamu pada tanggal</span>
-                  <span className="order-date-time">{formatDateFromISO(createdAt)} di</span>
-                </div>
-
-                <div className="order-card-items">
-                  {(order.items || []).map((item, idx) => {
-                    const itemName = item.name || item.menuItem?.name || 'Item';
-                    const itemImage = item.image || item.menuItem?.image || '/images/ikon_indomie.png';
-                    return (
-                      <div key={idx} className="order-item-icon">
-                        <Image 
-                          src={itemImage} 
-                          alt={itemName} 
-                          width={80}
-                          height={80}
-                          unoptimized
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="order-card-vendor">
-                  <span className="order-vendor-text">Total</span>
-                </div>
-
-                <div className="order-card-total">
-                  <span className="order-total-amount">{formatPrice(total)}</span>
-                  {queueNumber && <div className="order-queue">No. Antrian: {queueNumber}</div>}
-                </div>
-
-                <button 
-                  className="order-details-btn"
-                  onClick={() => handleShowDetails(order)}
-                  disabled={!(paymentStatus === 'verified' || paymentStatus === 'paid')}
-                >
-                  Details
-                </button>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Footer */}
-        <div className="history-footer">
-          <span className="history-footer-text">Developed by </span>
-          <span className="history-footer-text history-footer-held">HELD</span>
-        </div>
-
-        {/* Order Details Modal */}
-        <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
+        {/* Order Details Modal - Same as before */}
+        <Modal show={showModal} onHide={handleCloseModal} centered className="order-details-modal">
           <Modal.Header closeButton className="order-modal-header">
             <Modal.Title className="order-modal-title">Order Details</Modal.Title>
           </Modal.Header>
@@ -195,7 +165,7 @@ export default function HistoryOrderPage() {
                 <div className="modal-order-info">
                   <div className="modal-info-row">
                     <span className="modal-label">Order ID:</span>
-                    <span className="modal-value">#{selectedOrder._id || selectedOrder.id}</span>
+                    <span className="modal-value">#{(selectedOrder._id || selectedOrder.id)?.slice(-6).toUpperCase()}</span>
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Date:</span>
@@ -203,26 +173,24 @@ export default function HistoryOrderPage() {
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Vendor:</span>
-                    <span className="modal-value">{selectedOrder.vendor || selectedOrder.vendorName || (selectedOrder.vendor?.stallName) || '-'}</span>
+                    <span className="modal-value">{selectedOrder.vendor || selectedOrder.vendorName || '-'}</span>
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Pickup Location:</span>
-                    <span className="modal-value">{selectedOrder.pickupLocation || selectedOrder.location || '-'}</span>
+                    <span className="modal-value">{selectedOrder.pickupLocation || '-'}</span>
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Payment Method:</span>
-                    <span className="modal-value">{selectedOrder.paymentMethod || selectedOrder.payment_method || '-'}</span>
+                    <span className="modal-value">{selectedOrder.paymentMethod || '-'}</span>
                   </div>
                   <div className="modal-info-row">
                     <span className="modal-label">Status:</span>
-                    <span className={`modal-value ${selectedOrder.paymentStatus === 'verified' ? 'modal-status-verified' : 'modal-status-unpaid'}`}>
-                      {selectedOrder.paymentStatus === 'verified' ? 'Verified' : (selectedOrder.paymentStatus || selectedOrder.status || 'Unknown')}
-                    </span>
+                    <span className="modal-value modal-status-verified">Verified</span>
                   </div>
                   {selectedOrder.queueNumber && (
                     <div className="modal-info-row">
                       <span className="modal-label">No. Antrian:</span>
-                      <span className="modal-value">{selectedOrder.queueNumber}</span>
+                      <span className="modal-value modal-queue-highlight">{selectedOrder.queueNumber}</span>
                     </div>
                   )}
                 </div>
@@ -231,38 +199,38 @@ export default function HistoryOrderPage() {
                   <h5 className="modal-section-title">Items Ordered:</h5>
                   <div className="modal-items-list">
                     {(selectedOrder.items || []).map((item, idx) => {
-                          const name = item.name || item.menuItem?.name || 'Item';
-                          const qty = item.quantity || item.qty || 1;
-                          const price = item.price || item.menuItem?.price || item.unitPrice || 0;
-                          const img = item.image || item.menuItem?.image || '/images/ikon_indomie.png';
-                          return (
-                            <div key={idx} className="modal-item-row">
-                              <div className="modal-item-image">
-                                <Image 
-                                  src={img} 
-                                  alt={name} 
-                                  width={60}
-                                  height={60}
-                                  unoptimized
-                                />
-                              </div>
-                              <div className="modal-item-details">
-                                <span className="modal-item-name">{name}</span>
-                                <span className="modal-item-quantity">x{qty}</span>
-                              </div>
-                              <div className="modal-item-price">
-                                {formatPrice(price * qty)}
-                              </div>
-                            </div>
-                          );
-                        })}
+                      const name = item.name || item.menuItem?.name || 'Item';
+                      const qty = item.quantity || 1;
+                      const price = item.price || item.menuItem?.price || 0;
+                      const img = item.image || item.menuItem?.image || '/images/ikon_indomie.png';
+                      return (
+                        <div key={idx} className="modal-item-row">
+                          <div className="modal-item-image">
+                            <Image 
+                              src={img} 
+                              alt={name} 
+                              width={60}
+                              height={60}
+                              unoptimized
+                            />
+                          </div>
+                          <div className="modal-item-details">
+                            <span className="modal-item-name">{name}</span>
+                            <span className="modal-item-quantity">x{qty}</span>
+                          </div>
+                          <div className="modal-item-price">
+                            {formatPrice(price * qty)}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
                 <div className="modal-total-section">
                   <div className="modal-total-row">
                     <span className="modal-total-label">Total:</span>
-                    <span className="modal-total-value">{formatPrice(selectedOrder.total)}</span>
+                    <span className="modal-total-value">{formatPrice(selectedOrder.totalPrice || selectedOrder.total)}</span>
                   </div>
                 </div>
               </>

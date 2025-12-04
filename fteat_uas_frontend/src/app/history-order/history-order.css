@@ -1,0 +1,196 @@
+/* History Order Page - New Design */
+.history-order-page {
+  min-height: 100vh;
+  background: #FDF8F2;
+}
+
+.history-order-container {
+  padding: 120px 40px 60px 40px;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Main Title */
+.history-main-title {
+  font-family: 'Offside', cursive;
+  font-size: 42px;
+  color: #0A4988;
+  margin-bottom: 20px;
+  font-weight: 400;
+}
+
+/* User Name Badge */
+.history-user-badge {
+  display: inline-block;
+  background: #FFFFFF;
+  border: 2px solid #0A4988;
+  border-radius: 25px;
+  padding: 10px 30px;
+  margin-bottom: 40px;
+}
+
+.history-user-badge span {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: #0A4988;
+  font-weight: 500;
+}
+
+/* Queue Cards Grid */
+.queue-cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+.no-orders-message {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+  width: 100%;
+  padding: 40px;
+}
+
+/* Queue Card */
+.queue-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 20px;
+  width: 160px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.queue-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Queue Card Image */
+.queue-card-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E8F4FD 0%, #D4ECFC 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.queue-card-image img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+/* Queue Number Display */
+.queue-number-display {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  color: #0A4988;
+  line-height: 1;
+}
+
+/* Queue Details Button */
+.queue-details-btn {
+  background: #0A4988;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 25px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.queue-details-btn:hover {
+  background: #083a6e;
+}
+
+/* Footer - uses homepage-footer from custom.css */
+
+/* Modal Styles */
+.modal-queue-highlight {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #0A4988 !important;
+}
+
+.modal-status-verified {
+  color: #14AE5C !important;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .history-order-container {
+    padding: 100px 20px 40px 20px;
+  }
+
+  .history-main-title {
+    font-size: 32px;
+  }
+
+  .history-user-badge {
+    padding: 8px 20px;
+  }
+
+  .history-user-badge span {
+    font-size: 14px;
+  }
+
+  .queue-cards-grid {
+    gap: 20px;
+  }
+
+  .queue-card {
+    width: 140px;
+    padding: 15px;
+  }
+
+  .queue-card-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .queue-card-image img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .queue-number-display {
+    font-size: 36px;
+  }
+
+  .queue-details-btn {
+    padding: 6px 20px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .history-main-title {
+    font-size: 26px;
+  }
+
+  .queue-card {
+    width: 130px;
+    padding: 12px;
+  }
+
+  .queue-number-display {
+    font-size: 32px;
+  }
+}

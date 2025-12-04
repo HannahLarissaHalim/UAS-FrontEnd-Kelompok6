@@ -22,12 +22,12 @@ mongoose.connect(mongoUri, {
 
 const seedAdmin = async () => {
     try {
-        // hapus admin lama (jika ada)
-        await Admin.deleteOne({ email: 'admin196@gmail.com' });
+        // hapus SEMUA admin lama
+        await Admin.deleteMany({});
 
         // buat admin baru
         const admin = await Admin.create({
-            email: 'admin196@gmail.com',
+            email: 'fteatuntar@gmail.com',
             password: 'fteat196', // akan otomatis di-hash karena pre-save hook
             role: 'admin'
         });

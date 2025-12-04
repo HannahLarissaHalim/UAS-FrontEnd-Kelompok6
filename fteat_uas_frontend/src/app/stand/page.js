@@ -42,32 +42,54 @@ export default function StandPage() {
       {/* Stand Title */}
       <h1 className="stand-page-title">Stand</h1>
 
-      {/* Kantin Bursa Lt.7 */}
-      <h2
-        className="stand-vendor-title stand-vendor-bursa"
-        onClick={() => handleStandClick("Kantin Teknik Bursa Lt.7")}
-      >
-        Kantin Bursa Lt.7
-      </h2>
+      {/* Stand List Container */}
+      <div className="stand-list-container">
+        {/* Kantin Bursa Lt.7 */}
+        <div className="stand-item" onClick={() => handleStandClick("Kantin Teknik Bursa Lt.7")}>
+          <div className="stand-item-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 22V12H15V22" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <span className="stand-item-name">Kantin Bursa Lt.7</span>
+          <div className="stand-item-arrow">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
 
-      {/* Divider Line 1 */}
-      <div className="stand-divider-line-1"></div>
+        {/* Divider */}
+        <div className="stand-divider"></div>
 
-      {/* Decorative Elements */}
+        {/* Kantin LupaNamanya */}
+        <div className="stand-item" onClick={() => handleStandClick("Kantin LupaNamanya")}>
+          <div className="stand-item-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 22V12H15V22" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <span className="stand-item-name">Kantin LupaNamanya</span>
+          <div className="stand-item-arrow">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="stand-divider"></div>
+
+        {/* Segera hadir stand lainnya! */}
+        <p className="stand-coming-soon">Segera hadir stand lainnya!</p>
+      </div>
+
+      {/* Decorative Elements - Desktop Only */}
       <div className="stand-decoration-rect-16"></div>
       <div className="stand-decoration-rect-15"></div>
       <div className="stand-decoration-rect-20"></div>
-
-      {/* Kantin LupaNamanya */}
-      <h2
-        className="stand-vendor-title stand-vendor-lupa"
-        onClick={() => handleStandClick("Kantin LupaNamanya")}
-      >
-        Kantin LupaNamanya
-      </h2>
-
-      {/* Segera hadir stand lainnya! */}
-      <p className="stand-coming-soon">Segera hadir stand lainnya!</p>
 
       {/* Promo Box */}
       <div className="stand-promo-rectangle">
