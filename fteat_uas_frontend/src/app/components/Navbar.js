@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import ConfirmModal from "./ConfirmModal";
 import "../custom.css";
 
 export default function Navbar() {
@@ -14,6 +15,7 @@ export default function Navbar() {
     const [profilePic, setProfilePic] = useState("/images/navbar_icons/profile.png");
     const [cartCount, setCartCount] = useState(0);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     useEffect(() => {
         const checkAuth = () => {
@@ -215,12 +217,7 @@ export default function Navbar() {
                     <div className="navbar-icons">
                         {userRole === "admin" && (
                             <button
-                                onClick={() => {
-                                    localStorage.removeItem("token");
-                                    localStorage.removeItem("user");
-                                    localStorage.removeItem("role");
-                                    router.push("/admin/login");
-                                }}
+                                onClick={() => setShowLogoutModal(true)}
                                 className="navbar-icon-btn"
                                 style={{
                                     background: "#CB142C",
@@ -299,6 +296,32 @@ export default function Navbar() {
                     </div>
                 )}
             </div>
+
+            {/* Logout Confirmation Modal */}
+            <ConfirmModal
+                show={showLogoutModal}
+                onHide={() => setShowLogoutModal(false)}
+                onConfirm={() => {
+                    setShowLogoutModal(false);
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("role");
+                    localStorage.removeItem("cart");
+                    localStorage.removeItem("currentOrder");
+                    if (userRole === "admin") {
+                        router.push("/admin/login");
+                    } else if (userRole === "vendor") {
+                        router.push("/vendor/login");
+                    } else {
+                        router.push("/login");
+                    }
+                }}
+                title="Konfirmasi Logout"
+                message="Apakah kamu yakin ingin keluar dari akun ini?"
+                confirmText="Ya, Logout"
+                cancelText="Batal"
+                variant="warning"
+            />
         </nav>
     );
 }

@@ -48,7 +48,7 @@ export const mockFaculties = [
     ],
   };
   
-  // 💡 Export array kosong untuk MENGHINDARI build error pada halaman yang masih menggunakan import lama
+
   export const mockVendors = []; 
   export const mockOrders = []; 
   export const mockMenus = []; 

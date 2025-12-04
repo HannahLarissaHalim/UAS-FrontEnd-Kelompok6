@@ -252,30 +252,25 @@
 .vendor-btn-account {
   width: calc(50% - 8px);
   height: 60px;
-  background: #FFFFFF;
-  border: 2px solid #0A4988;
+  background: #1D56CF;
+  border: none;
   border-radius: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .vendor-btn-account:hover {
-  background: #0A4988;
+  background: #164ab3;
   transform: translateY(-2px);
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.vendor-btn-account:hover span {
-  color: #FFFFFF;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .vendor-btn-account span {
   font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  font-size: 16px;
-  color: #0A4988;
-  transition: color 0.3s ease;
+  font-weight: 700;
+  font-size: 18px;
+  color: #FFFFFF;
 }
 
 .vendor-btn-logout {

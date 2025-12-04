@@ -28,11 +28,14 @@ exports.protect = async (req, res, next) => {
     if (decoded && decoded.role) {
       if (decoded.role === 'admin') {
         req.user = await Admin.findById(decoded.id).select('-password');
+        if (req.user) req.user.role = 'admin'; // Ensure role is set
       } else if (decoded.role === 'vendor') {
         req.user = await Vendor.findById(decoded.id).select('-password');
+        if (req.user) req.user.role = 'vendor'; // Ensure role is set
       } else if (decoded.role === 'user' || decoded.role === 'customer') {
         // Support both 'user' and 'customer' roles in tokens
         req.user = await User.findById(decoded.id).select('-password');
+        if (req.user) req.user.role = 'user'; // Ensure role is set
       }
     } else {
       // Backwards-compatibility: tokens without a 'role' claim
@@ -68,7 +71,21 @@ exports.protect = async (req, res, next) => {
 // Middleware to check user role
 exports.authorize = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    // Determine user role - check explicit role field or infer from model type
+    let userRole = req.user.role;
+    
+    // Fallback: if role is not set, try to infer from user object properties
+    if (!userRole) {
+      if (req.user.VendorId || req.user.stallName) {
+        userRole = 'vendor';
+      } else if (req.user.npm) {
+        userRole = 'user';
+      } else if (req.user.isAdmin === true) {
+        userRole = 'admin';
+      }
+    }
+    
+    if (!roles.includes(userRole)) {
       return res.status(403).json({
         success: false,
         message: 'Akses ditolak, role tidak sesuai'

@@ -2,12 +2,14 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import AlertModal from "../components/AlertModal";
 
 export default function CheckEmailClient() {
   const searchParams = useSearchParams();
   const emailFromURL = searchParams.get("email") || localStorage.getItem("email");
 
   const [loading, setLoading] = useState(false);
+  const [alertModal, setAlertModal] = useState({ show: false, title: '', message: '', variant: 'info' });
 
   const handleResend = async () => {
     setLoading(true);
@@ -22,13 +24,13 @@ export default function CheckEmailClient() {
 
       const data = await res.json();
       if (data.success) {
-        alert("Email verifikasi berhasil dikirim ulang!");
+        setAlertModal({ show: true, title: 'Berhasil', message: 'Email verifikasi berhasil dikirim ulang!', variant: 'success' });
       } else {
-        alert(data.message || "Gagal mengirim ulang email.");
+        setAlertModal({ show: true, title: 'Gagal', message: data.message || 'Gagal mengirim ulang email.', variant: 'error' });
       }
     } catch (error) {
       console.error("Resend error:", error);
-      alert("Terjadi kesalahan saat mengirim ulang email.");
+      setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat mengirim ulang email.', variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -65,6 +67,15 @@ export default function CheckEmailClient() {
         >
           {loading ? "Mengirim..." : "Kirim Ulang Email"}
         </button>
+
+        {/* Alert Modal */}
+        <AlertModal
+          show={alertModal.show}
+          onHide={() => setAlertModal({ ...alertModal, show: false })}
+          title={alertModal.title}
+          message={alertModal.message}
+          variant={alertModal.variant}
+        />
       </div>
     </div>
   );

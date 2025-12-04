@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 
 // 1. Import Library untuk Cloudinary dan File Upload
@@ -40,7 +41,13 @@ const adminAuthRoutes = require("./routes/adminAuth");
 const orderRoutes = require('./routes/orderRoutes');
 
 const PORT_EXPRESS = process.env.PORT || 5000;
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
+
+// Allow multiple origins (localhost + Vercel)
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://uas-front-end-kelompok6-r23u.vercel.app',
+  process.env.CLIENT_URL //dari Railway env variable
+].filter(Boolean);
 
 // ======================================================
 // EXPRESS SERVER (DIPERTAHANKAN)
@@ -48,12 +55,24 @@ const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 const app = express();
 
 // FIXED: Middleware CORS untuk mengizinkan Next.js mengakses API
-app.use(cors({ origin: CLIENT_URL, credentials: true })); 
+app.use(cors({ 
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true 
+})); 
 
 // Middleware express-fileupload
 app.use(fileUpload({
-  useTempFiles: true,
-  tempFileDir: '/tmp/' // Direktori sementara
+  useTempFiles: true,
+  tempFileDir: '/tmp/' // Direktori sementara
 }));
 
 // Body Parsers 
@@ -72,16 +91,17 @@ app.use("/api/admin", adminAuthRoutes);
 app.use('/api/orders', orderRoutes);
 
 app.get('/', (req, res) => {
-  res.json({
-    message: 'FTEAT Backend API (Express)',
-    version: '1.0.0',
-  });
+  res.json({
+    message: 'FTEAT Backend API (Express)',
+    version: '1.0.0',
+    mongoStatus: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+  });
 });
 
 // Error handling
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
 });
 
 // Route not found

@@ -5,6 +5,7 @@ import { Form, Alert } from 'react-bootstrap';
 import Image from 'next/image';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import VendorNavbar from '../../components/VendorNavbar';
+import ConfirmModal from '../../components/ConfirmModal';
 import { api } from '../../../utils/api';
 import './vendor-account.css';
 
@@ -19,11 +20,13 @@ export default function VendorAccountPage() {
     vendorFirstName: '',
     vendorLastName: '',
     email: '',
+    pickupLocation: '',
   });
   const [profileImage, setProfileImage] = useState('/images/navbar_icons/profile.png');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const userStr = localStorage.getItem('user');
@@ -37,7 +40,8 @@ export default function VendorAccountPage() {
       accountHolder: user.accountHolder || '',
       vendorFirstName: user.vendorFirstName || '',
       vendorLastName: user.vendorLastName || '',
-      email: user.email || ''
+      email: user.email || '',
+      pickupLocation: user.pickupLocation || 'FT Lt 7'
     }));
     if (user.profileImage) {
       setProfileImage(user.profileImage);
@@ -62,6 +66,7 @@ export default function VendorAccountPage() {
         accountHolder: formData.accountHolder,
         vendorFirstName: formData.vendorFirstName,
         vendorLastName: formData.vendorLastName,
+        pickupLocation: formData.pickupLocation,
       };
 
       const res = await api.updateVendorProfile(payload, token);
@@ -86,9 +91,12 @@ export default function VendorAccountPage() {
   };
 
   const handleLogout = () => {
+    setShowLogoutModal(false);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('role');
+    localStorage.removeItem('cart');
+    localStorage.removeItem('currentOrder');
     router.push('/vendor/login');
   };
 
@@ -190,27 +198,38 @@ export default function VendorAccountPage() {
                 <input type="text" name="accountNumber" value={formData.accountNumber} onChange={handleChange} className="vendor-form-input" />
               </div>
               <div className="vendor-form-group half">
-                <label className="vendor-form-label">Nama Pemilik</label>
+                <label className="vendor-form-label">Nama Pemilik (A/N)</label>
                 <input type="text" name="accountHolder" value={formData.accountHolder} onChange={handleChange} className="vendor-form-input" />
               </div>
+            </div>
+
+            <div className="vendor-form-group">
+              <label className="vendor-form-label">Lokasi Pickup</label>
+              <input type="text" name="pickupLocation" value={formData.pickupLocation} onChange={handleChange} className="vendor-form-input" placeholder="Contoh: FT Lt 7" />
             </div>
 
             <div className="vendor-account-buttons">
               <button type="submit" className="vendor-btn-save" disabled={loading}>
                 {loading ? 'Menyimpan...' : 'Simpan'}
               </button>
-              <button type="button" className="vendor-btn-logout" onClick={handleLogout}>
+              <button type="button" className="vendor-btn-logout" onClick={() => setShowLogoutModal(true)}>
                 Logout
               </button>
             </div>
           </Form>
         </div>
 
-        {/* Footer */}
-        <div className="vendor-account-footer">
-          <span className="vendor-footer-text">Developed by </span>
-          <span className="vendor-footer-held">HELD</span>
-        </div>
+        {/* Logout Confirmation Modal */}
+        <ConfirmModal
+          show={showLogoutModal}
+          onHide={() => setShowLogoutModal(false)}
+          onConfirm={handleLogout}
+          title="Konfirmasi Logout"
+          message="Apakah kamu yakin ingin keluar dari akun ini?"
+          confirmText="Ya, Logout"
+          cancelText="Batal"
+          variant="warning"
+        />
       </div>
     </div>
   );

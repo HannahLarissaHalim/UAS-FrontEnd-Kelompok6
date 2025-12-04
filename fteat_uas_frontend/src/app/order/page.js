@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, ListGroup, Button, Form, Alert } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import HomeNavbar from '../components/HomeNavbar';
+import AlertModal from '../components/AlertModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function OrderPage() {
@@ -11,6 +12,7 @@ export default function OrderPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [alertModal, setAlertModal] = useState({ show: false, title: '', message: '', variant: 'info' });
 
   useEffect(() => {
     // Get user from localStorage
@@ -70,8 +72,8 @@ export default function OrderPage() {
       localStorage.removeItem('tempOrder');
 
       // Redirect to success page or dashboard
-      alert('Pesanan berhasil dibuat! Status: Processing');
-      router.push('/dashboard/customer');
+      setAlertModal({ show: true, title: 'Berhasil', message: 'Pesanan berhasil dibuat! Status: Processing', variant: 'success' });
+      setTimeout(() => { router.push('/dashboard/customer'); }, 1500);
     } catch (err) {
       setError('Gagal membuat pesanan. Silakan coba lagi.');
     } finally {
@@ -197,6 +199,15 @@ export default function OrderPage() {
           </Col>
         </Row>
       </Container>
+
+      {/* Alert Modal */}
+      <AlertModal
+        show={alertModal.show}
+        onHide={() => setAlertModal({ ...alertModal, show: false })}
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
+      />
     </>
   );
 }

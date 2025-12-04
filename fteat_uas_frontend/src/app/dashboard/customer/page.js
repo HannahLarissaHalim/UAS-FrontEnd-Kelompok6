@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Badge, Button, Table } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import HomeNavbar from '../../components/HomeNavbar';
+import AlertModal from '../../components/AlertModal';
 import { mockOrders } from '../../../utils/mockData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -10,6 +11,7 @@ export default function CustomerDashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [alertModal, setAlertModal] = useState({ show: false, title: '', message: '', variant: 'info' });
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -151,7 +153,7 @@ export default function CustomerDashboard() {
                               <Button 
                                 variant="outline-primary" 
                                 size="sm"
-                                onClick={() => alert(`Detail pesanan #${order.id}`)}
+                                onClick={() => setAlertModal({ show: true, title: 'Detail Pesanan', message: `Detail pesanan #${order.id}`, variant: 'info' })}
                               >
                                 Detail
                               </Button>
@@ -179,6 +181,15 @@ export default function CustomerDashboard() {
           </Col>
         </Row>
       </Container>
+
+      {/* Alert Modal */}
+      <AlertModal
+        show={alertModal.show}
+        onHide={() => setAlertModal({ ...alertModal, show: false })}
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
+      />
     </>
   );
 }

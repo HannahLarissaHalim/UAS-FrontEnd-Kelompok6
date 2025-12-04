@@ -271,7 +271,9 @@ exports.getOrdersByUser = async (req, res) => {
         const userId = req.params.userId || req.query.userId;
         console.log(`[getOrdersByUser] incoming userId param=${userId} Authorization=${req.headers.authorization || 'none'}`);
 
-        const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
+        const orders = await Order.find({ user: userId })
+            .populate('items.menuItem', 'name price image') // Populate menu details with image
+            .sort({ createdAt: -1 });
 
         // Attach vendor info for each order (vendor stored as VendorId string)
         const vendorIds = [...new Set(orders.map(o => o.vendor))].filter(Boolean);
@@ -284,6 +286,23 @@ exports.getOrdersByUser = async (req, res) => {
         const ordersWithVendorInfo = orders.map(o => {
             const obj = o.toObject ? o.toObject() : o;
             obj.vendorInfo = vendorMap[obj.vendor] || null;
+            // Also add pickupLocation from vendor if order doesn't have it
+            if (!obj.pickupLocation && obj.vendorInfo) {
+                obj.pickupLocation = obj.vendorInfo.pickupLocation || 'FT Lt 7';
+            }
+            // Flatten menu item data into items for easier frontend consumption
+            if (obj.items && Array.isArray(obj.items)) {
+                obj.items = obj.items.map(item => {
+                    const menuData = item.menuItem || {};
+                    return {
+                        ...item,
+                        name: menuData.name || item.name || 'Menu',
+                        price: menuData.price || item.price || 0,
+                        image: menuData.image || item.image || '/images/ikon_indomie.png',
+                        menuItem: menuData._id || item.menuItem
+                    };
+                });
+            }
             return obj;
         });
 
@@ -310,7 +329,10 @@ exports.getOrdersByVendor = async (req, res) => {
         const ordersWithVendor = orders.map(o => {
             const obj = o.toObject ? o.toObject() : o;
             obj.vendorInfo = vendorDoc || null;
-            
+            // Add pickupLocation from vendor if order doesn't have it
+            if (!obj.pickupLocation && vendorDoc) {
+                obj.pickupLocation = vendorDoc.pickupLocation || 'FT Lt 7';
+            }
             // Flatten menu item data into items for easier frontend consumption
             if (obj.items && Array.isArray(obj.items)) {
                 obj.items = obj.items.map(item => {

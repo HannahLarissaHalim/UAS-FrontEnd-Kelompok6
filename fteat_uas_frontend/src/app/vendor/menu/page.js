@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Container, Row, Col, Form, Modal, Button } from 'react-bootstrap';
 import VendorNavbar from '../../components/VendorNavbar';
+import ConfirmModal from '../../components/ConfirmModal';
+import AlertModal from '../../components/AlertModal';
 import { mockCategories } from '../../../utils/mockData';
 import ProtectedVendorRoute from '../../components/ProtectedVendorRoute';
 import api from '../../../utils/api';
@@ -24,6 +26,9 @@ export default function VendorMenuPage() {
   const [showAddToppingModal, setShowAddToppingModal] = useState(false);
   const [editingMenu, setEditingMenu] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSaveNewMenuModal, setShowSaveNewMenuModal] = useState(false);
+  const [showSaveEditMenuModal, setShowSaveEditMenuModal] = useState(false);
+  const [alertModal, setAlertModal] = useState({ show: false, title: '', message: '', variant: 'info' });
   const [newMenu, setNewMenu] = useState({
     name: '',
     category: '',
@@ -174,13 +179,13 @@ const loadMenus = async (vendorId) => {
     if (!result.success) {
       // On failure, reload to get correct state
       await loadMenus(vendorData?.VendorId || vendorData?.vendorId || vendorData?.vendorName || vendorData?._id);
-      alert('Gagal menghapus menu: ' + result.message);
+      setAlertModal({ show: true, title: 'Gagal', message: 'Gagal menghapus menu: ' + result.message, variant: 'error' });
     }
   } catch (error) {
     console.error('Error deleting menus:', error);
     // On error, reload to get correct state
     await loadMenus(vendorData?.VendorId || vendorData?.vendorId || vendorData?.vendorName || vendorData?._id);
-    alert('Terjadi kesalahan saat menghapus menu');
+    setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat menghapus menu', variant: 'error' });
   }
 };
 
@@ -244,13 +249,13 @@ const handleSaveEditMenu = async () => {
       setShowEditModal(false);
       setEditingMenu(null);
       
-      alert('Menu berhasil diperbarui!');
+      setAlertModal({ show: true, title: 'Berhasil', message: 'Menu berhasil diperbarui!', variant: 'success' });
     } else {
-      alert('Gagal memperbarui menu: ' + result.message);
+      setAlertModal({ show: true, title: 'Gagal', message: 'Gagal memperbarui menu: ' + result.message, variant: 'error' });
     }
   } catch (error) {
     console.error('Error updating menu:', error);
-    alert('Terjadi kesalahan saat memperbarui menu');
+    setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat memperbarui menu', variant: 'error' });
   }
 };
 
@@ -296,7 +301,7 @@ const handleSaveEditMenu = async () => {
             : item
         )
       );
-      alert('Gagal mengubah status stok: ' + result.message);
+      setAlertModal({ show: true, title: 'Gagal', message: 'Gagal mengubah status stok: ' + result.message, variant: 'error' });
     }
   } catch (error) {
     console.error('Error updating stock status:', error);
@@ -309,7 +314,7 @@ const handleSaveEditMenu = async () => {
           : item
       )
     );
-    alert('Terjadi kesalahan saat mengubah status stok');
+    setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat mengubah status stok', variant: 'error' });
   }
 };
 
@@ -389,7 +394,7 @@ const handleSaveNewMenu = async () => {
   try {
     // Validasi input
     if (!newMenu.name || !newMenu.category || !newMenu.price) {
-      alert('Mohon lengkapi nama menu, kategori, dan harga!');
+      setAlertModal({ show: true, title: 'Validasi Gagal', message: 'Mohon lengkapi nama menu, kategori, dan harga!', variant: 'warning' });
       return;
     }
 
@@ -445,13 +450,13 @@ const handleSaveNewMenu = async () => {
       });
       setNewTopping({ name: '', price: '' });
       
-      alert('Menu berhasil ditambahkan!');
+      setAlertModal({ show: true, title: 'Berhasil', message: 'Menu berhasil ditambahkan!', variant: 'success' });
     } else {
-      alert('Gagal menambahkan menu: ' + result.message);
+      setAlertModal({ show: true, title: 'Gagal', message: 'Gagal menambahkan menu: ' + result.message, variant: 'error' });
     }
   } catch (error) {
     console.error('Error creating menu:', error);
-    alert('Terjadi kesalahan saat menambahkan menu: ' + error.message);
+    setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat menambahkan menu: ' + error.message, variant: 'error' });
   }
 };
   if (!vendorData) {
@@ -630,21 +635,16 @@ const handleSaveNewMenu = async () => {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <Modal show={showDeleteConfirm} onHide={() => setShowDeleteConfirm(false)} centered className="delete-confirm-modal">
-        <Modal.Body className="delete-modal-body">
-          <p className="delete-confirm-text">
-            Anda yakin untuk hapus {selectedMenus.length} menu?
-          </p>
-          <div className="delete-modal-buttons">
-            <button className="delete-no-btn" onClick={() => setShowDeleteConfirm(false)}>
-              Tidak
-            </button>
-            <button className="delete-yes-btn" onClick={confirmDelete}>
-              Iya
-            </button>
-          </div>
-        </Modal.Body>
-      </Modal>
+      <ConfirmModal
+        show={showDeleteConfirm}
+        onHide={() => setShowDeleteConfirm(false)}
+        onConfirm={confirmDelete}
+        title="Konfirmasi Hapus Menu"
+        message={`Apakah kamu yakin ingin menghapus ${selectedMenus.length} menu? Menu yang sudah dihapus tidak dapat dikembalikan!`}
+        confirmText="Ya, Hapus"
+        cancelText="Batal"
+        variant="danger"
+      />
 
       {/* Add Menu Modal */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered size="lg" className="add-menu-modal">
@@ -815,7 +815,7 @@ const handleSaveNewMenu = async () => {
               </button>
             </div>
 
-            <button className="save-menu-btn" onClick={handleSaveNewMenu}>
+            <button className="save-menu-btn" onClick={() => setShowSaveNewMenuModal(true)}>
               Simpan
             </button>
           </div>
@@ -1046,13 +1046,52 @@ const handleSaveNewMenu = async () => {
                 </button>
               </div>
 
-              <button className="save-menu-btn" onClick={handleSaveEditMenu}>
+              <button className="save-menu-btn" onClick={() => setShowSaveEditMenuModal(true)}>
                 Simpan Perubahan
               </button>
             </div>
           </Modal.Body>
         </Modal>
       )}
+
+      {/* Save New Menu Confirmation Modal */}
+      <ConfirmModal
+        show={showSaveNewMenuModal}
+        onHide={() => setShowSaveNewMenuModal(false)}
+        onConfirm={() => {
+          setShowSaveNewMenuModal(false);
+          handleSaveNewMenu();
+        }}
+        title="Konfirmasi Simpan Menu"
+        message="Apakah kamu yakin ingin menyimpan menu baru ini?"
+        confirmText="Ya, Simpan"
+        cancelText="Batal"
+        variant="success"
+      />
+
+      {/* Save Edit Menu Confirmation Modal */}
+      <ConfirmModal
+        show={showSaveEditMenuModal}
+        onHide={() => setShowSaveEditMenuModal(false)}
+        onConfirm={() => {
+          setShowSaveEditMenuModal(false);
+          handleSaveEditMenu();
+        }}
+        title="Konfirmasi Simpan Perubahan"
+        message="Apakah kamu yakin ingin menyimpan perubahan menu ini?"
+        confirmText="Ya, Simpan"
+        cancelText="Batal"
+        variant="success"
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        show={alertModal.show}
+        onHide={() => setAlertModal({ ...alertModal, show: false })}
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
+      />
     </div>
     </ProtectedVendorRoute>
   );

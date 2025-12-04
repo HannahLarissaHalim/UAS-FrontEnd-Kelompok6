@@ -59,7 +59,8 @@ export default function RegisterVendor() {
     email: '',
     VendorId: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    pickupLocation: 'FT Lt 7'
   });
 
 
@@ -274,10 +275,22 @@ export default function RegisterVendor() {
                     name="VendorId"
                     value={formData.VendorId}
                     onChange={handleChange}
-                    placeholder="Masukkan Vendor ID (unik) atau gunakan format VEND-123"
+                    placeholder="Masukkan Vendor ID dengan format VNDXXX"
                     required
                   />
                   <Form.Text className="text-muted">Vendor ID akan menjadi penghubung antara akun vendor dan field <code>vendor</code> pada menu makanan. Harus unik.</Form.Text>
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Pickup Location</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="pickupLocation"
+                    value={formData.pickupLocation}
+                    onChange={handleChange}
+                    placeholder="Contoh: FT Lt 7"
+                  />
+                  <Form.Text className="text-muted">Lokasi pengambilan pesanan untuk pelanggan.</Form.Text>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
