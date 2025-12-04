@@ -93,8 +93,12 @@ export default function LoginPage() {
         localStorage.removeItem('role');
       }
 
-      // Redirect based on role
-      if (userData.role === 'vendor') {
+      // Check if there's a redirect after login (e.g., from buy now without login)
+      const redirectAfterLogin = localStorage.getItem('redirectAfterLogin');
+      if (redirectAfterLogin) {
+        localStorage.removeItem('redirectAfterLogin');
+        router.push(redirectAfterLogin);
+      } else if (userData.role === 'vendor') {
         router.push('/vendor-welcome');
       } else {
         router.push('/profile');
