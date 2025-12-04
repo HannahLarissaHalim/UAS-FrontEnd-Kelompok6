@@ -16,9 +16,10 @@ const DEBUG = process.env.NODE_ENV === 'development';
 // Get all menus (Gabungan dari Menu dan Kantin Bursa)
 exports.getMenus = async (req, res) => {
     try {
+        // Exclude large image data for faster loading - only fetch essential fields
         const [generalMenus, rawKantinBursaMenus, vendors] = await Promise.all([
-            Menu.find({}).sort({ price: 1 }).select('-__v'),
-            KantinBursa.find({}).sort({ Price: 1 }).select('-__v'),
+            Menu.find({}).sort({ price: 1 }).select('name price category vendor brand time image inStock additionals'),
+            KantinBursa.find({}).sort({ Price: 1 }).select('NamaMenu Price Kategori VendorID VarianTopping Time image inStock'),
             Vendor.find({}).select('namaKantin profileImage')
         ]);
         

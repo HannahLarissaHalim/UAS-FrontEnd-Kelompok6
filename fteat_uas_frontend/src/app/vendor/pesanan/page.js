@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Modal } from 'react-bootstrap';
 import VendorNavbar from '../../components/VendorNavbar';
+import AlertModal from '../../components/AlertModal';
+import ConfirmModal from '../../components/ConfirmModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './vendor-pesanan.css';
 import ProtectedVendorRoute from '../../components/ProtectedVendorRoute';
@@ -15,6 +17,9 @@ export default function VendorPesananPage() {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [alertModal, setAlertModal] = useState({ show: false, title: '', message: '', variant: 'info' });
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState(null);
 
   useEffect(() => {
     const user = localStorage.getItem('user');
@@ -154,12 +159,15 @@ export default function VendorPesananPage() {
       console.log('[VendorPesanan] verifyOrder response:', res);
 
       if (res && res.success) {
+        // Get queueNumber from response - it's in res.data (the order object)
+        const queueNumber = res.data?.queueNumber || res.queueNumber || 'N/A';
+        
         setOrders(orders.map(order => 
           order._id === orderId 
-            ? { ...order, paymentStatus: 'verified', queueNumber: res.data.queueNumber || order.queueNumber }
+            ? { ...order, paymentStatus: 'verified', queueNumber: queueNumber }
             : order
         ));
-        alert(`Pembayaran berhasil diverifikasi! Nomor antrian: ${res.data.queueNumber || 'terbaru'}`);
+        setAlertModal({ show: true, title: 'Berhasil', message: `Pembayaran berhasil diverifikasi! Nomor antrian: ${queueNumber}`, variant: 'success' });
         // Notify other parts of the app (e.g., student's history page) to refresh
         try {
           window.dispatchEvent(new CustomEvent('orderVerified', { detail: { orderId } }));
@@ -168,11 +176,11 @@ export default function VendorPesananPage() {
           window.dispatchEvent(new Event('orderVerified'));
         }
       } else {
-        alert('Gagal memverifikasi pembayaran: ' + (res?.message || 'Unknown'));
+        setAlertModal({ show: true, title: 'Gagal', message: 'Gagal memverifikasi pembayaran: ' + (res?.message || 'Unknown'), variant: 'error' });
       }
     } catch (err) {
       console.error('Error verifying payment:', err);
-      alert('Terjadi kesalahan saat memverifikasi pembayaran');
+      setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat memverifikasi pembayaran', variant: 'error' });
     }
 
     // TODO: Uncomment when backend is ready
@@ -203,10 +211,16 @@ export default function VendorPesananPage() {
     // }
   };
 
-  const handleCancelVerification = async (orderId) => {
-    if (!confirm('Apakah Anda yakin ingin membatalkan verifikasi pembayaran?')) {
-      return;
-    }
+  const handleCancelVerification = (orderId) => {
+    setOrderToCancel(orderId);
+    setShowCancelModal(true);
+  };
+
+  const confirmCancelVerification = async () => {
+    if (!orderToCancel) return;
+    const orderId = orderToCancel;
+    setShowCancelModal(false);
+    setOrderToCancel(null);
 
     try {
       const token = localStorage.getItem('token');
@@ -220,7 +234,7 @@ export default function VendorPesananPage() {
             ? { ...order, paymentStatus: 'unpaid', queueNumber: null }
             : order
         ));
-        alert('Verifikasi pembayaran berhasil dibatalkan');
+        setAlertModal({ show: true, title: 'Berhasil', message: 'Verifikasi pembayaran berhasil dibatalkan', variant: 'success' });
         // Notify other parts of the app (e.g., student's history page) to refresh
         try {
           window.dispatchEvent(new CustomEvent('orderVerified', { detail: { orderId } }));
@@ -228,11 +242,11 @@ export default function VendorPesananPage() {
           window.dispatchEvent(new Event('orderVerified'));
         }
       } else {
-        alert('Gagal membatalkan verifikasi: ' + (res?.message || 'Unknown'));
+        setAlertModal({ show: true, title: 'Gagal', message: 'Gagal membatalkan verifikasi: ' + (res?.message || 'Unknown'), variant: 'error' });
       }
     } catch (err) {
       console.error('Error canceling verification:', err);
-      alert('Terjadi kesalahan saat membatalkan verifikasi');
+      setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat membatalkan verifikasi', variant: 'error' });
     }
 
     // TODO: Uncomment when backend is ready
@@ -481,6 +495,30 @@ export default function VendorPesananPage() {
           </button>
         </Modal.Footer>
       </Modal>
+
+      {/* Alert Modal */}
+      <AlertModal
+        show={alertModal.show}
+        onHide={() => setAlertModal({ ...alertModal, show: false })}
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
+      />
+
+      {/* Cancel Verification Confirmation Modal */}
+      <ConfirmModal
+        show={showCancelModal}
+        onHide={() => {
+          setShowCancelModal(false);
+          setOrderToCancel(null);
+        }}
+        onConfirm={confirmCancelVerification}
+        title="Batalkan Verifikasi"
+        message="Apakah Anda yakin ingin membatalkan verifikasi pembayaran?"
+        confirmText="Ya, Batalkan"
+        cancelText="Tidak"
+        variant="warning"
+      />
     </div>
     </ProtectedVendorRoute>
   );

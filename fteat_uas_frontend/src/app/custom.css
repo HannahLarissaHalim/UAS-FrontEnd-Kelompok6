@@ -1975,16 +1975,22 @@ body {
   }
   
   .vendor-detail-modal .modal-info-row {
-    flex-direction: column;
-    gap: 0.25rem;
+    flex-direction: row !important;
+    gap: 10px;
   }
   
   .vendor-detail-modal .modal-label {
     font-size: 12px;
+    min-width: 100px;
   }
   
   .vendor-detail-modal .modal-value {
-    font-size: 14px;
+    font-size: 13px;
+  }
+  
+  .vendor-detail-modal .admin-edit-input {
+    max-width: 140px;
+    font-size: 13px;
   }
 }
 
@@ -4144,20 +4150,26 @@ select option:first-child {
 
 .modal-info-row {
   display: flex;
-  justify-content: flex-start;
-  gap: 2rem;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .modal-info-row .modal-label {
-  min-width: 50px;
+  min-width: 120px;
   text-align: left;
+  font-weight: 600;
+  color: #0A4988;
+  flex-shrink: 0;
 }
 
 .modal-info-row .modal-value {
   text-align: right;
   flex: 1;
+  color: #333;
 }
 
 .modal-info-row:last-child {
@@ -5815,4 +5827,169 @@ select option:first-child {
   background: #1565C0;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+}
+
+/* ===== MOBILE FLOATING CART BUTTON ===== */
+.mobile-floating-cart {
+  display: none; /* Hidden on desktop */
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #0A4988 0%, #1565C0 100%);
+  border-radius: 50px;
+  padding: 12px 24px;
+  box-shadow: 0 4px 20px rgba(10, 73, 136, 0.4);
+  z-index: 1000;
+  cursor: pointer;
+  align-items: center;
+  gap: 12px;
+  min-width: 280px;
+  transition: all 0.3s ease;
+}
+
+.mobile-floating-cart:hover {
+  transform: translateX(-50%) translateY(-3px);
+  box-shadow: 0 6px 25px rgba(10, 73, 136, 0.5);
+}
+
+.mobile-floating-cart:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+.floating-cart-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #DC3545;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.floating-cart-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.floating-cart-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+}
+
+.floating-cart-total {
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.floating-cart-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Show floating cart on tablet and mobile */
+@media (max-width: 991px) {
+  .mobile-floating-cart {
+    display: flex;
+  }
+  
+  /* Add padding at bottom of menu page to prevent overlap with floating cart */
+  .menu-page {
+    padding-bottom: 100px;
+  }
+}
+
+@media (max-width: 576px) {
+  .mobile-floating-cart {
+    min-width: 260px;
+    padding: 10px 20px;
+    bottom: 15px;
+  }
+  
+  .floating-cart-total {
+    font-size: 13px;
+  }
+}
+
+/* ===== ADMIN EDIT INPUT STYLES ===== */
+.admin-edit-input {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  padding: 8px 12px;
+  border: 2px solid #0A4988;
+  border-radius: 8px;
+  flex: 1;
+  min-width: 0;
+  transition: all 0.3s ease;
+}
+
+.admin-edit-input:focus {
+  outline: none;
+  border-color: #1565C0;
+  box-shadow: 0 0 0 3px rgba(10, 73, 136, 0.15);
+}
+
+.admin-edit-input::placeholder {
+  color: #999;
+}
+
+/* Make modal info row work better with inputs */
+.vendor-detail-modal .modal-order-info {
+  padding: 0 10px 20px 10px;
+}
+
+.vendor-detail-modal .modal-info-row {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.vendor-detail-modal .modal-info-row:last-of-type {
+  border-bottom: none;
+}
+
+.vendor-detail-modal .modal-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  color: #0A4988;
+  text-align: left !important;
+  flex-shrink: 0;
+  min-width: 130px;
+}
+
+.vendor-detail-modal .modal-value {
+  font-family: 'Montserrat', sans-serif;
+  color: #333;
+  text-align: right !important;
+  word-break: break-word;
+  flex: 1;
+}
+
+.vendor-detail-modal .admin-edit-input {
+  text-align: right;
+  max-width: 180px;
+  margin-left: auto;
 }

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Navbar from '../components/Navbar';
 import ConfirmModal from '../components/ConfirmModal';
+import AlertModal from '../components/AlertModal';
 import { api } from '../../utils/api';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -25,6 +26,8 @@ export default function AccountSettingsPage() {
   const fileInputRef = useRef(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [alertModal, setAlertModal] = useState({ show: false, title: '', message: '', variant: 'info' });
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -115,13 +118,13 @@ export default function AccountSettingsPage() {
 
     // Validasi tipe file
     if (!file.type.startsWith('image/')) {
-      alert('File harus berupa gambar');
+      setAlertModal({ show: true, title: 'Format Tidak Valid', message: 'File harus berupa gambar', variant: 'error' });
       return;
     }
 
     // Validasi ukuran file (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Ukuran file maksimal 5MB');
+      setAlertModal({ show: true, title: 'File Terlalu Besar', message: 'Ukuran file maksimal 5MB', variant: 'error' });
       return;
     }
 
@@ -132,7 +135,7 @@ export default function AccountSettingsPage() {
       setProfileImage(compressedImage); // Update preview
     } catch (error) {
       console.error('Error compressing image:', error);
-      alert('Terjadi kesalahan saat memproses gambar');
+      setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat memproses gambar', variant: 'error' });
     }
   };
 
@@ -142,14 +145,14 @@ export default function AccountSettingsPage() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('Sesi kamu telah habis. Silahkan login kembali');
-        router.push('/login');
+        setAlertModal({ show: true, title: 'Sesi Habis', message: 'Sesi kamu telah habis. Silahkan login kembali', variant: 'warning' });
+        setTimeout(() => router.push('/login'), 1500);
         return;
       }
 
       // Validasi nickname
       if (!formData.nickname || formData.nickname.trim() === '') {
-        alert('Nickname tidak boleh kosong');
+        setAlertModal({ show: true, title: 'Validasi Gagal', message: 'Nickname tidak boleh kosong', variant: 'warning' });
         setUploading(false);
         return;
       }
@@ -158,7 +161,7 @@ export default function AccountSettingsPage() {
       const nicknameResponse = await api.updateNickname(formData.nickname.trim(), token);
 
       if (!nicknameResponse.success) {
-        alert(nicknameResponse.message || 'Gagal menyimpan nickname');
+        setAlertModal({ show: true, title: 'Gagal', message: nicknameResponse.message || 'Gagal menyimpan nickname', variant: 'error' });
         setUploading(false);
         return;
       }
@@ -170,7 +173,7 @@ export default function AccountSettingsPage() {
         const imageResponse = await api.updateProfileImage(tempProfileImage, token);
 
         if (!imageResponse.success) {
-          alert(imageResponse.message || 'Gagal menyimpan foto profil');
+          setAlertModal({ show: true, title: 'Gagal', message: imageResponse.message || 'Gagal menyimpan foto profil', variant: 'error' });
           setUploading(false);
           return;
         }
@@ -205,12 +208,12 @@ export default function AccountSettingsPage() {
       // Trigger event untuk update navbar dan profile page
       window.dispatchEvent(new Event('userUpdated'));
 
-      alert('Profil telah diperbarui');
-      router.push('/profile');
+      setAlertModal({ show: true, title: 'Berhasil', message: 'Profil telah diperbarui', variant: 'success' });
+      setTimeout(() => router.push('/profile'), 1500);
 
     } catch (error) {
       console.error('Error:', error);
-      alert('Terjadi kesalahan saat menyimpan profil');
+      setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat menyimpan profil', variant: 'error' });
     } finally {
       setUploading(false);
     }
@@ -231,8 +234,8 @@ export default function AccountSettingsPage() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('Kamu tidak memiliki akun. Harap login untuk menghapus akun');
-        router.push('/login');
+        setAlertModal({ show: true, title: 'Error', message: 'Kamu tidak memiliki akun. Harap login untuk menghapus akun', variant: 'error' });
+        setTimeout(() => router.push('/login'), 1500);
         return;
       }
 
@@ -242,14 +245,14 @@ export default function AccountSettingsPage() {
         // Clear all local storage data
         localStorage.removeItem('user');
         localStorage.removeItem('token');
-        alert('Akunmu telah berhasil dihapus');
-        router.push('/register');
+        setAlertModal({ show: true, title: 'Berhasil', message: 'Akunmu telah berhasil dihapus', variant: 'success' });
+        setTimeout(() => router.push('/register'), 1500);
       } else {
-        alert(response.message || 'Gagal untuk menghapus akun');
+        setAlertModal({ show: true, title: 'Gagal', message: response.message || 'Gagal untuk menghapus akun', variant: 'error' });
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error terjadi saat menghapus akunmu, Coba lagi nanti');
+      setAlertModal({ show: true, title: 'Error', message: 'Error terjadi saat menghapus akunmu, Coba lagi nanti', variant: 'error' });
     }
   };
 
@@ -391,7 +394,7 @@ export default function AccountSettingsPage() {
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem', marginBottom: '1rem' }}>
                 <button 
                   className="account-btn-save" 
-                  onClick={handleSave}
+                  onClick={() => setShowSaveModal(true)}
                   disabled={uploading}
                   style={{ width: 'auto', minWidth: '200px' }}
                 >
@@ -469,6 +472,29 @@ export default function AccountSettingsPage() {
         confirmText="Ya, Hapus Akun"
         cancelText="Batal"
         variant="danger"
+      />
+
+      <ConfirmModal
+        show={showSaveModal}
+        onHide={() => setShowSaveModal(false)}
+        onConfirm={() => {
+          setShowSaveModal(false);
+          handleSave();
+        }}
+        title="Konfirmasi Simpan"
+        message="Apakah kamu yakin ingin menyimpan perubahan profil?"
+        confirmText="Ya, Simpan"
+        cancelText="Batal"
+        variant="success"
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        show={alertModal.show}
+        onHide={() => setAlertModal({ ...alertModal, show: false })}
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
       />
     </ProtectedRoute>
   );

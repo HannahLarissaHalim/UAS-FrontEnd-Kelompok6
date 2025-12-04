@@ -166,6 +166,7 @@ exports.updateVendorProfile = async (req, res) => {
 };
 
 // Admin updates vendor profile (including profile image and stall name)
+// SECURITY: Admin CANNOT edit bank details (bankName, accountNumber, accountHolder)
 exports.updateVendorByAdmin = async (req, res) => {
   try {
     const vendorId = req.params.id;
@@ -174,6 +175,11 @@ exports.updateVendorByAdmin = async (req, res) => {
     // Prevent role or password being changed
     delete update.role;
     delete update.password;
+    
+    // SECURITY: Prevent admin from editing bank details to prevent fraud
+    delete update.bankName;
+    delete update.accountNumber;
+    delete update.accountHolder;
 
     const vendor = await Vendor.findByIdAndUpdate(vendorId, update, { new: true, runValidators: true }).select('-password');
     if (!vendor) return res.status(404).json({ success: false, message: 'Vendor tidak ditemukan' });

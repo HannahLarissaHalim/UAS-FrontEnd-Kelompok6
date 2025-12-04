@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Table, Badge, Modal, Form, Tab, Tabs } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import HomeNavbar from '../../components/HomeNavbar';
+import ConfirmModal from '../../components/ConfirmModal';
+import AlertModal from '../../components/AlertModal';
 import { mockMenus, mockOrders, mockCategories } from '../../../utils/mockData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -21,6 +23,9 @@ export default function VendorDashboard() {
     estimatedTime: '5-10 menit',
     stock: '',
   });
+  const [alertModal, setAlertModal] = useState({ show: false, title: '', message: '', variant: 'info' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [menuToDelete, setMenuToDelete] = useState(null);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -124,18 +129,25 @@ export default function VendorDashboard() {
     // TODO: Call API to create/update menu
     // const response = await api.createMenu(menuForm, token);
     
-    alert(editingMenu ? 'Menu berhasil diupdate!' : 'Menu berhasil ditambahkan!');
+    setAlertModal({ show: true, title: 'Berhasil', message: editingMenu ? 'Menu berhasil diupdate!' : 'Menu berhasil ditambahkan!', variant: 'success' });
     handleCloseMenuModal();
     // Refresh menus
   };
 
   const handleDeleteMenu = async (menuId) => {
-    if (!confirm('Yakin ingin menghapus menu ini?')) return;
+    setMenuToDelete(menuId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteMenu = async () => {
+    if (!menuToDelete) return;
     
     // TODO: Call API to delete menu
-    // await api.deleteMenu(menuId, token);
+    // await api.deleteMenu(menuToDelete, token);
     
-    alert('Menu berhasil dihapus!');
+    setAlertModal({ show: true, title: 'Berhasil', message: 'Menu berhasil dihapus!', variant: 'success' });
+    setShowDeleteModal(false);
+    setMenuToDelete(null);
     // Refresh menus
   };
 
@@ -146,7 +158,7 @@ export default function VendorDashboard() {
     setOrders(orders.map(order => 
       order.id === orderId ? { ...order, status: newStatus } : order
     ));
-    alert(`Status pesanan #${orderId} diupdate menjadi ${newStatus}`);
+    setAlertModal({ show: true, title: 'Berhasil', message: `Status pesanan #${orderId} diupdate menjadi ${newStatus}`, variant: 'success' });
   };
 
   const calculateDailySales = () => {
@@ -488,6 +500,30 @@ export default function VendorDashboard() {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Alert Modal */}
+      <AlertModal
+        show={alertModal.show}
+        onHide={() => setAlertModal({ ...alertModal, show: false })}
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        show={showDeleteModal}
+        onHide={() => {
+          setShowDeleteModal(false);
+          setMenuToDelete(null);
+        }}
+        onConfirm={confirmDeleteMenu}
+        title="Hapus Menu"
+        message="Apakah kamu yakin ingin menghapus menu ini?"
+        confirmText="Ya, Hapus"
+        cancelText="Batal"
+        variant="danger"
+      />
     </>
   );
 }

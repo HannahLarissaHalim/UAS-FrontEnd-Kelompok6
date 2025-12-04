@@ -10,8 +10,19 @@ export default function ConfirmModal({
   message, 
   confirmText = "Ya, Lanjutkan",
   cancelText = "Batal",
-  variant = "danger" // danger, warning, primary
+  variant = "danger" // danger, warning, primary, success
 }) {
+  // Get button color based on variant
+  const getButtonColor = () => {
+    switch(variant) {
+      case 'success': return '#14AE5C';
+      case 'primary': return '#0A4988';
+      case 'warning': return '#FFC107';
+      case 'danger': 
+      default: return '#DC3545';
+    }
+  };
+
   return (
     <Modal 
       show={show} 
@@ -83,9 +94,9 @@ export default function ConfirmModal({
             fontWeight: '600',
             padding: '0.5rem 1.5rem',
             borderRadius: '8px',
-            backgroundColor: '#DC3545',
-            borderColor: '#DC3545',
-            color: 'white'
+            backgroundColor: getButtonColor(),
+            borderColor: getButtonColor(),
+            color: variant === 'warning' ? '#333' : 'white'
           }}
         >
           {confirmText}

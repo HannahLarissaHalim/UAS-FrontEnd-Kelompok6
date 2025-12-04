@@ -47,6 +47,10 @@ const vendorSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    role: {
+        type: String,
+        default: 'vendor'
+    },
     VendorId: {
         type: String,
         required: true,
@@ -55,6 +59,10 @@ const vendorSchema = new mongoose.Schema({
     profileImage: {
         type: String,
         default: null,
+    },
+    pickupLocation: {
+        type: String,
+        default: 'FT Lt 7',
     },
 }, { 
     timestamps: true,

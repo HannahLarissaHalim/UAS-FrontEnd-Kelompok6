@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Modal } from 'react-bootstrap';
 import Navbar from '../../components/Navbar';
+import ConfirmModal from '../../components/ConfirmModal';
+import AlertModal from '../../components/AlertModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { api } from '../../../utils/api';
 import '../../custom.css';
@@ -15,8 +17,22 @@ export default function AdminStandPage() {
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [editedStallName, setEditedStallName] = useState('');
-  const [editedProfileImage, setEditedProfileImage] = useState('');
+  const [editedVendor, setEditedVendor] = useState({
+    stallName: '',
+    profileImage: '',
+    VendorId: '',
+    email: '',
+    whatsapp: '',
+    vendorFirstName: '',
+    vendorLastName: '',
+    bankName: '',
+    accountNumber: '',
+    pickupLocation: '',
+  });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [vendorToDelete, setVendorToDelete] = useState(null);
+  const [alertModal, setAlertModal] = useState({ show: false, title: '', message: '', variant: 'info' });
 
   const loadVendors = async () => {
     try {
@@ -55,18 +71,28 @@ export default function AdminStandPage() {
           setSelectedVendor({ ...selectedVendor, isApproved: newStatus });
         }
       } else {
-        alert(res?.message || 'Gagal mengubah status vendor');
+        setAlertModal({ show: true, title: 'Gagal', message: res?.message || 'Gagal mengubah status vendor', variant: 'error' });
       }
     } catch (err) {
       console.error('Error toggling approval:', err);
-      alert('Error mengubah status');
+      setAlertModal({ show: true, title: 'Error', message: 'Error mengubah status', variant: 'error' });
     }
   };
 
   const handleVendorClick = (vendor) => {
     setSelectedVendor(vendor);
-    setEditedStallName(vendor.stallName || vendor.namaKantin || '');
-    setEditedProfileImage(vendor.profileImage || '');
+    setEditedVendor({
+      stallName: vendor.stallName || vendor.namaKantin || '',
+      profileImage: vendor.profileImage || '',
+      VendorId: vendor.VendorId || '',
+      email: vendor.email || '',
+      whatsapp: vendor.whatsapp || '',
+      vendorFirstName: vendor.vendorFirstName || '',
+      vendorLastName: vendor.vendorLastName || '',
+      bankName: vendor.bankName || '',
+      accountNumber: vendor.accountNumber || '',
+      pickupLocation: vendor.pickupLocation || 'FT Lt 7',
+    });
     setEditMode(false);
     setShowModal(true);
   };
@@ -82,20 +108,24 @@ export default function AdminStandPage() {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('File harus berupa gambar');
+      setAlertModal({ show: true, title: 'Format Tidak Valid', message: 'File harus berupa gambar', variant: 'error' });
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      alert('Ukuran gambar maksimal 2MB');
+      setAlertModal({ show: true, title: 'File Terlalu Besar', message: 'Ukuran gambar maksimal 2MB', variant: 'error' });
       return;
     }
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setEditedProfileImage(reader.result);
+      setEditedVendor(prev => ({ ...prev, profileImage: reader.result }));
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleFieldChange = (field, value) => {
+    setEditedVendor(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSaveEdit = async () => {
@@ -103,51 +133,67 @@ export default function AdminStandPage() {
 
     try {
       const token = localStorage.getItem('token');
+      // Note: bankName, accountNumber, accountHolder are NOT editable by admin for security
       const payload = {
-        namaKantin: editedStallName,
-        stallName: editedStallName,
-        profileImage: editedProfileImage,
+        namaKantin: editedVendor.stallName,
+        stallName: editedVendor.stallName,
+        profileImage: editedVendor.profileImage,
+        VendorId: editedVendor.VendorId,
+        email: editedVendor.email,
+        whatsapp: editedVendor.whatsapp,
+        vendorFirstName: editedVendor.vendorFirstName,
+        vendorLastName: editedVendor.vendorLastName,
+        pickupLocation: editedVendor.pickupLocation,
       };
 
       const res = await api.updateVendorByAdmin(selectedVendor._id, payload, token);
       if (res && res.success) {
-        // Update vendors list
+        // Update vendors list with all edited fields
+        const updatedVendor = { 
+          ...selectedVendor, 
+          ...editedVendor,
+          namaKantin: editedVendor.stallName 
+        };
         setVendors(prev => prev.map(v => 
-          v._id === selectedVendor._id 
-            ? { ...v, stallName: editedStallName, namaKantin: editedStallName, profileImage: editedProfileImage }
-            : v
+          v._id === selectedVendor._id ? updatedVendor : v
         ));
-        setSelectedVendor({ ...selectedVendor, stallName: editedStallName, namaKantin: editedStallName, profileImage: editedProfileImage });
+        setSelectedVendor(updatedVendor);
         setEditMode(false);
-        alert('Profil vendor berhasil diperbarui');
+        setAlertModal({ show: true, title: 'Berhasil', message: 'Profil vendor berhasil diperbarui', variant: 'success' });
       } else {
-        alert(res?.message || 'Gagal memperbarui profil vendor');
+        setAlertModal({ show: true, title: 'Gagal', message: res?.message || 'Gagal memperbarui profil vendor', variant: 'error' });
       }
     } catch (err) {
       console.error('Error updating vendor:', err);
-      alert('Error memperbarui profil vendor');
+      setAlertModal({ show: true, title: 'Error', message: 'Error memperbarui profil vendor', variant: 'error' });
     }
   };
 
-  const handleDeleteVendor = async (vendor) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus vendor "${vendor.stallName || vendor.email}"? Tindakan ini tidak dapat dibatalkan.`)) {
-      return;
-    }
+  const handleDeleteVendor = (vendor) => {
+    setVendorToDelete(vendor);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteVendor = async () => {
+    if (!vendorToDelete) return;
     
     try {
       const token = localStorage.getItem('token');
-      const res = await api.deleteVendor(vendor._id, token);
+      const res = await api.deleteVendor(vendorToDelete._id, token);
       if (res && res.success) {
-        setVendors(prev => prev.filter(v => v._id !== vendor._id));
+        setVendors(prev => prev.filter(v => v._id !== vendorToDelete._id));
         setShowModal(false);
         setSelectedVendor(null);
-        alert('Vendor berhasil dihapus');
+        setAlertModal({ show: true, title: 'Berhasil', message: 'Vendor berhasil dihapus', variant: 'success' });
       } else {
-        alert(res?.message || 'Gagal menghapus vendor');
+        setAlertModal({ show: true, title: 'Gagal', message: res?.message || 'Gagal menghapus vendor', variant: 'error' });
       }
     } catch (err) {
       console.error('Error deleting vendor:', err);
-      alert('Error menghapus vendor');
+      setAlertModal({ show: true, title: 'Error', message: 'Error menghapus vendor', variant: 'error' });
+    } finally {
+      setShowDeleteModal(false);
+      setVendorToDelete(null);
     }
   };
 
@@ -252,7 +298,7 @@ export default function AdminStandPage() {
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <div style={{ position: 'relative', display: 'inline-block' }}>
                   <img 
-                    src={editedProfileImage || '/images/navbar_icons/profile.png'} 
+                    src={editedVendor.profileImage || '/images/navbar_icons/profile.png'} 
                     alt="Vendor Profile"
                     style={{
                       width: '120px',
@@ -297,45 +343,119 @@ export default function AdminStandPage() {
                 {editMode ? (
                   <input 
                     type="text"
-                    value={editedStallName}
-                    onChange={(e) => setEditedStallName(e.target.value)}
-                    style={{
-                      fontFamily: 'Montserrat',
-                      fontSize: '0.95rem',
-                      padding: '5px 10px',
-                      border: '2px solid #0A4988',
-                      borderRadius: '5px',
-                      flex: 1
-                    }}
+                    value={editedVendor.stallName}
+                    onChange={(e) => handleFieldChange('stallName', e.target.value)}
+                    className="admin-edit-input"
                   />
                 ) : (
                   <span className="modal-value">{selectedVendor.stallName || '-'}</span>
                 )}
               </div>
 
+              {/* Vendor ID - Editable */}
               <div className="modal-info-row">
                 <span className="modal-label">Vendor ID:</span>
-                <span className="modal-value">{selectedVendor.VendorId || '-'}</span>
+                {editMode ? (
+                  <input 
+                    type="text"
+                    value={editedVendor.VendorId}
+                    onChange={(e) => handleFieldChange('VendorId', e.target.value)}
+                    className="admin-edit-input"
+                  />
+                ) : (
+                  <span className="modal-value">{selectedVendor.VendorId || '-'}</span>
+                )}
               </div>
+
+              {/* Email - Editable */}
               <div className="modal-info-row">
                 <span className="modal-label">Email:</span>
-                <span className="modal-value">{selectedVendor.email || '-'}</span>
+                {editMode ? (
+                  <input 
+                    type="email"
+                    value={editedVendor.email}
+                    onChange={(e) => handleFieldChange('email', e.target.value)}
+                    className="admin-edit-input"
+                  />
+                ) : (
+                  <span className="modal-value">{selectedVendor.email || '-'}</span>
+                )}
               </div>
+
+              {/* WhatsApp - Editable */}
               <div className="modal-info-row">
                 <span className="modal-label">WhatsApp:</span>
-                <span className="modal-value">{selectedVendor.whatsapp || '-'}</span>
+                {editMode ? (
+                  <input 
+                    type="text"
+                    value={editedVendor.whatsapp}
+                    onChange={(e) => handleFieldChange('whatsapp', e.target.value)}
+                    className="admin-edit-input"
+                  />
+                ) : (
+                  <span className="modal-value">{selectedVendor.whatsapp || '-'}</span>
+                )}
               </div>
+
+              {/* Nama Pemilik (First Name) - Editable */}
               <div className="modal-info-row">
-                <span className="modal-label">Nama Pemilik:</span>
-                <span className="modal-value">{selectedVendor.vendorFirstName} {selectedVendor.vendorLastName || ''}</span>
+                <span className="modal-label">Nama Depan:</span>
+                {editMode ? (
+                  <input 
+                    type="text"
+                    value={editedVendor.vendorFirstName}
+                    onChange={(e) => handleFieldChange('vendorFirstName', e.target.value)}
+                    className="admin-edit-input"
+                  />
+                ) : (
+                  <span className="modal-value">{selectedVendor.vendorFirstName || '-'}</span>
+                )}
               </div>
+
+              {/* Nama Pemilik (Last Name) - Editable */}
+              <div className="modal-info-row">
+                <span className="modal-label">Nama Belakang:</span>
+                {editMode ? (
+                  <input 
+                    type="text"
+                    value={editedVendor.vendorLastName}
+                    onChange={(e) => handleFieldChange('vendorLastName', e.target.value)}
+                    className="admin-edit-input"
+                  />
+                ) : (
+                  <span className="modal-value">{selectedVendor.vendorLastName || '-'}</span>
+                )}
+              </div>
+
+              {/* Bank - Read Only for Admin (security) */}
               <div className="modal-info-row">
                 <span className="modal-label">Bank:</span>
                 <span className="modal-value">{selectedVendor.bankName || '-'}</span>
               </div>
+              {/* No. Rekening - Read Only for Admin (security) */}
               <div className="modal-info-row">
                 <span className="modal-label">No. Rekening:</span>
                 <span className="modal-value">{selectedVendor.accountNumber || '-'}</span>
+              </div>
+              {/* A/N Rekening - Read Only for Admin (security) */}
+              <div className="modal-info-row">
+                <span className="modal-label">A/N Rekening:</span>
+                <span className="modal-value">{selectedVendor.accountHolder || '-'}</span>
+              </div>
+              {/* Pickup Location - Editable */}
+              <div className="modal-info-row">
+                <span className="modal-label">Pickup Location:</span>
+                {editMode ? (
+                  <input 
+                    type="text"
+                    value={editedVendor.pickupLocation}
+                    onChange={(e) => handleFieldChange('pickupLocation', e.target.value)}
+                    className="admin-edit-input"
+                    placeholder="Contoh: FT Lt 7"
+                  />
+                ) : (
+                  <span className="modal-value">{selectedVendor.pickupLocation || '-'}</span>
+                )}
               </div>
               <div className="modal-info-row">
                 <span className="modal-label">Status:</span>
@@ -343,8 +463,16 @@ export default function AdminStandPage() {
                   {selectedVendor.isApproved ? 'Approved' : 'Pending'}
                 </span>
               </div>
-              <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px' }}>
-                <span style={{ fontFamily: 'Montserrat', fontWeight: 600, color: '#0A4988' }}>Approve Vendor:</span>
+              <div style={{ 
+                marginTop: '20px', 
+                paddingTop: '15px',
+                borderTop: '2px solid #0A4988',
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                gap: '15px' 
+              }}>
+                <span style={{ fontFamily: 'Montserrat', fontWeight: 600, color: '#0A4988', fontSize: '16px' }}>Approve Vendor:</span>
                 <label className="toggle-switch">
                   <input 
                     type="checkbox" 
@@ -368,8 +496,19 @@ export default function AdminStandPage() {
                   className="modal-close-btn" 
                   onClick={() => {
                     setEditMode(false);
-                    setEditedStallName(selectedVendor.stallName || selectedVendor.namaKantin || '');
-                    setEditedProfileImage(selectedVendor.profileImage || '');
+                    // Reset all fields to original values
+                    setEditedVendor({
+                      stallName: selectedVendor.stallName || selectedVendor.namaKantin || '',
+                      profileImage: selectedVendor.profileImage || '',
+                      VendorId: selectedVendor.VendorId || '',
+                      email: selectedVendor.email || '',
+                      whatsapp: selectedVendor.whatsapp || '',
+                      vendorFirstName: selectedVendor.vendorFirstName || '',
+                      vendorLastName: selectedVendor.vendorLastName || '',
+                      bankName: selectedVendor.bankName || '',
+                      accountNumber: selectedVendor.accountNumber || '',
+                      pickupLocation: selectedVendor.pickupLocation || 'FT Lt 7',
+                    });
                   }}
                   style={{ background: '#6c757d' }}
                 >
@@ -377,7 +516,7 @@ export default function AdminStandPage() {
                 </button>
                 <button 
                   className="modal-close-btn" 
-                  onClick={handleSaveEdit}
+                  onClick={() => setShowSaveModal(true)}
                   style={{ background: '#28a745' }}
                 >
                   Simpan
@@ -400,6 +539,45 @@ export default function AdminStandPage() {
           </div>
         </Modal.Footer>
       </Modal>
+
+      {/* Delete Vendor Confirmation Modal */}
+      <ConfirmModal
+        show={showDeleteModal}
+        onHide={() => {
+          setShowDeleteModal(false);
+          setVendorToDelete(null);
+        }}
+        onConfirm={confirmDeleteVendor}
+        title="Konfirmasi Hapus Vendor"
+        message={`Apakah Anda yakin ingin menghapus vendor "${vendorToDelete?.stallName || vendorToDelete?.email}"? Tindakan ini tidak dapat dibatalkan!`}
+        confirmText="Ya, Hapus"
+        cancelText="Batal"
+        variant="danger"
+      />
+
+      {/* Save Edit Confirmation Modal */}
+      <ConfirmModal
+        show={showSaveModal}
+        onHide={() => setShowSaveModal(false)}
+        onConfirm={() => {
+          setShowSaveModal(false);
+          handleSaveEdit();
+        }}
+        title="Konfirmasi Simpan"
+        message="Apakah Anda yakin ingin menyimpan perubahan profil vendor?"
+        confirmText="Ya, Simpan"
+        cancelText="Batal"
+        variant="success"
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        show={alertModal.show}
+        onHide={() => setAlertModal({ ...alertModal, show: false })}
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
+      />
     </div>
   );
 }

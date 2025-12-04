@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Modal, Button, ListGroup } from 'react-bootstrap';
 import Navbar from '../components/Navbar';
+import AlertModal from '../components/AlertModal';
+import ConfirmModal from '../components/ConfirmModal';
 import api from '../../utils/api';
 import ProtectedRoute from '../components/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -66,6 +68,9 @@ export default function PaymentPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [selectedAdditionals, setSelectedAdditionals] = useState({});
+  const [alertModal, setAlertModal] = useState({ show: false, title: '', message: '', variant: 'info' });
+  const [showRemoveItemModal, setShowRemoveItemModal] = useState(false);
+  const [itemToRemove, setItemToRemove] = useState({ vendor: null, index: null });
 
   useEffect(() => {
     async function loadCartAndVendors() {
@@ -292,40 +297,14 @@ export default function PaymentPage() {
     const currentQty = newItems[index].quantity;
     const newQty = currentQty + change;
     
-    // If quantity becomes 0 or less, remove the item
+    // If quantity becomes 0 or less, show confirmation modal
     if (newQty <= 0) {
-      if (confirm('Remove this item from your order?')) {
-        newItems.splice(index, 1);
-        
-        // If no items left for this vendor, remove the vendor
-        if (newItems.length === 0) {
-          delete newOrderData[vendor];
-          
-          // Update localStorage
-          if (Object.keys(newOrderData).length === 0) {
-            localStorage.removeItem('currentOrder');
-            localStorage.removeItem('cart');
-            setOrderData({});
-          } else {
-            localStorage.setItem('currentOrder', JSON.stringify(newOrderData));
-            // Update cart as well
-            updateCartInLocalStorage(newOrderData);
-            setOrderData(newOrderData);
-          }
-          
-          // Force re-render
-          setRenderKey(prev => prev + 1);
-          
-          // Dispatch cart update event
-          window.dispatchEvent(new Event('cartUpdated'));
-          return;
-        }
-      } else {
-        return; // User cancelled deletion
-      }
-    } else {
-      newItems[index].quantity = newQty;
+      setItemToRemove({ vendor, index });
+      setShowRemoveItemModal(true);
+      return;
     }
+    
+    newItems[index].quantity = newQty;
     
     const newTotal = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     vendorOrder.items = newItems;
@@ -343,6 +322,52 @@ export default function PaymentPage() {
     
     // Dispatch cart update event
     window.dispatchEvent(new Event('cartUpdated'));
+  };
+
+  const confirmRemoveItem = () => {
+    const { vendor, index } = itemToRemove;
+    if (!vendor) return;
+
+    const newOrderData = { ...orderData };
+    const vendorOrder = { ...newOrderData[vendor] };
+    const newItems = [...vendorOrder.items];
+    
+    newItems.splice(index, 1);
+    
+    // If no items left for this vendor, remove the vendor
+    if (newItems.length === 0) {
+      delete newOrderData[vendor];
+      
+      // Update localStorage
+      if (Object.keys(newOrderData).length === 0) {
+        localStorage.removeItem('currentOrder');
+        localStorage.removeItem('cart');
+        setOrderData({});
+      } else {
+        localStorage.setItem('currentOrder', JSON.stringify(newOrderData));
+        updateCartInLocalStorage(newOrderData);
+        setOrderData(newOrderData);
+      }
+    } else {
+      const newTotal = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      vendorOrder.items = newItems;
+      vendorOrder.total = newTotal;
+      newOrderData[vendor] = vendorOrder;
+      
+      localStorage.setItem('currentOrder', JSON.stringify(newOrderData));
+      updateCartInLocalStorage(newOrderData);
+      setOrderData(newOrderData);
+    }
+    
+    // Force re-render
+    setRenderKey(prev => prev + 1);
+    
+    // Dispatch cart update event
+    window.dispatchEvent(new Event('cartUpdated'));
+    
+    // Close modal
+    setShowRemoveItemModal(false);
+    setItemToRemove({ vendor: null, index: null });
   };
   
   const updateCartInLocalStorage = (orderData) => {
@@ -388,19 +413,35 @@ export default function PaymentPage() {
         };
       });
 
+      // Get pickup location from vendor info or use default
+      const vendorInfo = vendorInfoMap[vendorGroup.vendorId] || vendorInfoMap[policyVendor];
+      const pickupLoc = vendorInfo?.pickupLocation || 'FT Lt 7';
+
       const payload = {
         user: userId,
         vendor: vendorGroup.vendorId || policyVendor,
         items: itemsPayload,
         totalPrice: vendorGroup.total,
         paymentMethod: 'transfer',
-        pickupLocation: policyVendor,
+        pickupLocation: pickupLoc,
         paymentStatus: 'unpaid'
       };
 
       const res = await api.createOrder(payload, token);
       if (!res?.success) {
-        alert('Gagal membuat pesanan: ' + (res?.message || 'Unknown'));
+        const errorMsg = res?.message || 'Unknown error';
+        
+        // If menu not found, clear cache and cart
+        if (errorMsg.includes('tidak ditemukan') || errorMsg.includes('not found')) {
+          localStorage.removeItem('cachedMenus');
+          localStorage.removeItem('menusCacheTime');
+          localStorage.removeItem('cart');
+          localStorage.removeItem('currentOrder');
+          setAlertModal({ show: true, title: 'Menu Tidak Tersedia', message: 'Menu tidak tersedia lagi. Cart telah dibersihkan. Silakan pilih menu lagi dari halaman menu.', variant: 'warning' });
+          setTimeout(() => { window.location.href = '/menu'; }, 2000);
+        } else {
+          setAlertModal({ show: true, title: 'Gagal', message: 'Gagal membuat pesanan: ' + errorMsg, variant: 'error' });
+        }
         return;
       }
 
@@ -429,10 +470,10 @@ export default function PaymentPage() {
 
       // notify cart updated
       window.dispatchEvent(new Event('cartUpdated'));
-      alert('Pesanan berhasil dibuat dan pemberitahuan dikirim ke vendor.');
+      setAlertModal({ show: true, title: 'Berhasil', message: 'Pesanan berhasil dibuat dan pemberitahuan dikirim ke vendor.', variant: 'success' });
     } catch (err) {
       console.error('Error creating order:', err);
-      alert('Terjadi kesalahan saat membuat pesanan');
+      setAlertModal({ show: true, title: 'Error', message: 'Terjadi kesalahan saat membuat pesanan', variant: 'error' });
     } finally {
       setCreatingOrder(false);
       setShowPolicyModal(false);
@@ -747,6 +788,30 @@ export default function PaymentPage() {
             <Button variant="success" onClick={confirmAndCreateOrder} disabled={creatingOrder}>{creatingOrder ? 'Memproses...' : 'Setuju'}</Button>
           </Modal.Footer>
         </Modal>
+
+        {/* Alert Modal */}
+        <AlertModal
+          show={alertModal.show}
+          onHide={() => setAlertModal({ ...alertModal, show: false })}
+          title={alertModal.title}
+          message={alertModal.message}
+          variant={alertModal.variant}
+        />
+
+        {/* Remove Item Confirmation Modal */}
+        <ConfirmModal
+          show={showRemoveItemModal}
+          onHide={() => {
+            setShowRemoveItemModal(false);
+            setItemToRemove({ vendor: null, index: null });
+          }}
+          onConfirm={confirmRemoveItem}
+          title="Hapus Item"
+          message="Apakah kamu yakin ingin menghapus item ini dari pesanan?"
+          confirmText="Ya, Hapus"
+          cancelText="Batal"
+          variant="danger"
+        />
       </div>
     </ProtectedRoute>
   );
