@@ -95,9 +95,9 @@ export default function Navbar() {
             router.push("/login");
             return;
         }
-        // Redirect vendor to vendor welcome, customer to regular profile
+        // Redirect vendor to vendor account, customer to regular profile
         if (userRole === "vendor") {
-            router.push("/vendor-welcome");
+            router.push("/vendor/account");
         } else {
             router.push("/profile");
         }

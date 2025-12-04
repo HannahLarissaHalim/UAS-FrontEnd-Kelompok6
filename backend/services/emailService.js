@@ -19,7 +19,7 @@ exports.sendVerificationEmail = async (toEmail, token) => {
     <p><a href="${verificationLink}" target="_blank">${verificationLink}</a></p>
     <p><i>Link ini hanya berlaku selama 5 menit.</i></p>
   `;
-  sendSmtpEmail.sender = { name: "FTEat", email: "noreply@fteat.com" };
+  sendSmtpEmail.sender = { name: "FTEat", email: "noreply.fteat@gmail.com" };
   sendSmtpEmail.to = [{ email: toEmail }];
 
   const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
@@ -39,7 +39,7 @@ exports.sendResetPasswordEmail = async (toEmail, token) => {
     <p><i>Link hanya berlaku selama 5 menit.</i></p>
     <p>Jika Anda tidak meminta reset password, abaikan email ini.</p>
   `;
-  sendSmtpEmail.sender = { name: "FTEat", email: "noreply@fteat.com" };
+  sendSmtpEmail.sender = { name: "FTEat", email: "noreply.fteat@gmail.com" };
   sendSmtpEmail.to = [{ email: toEmail }];
 
   const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
