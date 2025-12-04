@@ -7,14 +7,16 @@ exports.sendVerificationEmail = async (toEmail, token) => {
 
   // Setup Gmail SMTP transporter
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.SMTP_PORT) || 465,
+    secure: true, // use SSL for port 465
     auth: {
       user: process.env.SMTP_USER, // sender email
       pass: process.env.SMTP_PASS  // app password
     },
     tls: {
-    rejectUnauthorized: false
-  }
+      rejectUnauthorized: false
+    }
   });
 
   const mailOptions = {
@@ -41,7 +43,9 @@ exports.sendResetPasswordEmail = async (toEmail, token) => {
   const resetLink = `${baseUrl}/change-password/${token}`;
 
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.SMTP_PORT) || 465,
+    secure: true, // use SSL for port 465
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
