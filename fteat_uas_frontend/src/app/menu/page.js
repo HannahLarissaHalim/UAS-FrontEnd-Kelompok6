@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Navbar from '../components/Navbar';
 import MenuCard from '../components/MenuCard';
+import ErrorPage from '../components/ErrorPage';
 
 import { mockCategories } from '../../utils/mockData'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -18,10 +19,12 @@ export default function MenuPage() {
 
   const [menus, setMenus] = useState([]); 
   const [loading, setLoading] = useState(true); 
+  const [apiError, setApiError] = useState(null); 
 
   // Fungsi untuk mengambil data dari API Express (http://localhost:5000)
   const fetchMenus = useCallback(async () => {
     setLoading(true);
+    setApiError(null);
     try {
       // ⚠️ PERBAIKAN UTAMA: Menggunakan URL ABSOLUT ke server Express
       const response = await fetch('http://localhost:5000/api/menus'); 
@@ -30,6 +33,11 @@ export default function MenuPage() {
         // Log error respons dari server jika status bukan 200
         const errorText = await response.text();
         console.error('API responded with error status:', response.status, errorText);
+        setApiError({
+          code: response.status,
+          message: response.status === 404 ? 'API Not Found' : 'Server Error',
+          details: `Failed to fetch menus. Status: ${response.status}`
+        });
         throw new Error('Gagal mengambil data menu dari server');
       }
       
@@ -39,12 +47,18 @@ export default function MenuPage() {
 
     } catch (error) {
       console.error('Fetch error:', error);
-      // Opsional: set menus ke array kosong jika fetch gagal
+      if (!apiError) {
+        setApiError({
+          code: 'ERR_CONNECTION',
+          message: 'Cannot Reach Server',
+          details: 'Unable to connect to the API server. Please check if the server is running.'
+        });
+      }
       setMenus([]); 
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [apiError]);
 
   // Effect 1: Load data menu saat komponen dimount
   useEffect(() => {
@@ -117,13 +131,17 @@ export default function MenuPage() {
     const orderData = {
       vendor: menuWithAdditionals.vendor || 'Kantin Lupa Namanya', 
       items: [{
+        _id: menuWithAdditionals._id || menuWithAdditionals.id,
+        menuItem: menuWithAdditionals._id || menuWithAdditionals.id,
         name: menuWithAdditionals.name,
         category: menuWithAdditionals.category,
         quantity: 1,
         price: menuWithAdditionals.totalPrice || menuWithAdditionals.price,
         basePrice: menuWithAdditionals.price, 
         image: menuWithAdditionals.image,
-        toppings: menuWithAdditionals.selectedAdditionals?.map(a => `${a.name} (${a.quantity})`).join(', ') || ''
+        toppings: menuWithAdditionals.selectedAdditionals?.map(a => `${a.name} (${a.quantity})`).join(', ') || '',
+        vendorId: menuWithAdditionals.vendor || menuWithAdditionals.vendorId || '',
+        vendorName: menuWithAdditionals.vendor || menuWithAdditionals.vendorName || ''
       }],
       total: menuWithAdditionals.totalPrice || menuWithAdditionals.price
     };
@@ -135,6 +153,17 @@ export default function MenuPage() {
     setSearchTerm('');
     setSelectedCategories([]);
   };
+
+  // Show error page if API error
+  if (apiError) {
+    return (
+      <ErrorPage
+        errorCode={apiError.code}
+        errorMessage={apiError.message}
+        errorDetails={apiError.details}
+      />
+    );
+  }
 
   return (
     <div className="menu-page">
@@ -187,7 +216,7 @@ export default function MenuPage() {
                     <div className="spinner-border text-primary" role="status">
                         <span className="visually-hidden">Loading...</span>
                     </div>
-                    <h4 className="mt-3">Memuat menu...</h4>
+                    <h4 className="mt-3" style={{ color: '#000' }}>Loading...</h4>
                 </div>
             )}
 

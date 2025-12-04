@@ -1,12 +1,13 @@
 // Pastikan path ke model Anda sudah benar
 const Menu = require('../models/menu'); 
-const KantinBursa = require('../models/KantinBursa'); // 💡 Mengimpor Model Kantin Bursa
+const KantinBursa = require('../models/KantinBursa'); // Mengimpor Model Kantin Bursa
+const Vendor = require('../models/Vendor'); // Import Vendor model
 
 // Asumsi Anda memiliki utilitas sendJson di utils/sendJson
 // Jika sendJson tidak ada, ini akan memunculkan error.
 const sendJson = (res, statusCode, success, data, message) => {
-    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success, message, data }));
+    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success, message, data }));
 };
 
 // Debug mode - set to false in production
@@ -15,10 +16,26 @@ const DEBUG = process.env.NODE_ENV === 'development';
 // Get all menus (Gabungan dari Menu dan Kantin Bursa)
 exports.getMenus = async (req, res) => {
     try {
-        const [generalMenus, rawKantinBursaMenus] = await Promise.all([
+        const [generalMenus, rawKantinBursaMenus, vendors] = await Promise.all([
             Menu.find({}).sort({ price: 1 }).select('-__v'),
-            KantinBursa.find({}).sort({ Price: 1 }).select('-__v')
+            KantinBursa.find({}).sort({ Price: 1 }).select('-__v'),
+            Vendor.find({}).select('namaKantin profileImage')
         ]);
+        
+        // Create vendor map for quick lookup
+        const vendorMap = {};
+        vendors.forEach(v => {
+            vendorMap[v.namaKantin] = v.profileImage || '/images/icon_small.png';
+        });
+        
+        // Add vendorProfileImage to general menus
+        const enrichedGeneralMenus = generalMenus.map(menu => {
+            const plainMenu = menu.toObject ? menu.toObject() : menu;
+            return {
+                ...plainMenu,
+                vendorProfileImage: vendorMap[plainMenu.vendor] || '/images/icon_small.png'
+            };
+        });
         
         // 💡 LANGKAH MAPPING: Menyesuaikan properti Kantin Bursa agar sesuai MenuCard
         const mappedKantinBursaMenus = rawKantinBursaMenus.map(menu => {
@@ -31,6 +48,7 @@ exports.getMenus = async (req, res) => {
                 price: parseFloat(plainMenu.Price), // Price -> price (Konversi ke Number/Float)
                 category: plainMenu.Kategori,    // Kategori -> category
                 vendor: plainMenu.VendorID,      // VendorID -> vendor (untuk MenuCard)
+                vendorProfileImage: vendorMap[plainMenu.VendorID] || '/images/icon_small.png',
                 
                 // --- Menambahkan Fallback/Properti Opsional ---
                 brand: plainMenu.VarianTopping || '', // VarianTopping sebagai brand/deskripsi
@@ -45,7 +63,7 @@ exports.getMenus = async (req, res) => {
         });
 
         // Gabungkan menu umum dan menu Kantin Bursa yang sudah di-mapping
-        const allMenus = [...generalMenus, ...mappedKantinBursaMenus];
+        const allMenus = [...enrichedGeneralMenus, ...mappedKantinBursaMenus];
 
         sendJson(res, 200, true, allMenus, 'Daftar menu gabungan berhasil diambil.');
 

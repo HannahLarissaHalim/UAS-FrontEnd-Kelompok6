@@ -1,64 +1,40 @@
-/* Account Settings Page Styles */
-/* .account-settings-page {
-  position: relative;
-  width: 1440px;
-  height: 1024px;
-  background: #FDF8F2;
-  margin: 0 auto;
-  overflow: hidden;
-} */
+/* ============================================
+   Account Settings Page - Centered Layout
+   Desktop, Tablet, Mobile responsive
+   ============================================ */
 
 .account-settings-page {
-  width: 100%;
-  min-height: calc(100vh - 100px);
-  display: flex;
-  justify-content: center;   
-  align-items: flex-start;  
-  padding-top: 40px;
   position: relative;
-  overflow: visible;
+  width: 100%;
+  min-height: 100vh;
+  background: #FDF8F2;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
+/* Main content wrapper - CENTERED for all */
 .account-settings-wrapper {
-  width: 100%;
-  max-width: 900px;  
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 25px;
-  position: relative;
-}
-
-.account-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-  width: 100%;
-  max-width: 900px; 
-  position: relative;
+  justify-content: flex-start;
+  padding: 20px 40px 60px 40px;
+  min-height: calc(100vh - 80px);
   z-index: 5;
+  text-align: center;
 }
 
-
-/* Background Logo */
-/* .account-bg-logo {
-  position: absolute;
-  width: 822px;
-  height: 822px;
-  left: -102px;
-  top: 123px;
-  opacity: 0.3;
-  z-index: 0;
-} */
-
+/* Background Logo - centered with low opacity */
 .account-bg-logo {
-  position: absolute;
-  top: 120px; 
+  position: fixed;
+  width: 450px;
+  height: 450px;
   left: 50%;
-  transform: translateX(-50%);
-  opacity: 0.15;
-  z-index: -1;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.1;
+  z-index: 0;
   pointer-events: none;
 }
 
@@ -68,188 +44,169 @@
   object-fit: contain;
 }
 
-/* Top Logo */
-.account-top-logo {
-  /* position: absolute; */
-  width: 221px;
-  height: 212px;
-  /* left: 1228px;
-  top: 22px; */
-  z-index: 10;
-
+/* Back Button - NOT fixed, scrolls with content */
+.back-button {
+  position: relative;
   align-self: flex-end;
-  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 2px solid #0A4988;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #0A4988;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
-.account-top-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.back-button:hover {
+  background: #0A4988;
+  color: #FFFFFF;
 }
 
-/* Navbar Line */
-.account-navbar-line {
-  /* position: absolute; */
-  width: 1350px;
-  height: 0px;
-  /* left: 0px;
-  top: 160px; */
-  border: 3px solid #0A4988;
-  z-index: 5;
-  margin-top: 20px;
+.back-button:hover svg path {
+  stroke: #FFFFFF;
+}
+
+.back-button svg {
+  width: 20px;
+  height: 20px;
 }
 
 /* Account Settings Header */
 .account-settings-header {
-  /* position: absolute;
-  left: 699px;
-  top: 241px; */
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   z-index: 5;
-  margin-top: 40px;
+  margin-bottom: 20px;
 }
 
 .settings-icon {
-  width: 68px;
-  height: 68px;
+  width: 50px;
+  height: 50px;
 }
 
 .account-settings-title {
   font-family: 'Offside', cursive;
-  font-style: normal;
+  font-style: italic;
   font-weight: 400;
-  font-size: 66px;
-  line-height: 83px;
+  font-size: 48px;
+  line-height: 1.2;
   color: #0A4988;
   margin: 0;
 }
 
 /* Profile Section */
 .account-profile-section {
-  /* position: absolute;
-  left: 653px;
-  top: 353px; */
   z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 37px;
+  gap: 15px;
+  width: 100%;
+  max-width: 500px;
 }
 
-/* Profile Image Wrapper
+/* Profile Image - centered */
 .account-profile-wrapper {
-  position: absolute;
-  left: 0;
-  top: 0;
-} */
-
-/* .account-profile-image {
-  position: absolute;
-  width: 180px;
-  height: 179px;
-  left: 0;
-  top: 0;
-  border-radius: 118px;
-  overflow: hidden;
-  border: 1px solid #000000;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  cursor: pointer;
-  transition: all 0.3s ease;
-} */
-
-.account-profile-image:hover {
-  /* transform: scale(1.05);
-  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.35); */
-  border: none !important;
-  outline: none !important;
-  box-shadow: 0 0 0 transparent !important;
-  cursor: pointer;
+  position: relative;
+  width: 140px;
+  margin: 0 auto 15px auto;
+  z-index: 10;
 }
 
-.account-profile-image img {
-  /* width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 118px; */
+.account-profile-image {
   width: 180px;
   height: 180px;
   border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #0A4988;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.account-profile-img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  display: block;
-  
+  border-radius: 50%;
+}
+
+.account-profile-image:hover {
+  border-color: #642481;
+}
+
+.account-profile-image img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .account-profile-edit-icon {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  width: 150px;
-  height: 150px;
-
+  bottom: 0;
+  right: 0;
+  background: #FFFFFF;
+  border: 2px solid #0A4988;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
-
   cursor: pointer;
-  opacity: 0;         
+  opacity: 0;
   transition: 0.25s ease;
-}
-
-.account-profile-wrapper:hover .account-profile-edit-icon {
-  opacity: 1;          
-}
-
-.account-profile-edit-icon svg {
-  width: 180px;
-  height: 180px;
-  pointer-events: none; 
-}
-
-.account-profile-wrapper {
-  position: relative;
-  width: 180px;
-  margin: 0 auto;
 }
 
 .account-profile-wrapper:hover .account-profile-edit-icon {
   opacity: 1;
 }
 
+.account-profile-edit-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
 /* Name Box */
 .account-name-box {
-  /* position: absolute; */
-  width: 700px;
-  height: 67px;
-  /* left: 203px;
-  top: 14px; */
+  width: 100%;
+  max-width: 500px;
+  height: 55px;
   background: #FFFFFF;
-  border: 1px solid #000000;
-  border-radius: 17px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 30px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  padding-left: 1.5rem;
-  padding-right: 3rem;
-  position: relative;
+  justify-content: center;
+  padding: 0 1.5rem;
 }
 
 .account-user-name-input {
   width: 100%;
   font-family: 'Montserrat', sans-serif;
-  font-style: normal;
   font-weight: 400;
-  font-size: 42px;
-  line-height: 51px;
+  font-size: 24px;
+  line-height: 30px;
   color: #0A4988;
   background: transparent;
   border: none;
   outline: none;
   text-align: center;
-  padding: 0.5rem 1rem;
+}
+
+.account-user-name-input::placeholder {
+  color: #999;
 }
 
 .account-user-name-input:focus {
@@ -257,100 +214,46 @@
   border-radius: 10px;
 }
 
-.account-user-name {
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 38px;
-  line-height: 46px;
-  color: #000000;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.account-name-edit-icon {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-}
-
-.account-name-edit-icon:hover {
-  opacity: 0.7;
-}
-
 /* Info Box */
 .account-info-box {
-  /* position: absolute; */
-  width: 700px;
-  height: 99px;
-  /* left: 203px;
-  top: 117px; */
+  width: 100%;
+  max-width: 500px;
   background: #FFFFFF;
-  border: 1px solid #000000;
-  border-radius: 17px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 1rem 1.5rem;
-  gap: 0.5rem;
-  height: auto;
+  align-items: center;
+  padding: 15px 20px;
+  gap: 6px;
 }
 
 .account-info-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  width: 100%;
 }
 
-.account-info-label {
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 29px;
-  color: #68237A;
-}
-
-.account-info-npm {
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 28px;
-  line-height: 34px;
-  color: #000000;
+.account-info-row-split {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
 }
 
 .account-info-separator {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
-  font-size: 28px;
-  line-height: 34px;
-  color: #000000;
-
-  margin: 0 12px;     
-  white-space: nowrap;  
-  z-index: 2;
-}
-
-.account-btn-save {
-  margin-top: -20px; 
-}
-
-
-.account-info-program {
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 28px;
-  line-height: 34px;
-  color: #000000;
+  font-size: 16px;
+  line-height: 20px;
+  color: #0A4988;
+  margin: 0 5px;
 }
 
 /* Info Input Fields */
@@ -358,293 +261,162 @@
 .account-info-npm-input,
 .account-info-program-input {
   font-family: 'Montserrat', sans-serif;
-  font-style: normal;
   font-weight: 400;
-  font-size: 24px;
-  line-height: 29px;
+  font-size: 16px;
+  line-height: 20px;
   background: transparent;
   border: none;
   outline: none;
-  color: #000000;
+  color: #0A4988;
+  text-align: center;
 }
 
 .account-info-input {
   font-weight: 600;
-  color: #68237A;
+  color: #642481;
   width: 100%;
-}
-
-.account-info-row-split {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  text-align: center;
 }
 
 .account-info-npm-input {
-  font-size: 28px;
-  line-height: 34px;
   width: auto;
-  min-width: 120px;
+  min-width: 80px;
+  max-width: 100px;
 }
 
 .account-info-program-input {
-  font-size: 28px;
-  line-height: 34px;
+  width: auto;
   flex: 1;
+  min-width: 100px;
 }
 
-/* Form Section */
-.account-form-section {
-  /* position: absolute;
-  left: 856px;
-  top: 600px; */
-  width: 520px;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 30px;
-}
-
+/* Form Section - Email field */
 .account-form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 15px;
 }
 
 .account-form-label {
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 16px;
   color: #0A4988;
 }
 
 .account-form-input {
   width: 100%;
-  height: 48px;
+  height: 45px;
   background: #FFFFFF;
-  border-radius: 17px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 25px;
   padding: 0 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 20px;
-  color: #000000;
+  font-size: 16px;
+  color: #0A4988;
   outline: none;
 }
 
 .account-form-input:focus {
   border-color: #0A4988;
-  box-shadow: 0px 4px 8px rgba(10, 73, 136, 0.3);
+  box-shadow: 0px 2px 4px rgba(10, 73, 136, 0.2);
 }
 
-.account-password-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.account-password-wrapper .account-form-input {
-  padding-right: 50px;
-}
-
-/* Email Section */
-.account-email-section {
-  /* position: absolute;
-  left: 856px;
-  top: 603px; */
-  z-index: 5;
-  width: 520px;
-}
-
-
-.account-field-label {
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 24px;
-  color: #000000;
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.account-email-box {
-  width: 520px;
-  height: 48px;
-  background: #FFFFFF;
-  border: 1px solid #000000;
-  border-radius: 17px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-}
-
-.account-email-input {
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 25px;
-  line-height: 30px;
-  color: #000000;
-}
-
-/* Password Section */
-.account-password-section {
-  /* position: absolute;
-  left: 861px;
-  top: 704px; */
-  z-index: 5;
-  width: 520px;
-}
-
-.account-password-box {
-  width: 514px;
-  height: 44px;
-  background: #FFFFFF;
-  border: 1px solid #000000;
-  border-radius: 17px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-  position: relative;
-  margin-bottom: 0.75rem;
-}
-
-.account-password-input {
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 24px;
-  color: #000000;
-  padding-right: 40px;
-}
-
-.account-password-toggle {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.account-change-password {
-  font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 29px;
-  color: #0A4988;
-  text-decoration: none;
-  display: block;
-  margin-top: 0.75rem;
-}
-
-.account-change-password:hover {
-  text-decoration: underline;
-}
-
-/* Action Buttons */
+/* Action Buttons - in single white rounded box like profile */
 .account-action-buttons {
-  /* position: absolute;
-  left: 868px;
-  top: 850px; */
   display: flex;
-  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
   z-index: 5;
-  margin-top: 30px;
+  margin-top: 25px;
+  padding: 15px 30px;
+  background: #FFFFFF;
+  border-radius: 30px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+  max-width: 450px;
 }
 
 .account-btn-logout {
-  width: 116px;
-  height: 55px;
-  background: #FF4040;
-  border-radius: 6px;
+  background: transparent;
   border: none;
   font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 25px;
-  line-height: 30px;
-  color: #FFFFFF;
+  font-weight: 500;
+  font-size: 16px;
+  color: #FF4040;
   cursor: pointer;
   transition: all 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 20px;
 }
 
 .account-btn-logout:hover {
-  background: #e63636;
-  transform: translateY(-2px);
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  background: #FF4040;
+  color: #FFFFFF;
 }
 
 .account-btn-delete {
-  width: 248px;
-  height: 55px;
-  background: #FF4040;
-  border-radius: 6px;
+  background: transparent;
   border: none;
   font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 25px;
-  line-height: 30px;
-  color: #FFFFFF;
+  font-weight: 500;
+  font-size: 16px;
+  color: #FF4040;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  gap: 0.3rem;
   transition: all 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 20px;
 }
 
 .account-btn-delete:hover {
-  background: #e63636;
-  transform: translateY(-2px);
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  background: #FF4040;
+  color: #FFFFFF;
+}
+
+.account-btn-delete:hover svg path {
+  fill: #FFFFFF;
+}
+
+.account-btn-delete svg {
+  width: 20px;
+  height: 20px;
 }
 
 .account-btn-save {
-  width: 81px;
-  height: 55px;
   background: #0A4988;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 5px;
   border: none;
   font-family: 'Montserrat', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 25px;
-  line-height: 30px;
+  font-weight: 500;
+  font-size: 16px;
   color: #FFFFFF;
   cursor: pointer;
   transition: all 0.3s ease;
+  padding: 8px 20px;
+  border-radius: 20px;
 }
 
 .account-btn-save:hover {
   background: #083a6f;
-  transform: translateY(-2px);
-  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
 }
 
-/* Footer */
+.account-btn-save:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+/* Footer - centered */
 .account-footer {
-  /* position: absolute;
-  left: 987px;
-  top: 947px; */
+  position: relative;
   display: flex;
   align-items: baseline;
+  justify-content: center;
   gap: 0.5rem;
   z-index: 5;
   margin-top: 40px;
@@ -652,21 +424,326 @@
 
 .account-footer-text {
   font-family: 'Montserrat Alternates', sans-serif;
-  font-style: normal;
   font-weight: 400;
-  font-size: 40px;
-  line-height: 49px;
+  font-size: 24px;
+  line-height: 30px;
   color: #000000;
 }
 
 .account-footer-held {
   font-family: 'Montserrat Alternates', sans-serif;
-  font-style: normal;
   font-weight: 700;
-  font-size: 40px;
-  line-height: 49px;
+  font-size: 24px;
+  line-height: 30px;
   color: #000000;
   text-decoration: underline;
 }
 
+/* ===== TABLET (769px - 1024px) ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .account-settings-wrapper {
+    padding: 15px 30px 60px 30px;
+  }
 
+  .account-bg-logo {
+    width: 350px;
+    height: 350px;
+    opacity: 0.1;
+  }
+
+  .back-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+
+  .back-button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .account-settings-title {
+    font-size: 34px;
+  }
+
+  .settings-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .account-profile-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+
+  .account-profile-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .account-profile-section {
+    max-width: 420px;
+  }
+
+  .account-name-box,
+  .account-info-box,
+  .account-form-group {
+    max-width: 420px;
+  }
+
+  .account-info-input {
+    font-size: 14px;
+  }
+
+  .account-info-npm-input,
+  .account-info-program-input,
+  .account-info-separator {
+    font-size: 13px;
+  }
+
+  .account-footer-text,
+  .account-footer-held {
+    font-size: 18px;
+  }
+}
+
+/* ===== MOBILE (max 768px) ===== */
+@media screen and (max-width: 768px) {
+  .account-settings-page {
+    min-height: 100vh !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .account-settings-wrapper {
+    padding: 10px 20px 30px 20px !important;
+    align-items: center !important;
+    width: calc(100% - 40px) !important;
+    max-width: calc(100vw - 40px) !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .account-bg-logo {
+    width: 150px !important;
+    height: 150px !important;
+    opacity: 0.08 !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  .back-button {
+    align-self: flex-end !important;
+    position: relative !important;
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+    margin-bottom: 8px !important;
+    margin-right: 0 !important;
+  }
+
+  .back-button svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .account-settings-header {
+    flex-direction: row !important;
+    gap: 0.4rem !important;
+    margin-bottom: 10px !important;
+    justify-content: center !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .account-settings-title {
+    font-size: 18px !important;
+  }
+
+  .settings-icon {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .account-profile-wrapper {
+    position: relative !important;
+    width: 80px !important;
+    height: 80px !important;
+    margin: 0 auto 10px auto !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+  }
+
+  .account-profile-image {
+    width: 80px !important;
+    height: 80px !important;
+    border-width: 2px !important;
+    margin: 0 auto !important;
+  }
+
+  .account-profile-image img,
+  .account-profile-wrapper img,
+  .account-profile-img {
+    width: 80px !important;
+    height: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+    min-height: 80px !important;
+    max-height: 80px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+  }
+
+  .account-profile-edit-icon {
+    width: 24px !important;
+    height: 24px !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    opacity: 1 !important;
+  }
+
+  .account-profile-edit-icon svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .account-profile-section {
+    max-width: 100% !important;
+    width: 100% !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .account-name-box {
+    height: 40px !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 20px !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+  }
+
+  .account-user-name-input {
+    font-size: 14px !important;
+    text-align: center !important;
+  }
+
+  .account-info-box {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 10px 15px !important;
+    border-radius: 15px !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .account-info-row {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+  }
+
+  .account-info-input {
+    font-size: 12px !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .account-info-row-split {
+    flex-wrap: nowrap !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .account-info-npm-input {
+    font-size: 11px !important;
+    width: auto !important;
+    min-width: 60px !important;
+    max-width: 80px !important;
+    text-align: center !important;
+  }
+
+  .account-info-program-input {
+    font-size: 11px !important;
+    width: auto !important;
+    flex: 1 !important;
+    text-align: center !important;
+  }
+
+  .account-info-separator {
+    font-size: 11px !important;
+    margin: 0 5px !important;
+  }
+
+  .account-form-group {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .account-form-label {
+    font-size: 12px !important;
+    text-align: left !important;
+  }
+
+  .account-form-input {
+    height: 38px !important;
+    font-size: 12px !important;
+    border-radius: 19px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .account-action-buttons {
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 12px 15px !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+    border-radius: 15px !important;
+    margin-top: 15px !important;
+    box-sizing: border-box !important;
+  }
+
+  .account-btn-logout,
+  .account-btn-delete,
+  .account-btn-save {
+    font-size: 13px !important;
+    padding: 10px 15px !important;
+    width: 100% !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+  }
+
+  .account-btn-delete svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .account-footer {
+    margin-top: 20px !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .account-footer-text,
+  .account-footer-held {
+    font-size: 12px !important;
+  }
+}

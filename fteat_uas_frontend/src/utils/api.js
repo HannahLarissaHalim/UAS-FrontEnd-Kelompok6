@@ -146,14 +146,36 @@ export const api = {
     return response.json();
   },
 
-  approveVendor: async (vendorId, token) => { // <- baru untuk admin approve vendor
+  approveVendor: async (vendorId, isApproved, token) => {
     const response = await fetch(`${API_URL}/api/vendor/admin/vendors/${vendorId}/approve`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ isApproved: true }),
+      body: JSON.stringify({ isApproved }),
+    });
+    return response.json();
+  },
+
+  deleteVendor: async (vendorId, token) => {
+    const response = await fetch(`${API_URL}/api/vendor/admin/vendors/${vendorId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  },
+
+  updateVendorByAdmin: async (vendorId, payload, token) => {
+    const response = await fetch(`${API_URL}/api/vendor/admin/vendors/${vendorId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
     });
     return response.json();
   },

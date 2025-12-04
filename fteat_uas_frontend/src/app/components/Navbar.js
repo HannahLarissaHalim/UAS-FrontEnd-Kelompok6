@@ -3,30 +3,29 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import "../custom.css"; 
+import "../custom.css";
 
 export default function Navbar() {
     const router = useRouter();
     const pathname = usePathname();
 
-    // login state
-    // used to check if user has token in local storage (already signed in)
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userRole, setUserRole] = useState(null);
     const [profilePic, setProfilePic] = useState("/images/navbar_icons/profile.png");
     const [cartCount, setCartCount] = useState(0);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
-        // check token asynchronously to avoid sync state update warning
         const checkAuth = () => {
             const token = localStorage.getItem("token");
+            const role = localStorage.getItem("role");
+
             if (token) {
-                // wrap setstate in a microtask to avoid cascading render
                 setTimeout(() => {
                     setIsLoggedIn(true);
-                    
-                    // Load profile image from user data
-                    const userData = localStorage.getItem('user');
+                    setUserRole(role);
+
+                    const userData = localStorage.getItem("user");
                     if (userData) {
                         try {
                             const user = JSON.parse(userData);
@@ -34,43 +33,39 @@ export default function Navbar() {
                                 setProfilePic(user.profileImage);
                             }
                         } catch (error) {
-                            console.error('Error parsing user data:', error);
+                            console.error("Error parsing user data:", error);
                         }
                     }
                 }, 0);
             }
         };
-        
-        // Load cart count
+
         const updateCartCount = () => {
-            const cart = localStorage.getItem('cart');
+            const cart = localStorage.getItem("cart");
             if (cart) {
                 const cartItems = JSON.parse(cart);
                 setCartCount(cartItems.length);
             }
         };
-        
+
         checkAuth();
         updateCartCount();
-        
-        // Listen for storage changes to update cart count
+
         const handleStorageChange = (e) => {
-            if (e.key === 'cart') {
+            if (e.key === "cart") {
                 updateCartCount();
             }
         };
-        
-        window.addEventListener('storage', handleStorageChange);
-        
-        // Also listen for custom cart update event
+
+        window.addEventListener("storage", handleStorageChange);
+
         const handleCartUpdate = () => {
             updateCartCount();
         };
-        window.addEventListener('cartUpdated', handleCartUpdate);
-        
-        // Listen for user/profile updates
+        window.addEventListener("cartUpdated", handleCartUpdate);
+
         const handleUserUpdate = () => {
-            const userData = localStorage.getItem('user');
+            const userData = localStorage.getItem("user");
             if (userData) {
                 try {
                     const user = JSON.parse(userData);
@@ -80,22 +75,22 @@ export default function Navbar() {
                         setProfilePic("/images/navbar_icons/profile.png");
                     }
                 } catch (error) {
-                    console.error('Error parsing user data:', error);
+                    console.error("Error parsing user data:", error);
                 }
             }
         };
-        window.addEventListener('userUpdated', handleUserUpdate);
-        
+        window.addEventListener("userUpdated", handleUserUpdate);
+
         return () => {
-            window.removeEventListener('storage', handleStorageChange);
-            window.removeEventListener('cartUpdated', handleCartUpdate);
-            window.removeEventListener('userUpdated', handleUserUpdate);
+            window.removeEventListener("storage", handleStorageChange);
+            window.removeEventListener("cartUpdated", handleCartUpdate);
+            window.removeEventListener("userUpdated", handleUserUpdate);
         };
     }, []);
 
     const handleProfileClick = () => {
         if (!isLoggedIn) {
-            router.push("/login"); // langsung redirect ke login page
+            router.push("/login");
             return;
         }
         router.push("/profile");
@@ -103,71 +98,34 @@ export default function Navbar() {
 
     const handleCartClick = () => {
         if (!isLoggedIn) {
-            router.push("/login"); // langsung redirect ke login page
+            router.push("/login");
             return;
         }
         router.push("/payment");
     };
 
-    // // handle button clicks
-    // const handleProfileClick = () => {
-    //     // if not logged in, show alert
-    //     // else redirect to welcome page
-    //     if (!isLoggedIn) {
-    //         alert("please sign in to view your profile.");
-    //     } else {
-    //         router.push("/profile");
-    //     }
-    // };
-
-    // const handleCartClick = () => {
-    //     // if not logged in, show alert
-    //     // else redirect to payment page
-    //     if (!isLoggedIn) {
-    //         alert("please sign in to access your cart.");
-    //     } else {
-    //         router.push("/payment");
-    //     }
-    // };
-
-    // helper to mark active link
-    // gives visual cue for current page in navbar
     const isActive = (path) => {
-        // buat /home aktif juga kalau lagi di /login atau /register
-        const homeRelatedPages = ['/login', '/register', '/choose-login'];
-        
-        if (homeRelatedPages.includes(pathname) && path === '/home') {
-            return 'active-link';
+        const homeRelatedPages = ["/login", "/register", "/choose-login"];
+
+        if (homeRelatedPages.includes(pathname) && path === "/home") {
+            return "active-link";
         }
 
-        return pathname === path ? 'active-link' : '';
+        return pathname === path ? "active-link" : "";
     };
 
-    // hide icons on specific pages
-    // icons (cart, profile) will not show on these pages
-    const hideIcons = [
-        "/",
-        "/home",
-        "/register",
-        "/login",
-        "/check-email",
-        "/verify",
-        "/aboutus",
-    ];
+    const hideIcons = ["/", "/home", "/register", "/login", "/check-email", "/verify"];
 
     const showIcons = !hideIcons.includes(pathname);
 
-    // main navbar ui
     return (
         <nav className="navbar-container">
             <div className="navbar-inner">
-                {/* left: logo and brand name */}
                 <div
                     className="navbar-logo"
                     onClick={() => router.push("/home")}
                     style={{ cursor: "pointer" }}
                 >
-                    {/* site logo image */}
                     <Image
                         src="/images/logo.png"
                         alt="fteat logo"
@@ -178,8 +136,7 @@ export default function Navbar() {
                     <span className="navbar-brand-text">FTEAT</span>
                 </div>
 
-                {/* Burger menu button */}
-                <button 
+                <button
                     className="burger-menu"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     aria-label="Toggle menu"
@@ -189,8 +146,15 @@ export default function Navbar() {
                     <span></span>
                 </button>
 
-                {/* navigation links */}
-                <div className={`navbar-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+                <div className={`navbar-links ${isMobileMenuOpen ? "mobile-open" : ""}`}>
+                    <Link
+                        href="/home"
+                        className={isActive("/home")}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        Home
+                    </Link>
+
                     <Link
                         href="/aboutus"
                         className={pathname === "/aboutus" ? "active" : ""}
@@ -199,70 +163,139 @@ export default function Navbar() {
                         About Us
                     </Link>
 
-                    <Link 
-                        href="/home" 
-                        className={isActive("/home")}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                        Home
-                    </Link>
+                    {userRole === "admin" && (
+                        <Link
+                            href="/admin/stand"
+                            className={pathname === "/admin/stand" ? "active" : ""}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            Verifikasi Vendor
+                        </Link>
+                    )}
 
-                    <Link
-                        href="/stand"
-                        className={pathname === "/stand" ? "active" : ""}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                        Stand
-                    </Link>
-                    <Link
-                        href="/menu"
-                        className={pathname === "/menu" ? "active" : ""}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                        Menu
-                    </Link>
+                    {userRole === "vendor" && (
+                        <>
+                            <Link
+                                href="/vendor/menu"
+                                className={pathname === "/vendor/menu" ? "active" : ""}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                Menu
+                            </Link>
+                            <Link
+                                href="/vendor/pesanan"
+                                className={pathname === "/vendor/pesanan" ? "active" : ""}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                Pesanan
+                            </Link>
+                            <Link
+                                href="/vendor/account"
+                                className={pathname === "/vendor/account" ? "active" : ""}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                Account Settings
+                            </Link>
+                        </>
+                    )}
+
+                    {/* Mahasiswa or not logged in - show Menu link to /menu */}
+                    {userRole !== "admin" && userRole !== "vendor" && (
+                        <Link
+                            href="/menu"
+                            className={pathname === "/menu" ? "active" : ""}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            Menu
+                        </Link>
+                    )}
                 </div>
 
-                {/* right: cart and profile icons */}
                 {showIcons && (
                     <div className="navbar-icons">
-                        {/* cart icon */}
-                        <button
-                            onClick={handleCartClick}
-                            className={`navbar-icon-btn navbar-cart-btn ${pathname === "/payment" ? "active-icon" : ""}`}
-                            aria-label="cart"
-                        >
-                            <Image
-                                src="/images/navbar_icons/trolley.png"
-                                alt="cart"
-                                width={26}
-                                height={26}
-                                unoptimized
-                            />
-                            {cartCount > 0 && (
-                                <span className="cart-badge">{cartCount}</span>
-                            )}
-                        </button>
-
-                        {/* profile icon */}
-                        <button
-                            onClick={handleProfileClick}
-                            className="navbar-icon-btn"
-                            aria-label="profile"
-                        >
-                            {/* Gunakan img biasa untuk support base64 */}
-                            <img
-                                src={profilePic}
-                                alt="profile"
-                                className="navbar-profile-img"
-                                style={{
-                                    width: '35px',
-                                    height: '35px',
-                                    borderRadius: '50%',
-                                    objectFit: 'cover'
+                        {userRole === "admin" && (
+                            <button
+                                onClick={() => {
+                                    localStorage.removeItem("token");
+                                    localStorage.removeItem("user");
+                                    localStorage.removeItem("role");
+                                    router.push("/admin/login");
                                 }}
-                            />
-                        </button>
+                                className="navbar-icon-btn"
+                                style={{
+                                    background: "#CB142C",
+                                    color: "white",
+                                    padding: "8px 16px",
+                                    borderRadius: "8px",
+                                    fontSize: "14px",
+                                    fontWeight: "500",
+                                }}
+                            >
+                                Logout
+                            </button>
+                        )}
+
+                        {userRole === "vendor" && (
+                            <button
+                                onClick={() => router.push("/vendor/profile")}
+                                className="navbar-icon-btn"
+                                aria-label="profile"
+                            >
+                                <img
+                                    src={profilePic}
+                                    alt="profile"
+                                    className="navbar-profile-img"
+                                    style={{
+                                        width: "35px",
+                                        height: "35px",
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
+                                    }}
+                                />
+                            </button>
+                        )}
+
+                        {/* Mahasiswa or guest - show cart and profile */}
+                        {userRole !== "admin" && userRole !== "vendor" && (
+                            <>
+                                <button
+                                    onClick={handleCartClick}
+                                    className={`navbar-icon-btn navbar-cart-btn ${
+                                        pathname === "/payment" ? "active-icon" : ""
+                                    }`}
+                                    aria-label="cart"
+                                >
+                                    <Image
+                                        src="/images/navbar_icons/trolley.png"
+                                        alt="cart"
+                                        width={26}
+                                        height={26}
+                                        unoptimized
+                                    />
+                                    {cartCount > 0 && (
+                                        <span className="cart-badge">{cartCount}</span>
+                                    )}
+                                </button>
+
+                                <button
+                                    onClick={handleProfileClick}
+                                    className="navbar-icon-btn"
+                                    aria-label="profile"
+                                >
+                                    <img
+                                        src={profilePic}
+                                        alt="profile"
+                                        className="navbar-profile-img"
+                                        style={{
+                                            width: "35px",
+                                            height: "35px",
+                                            borderRadius: "50%",
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
             </div>

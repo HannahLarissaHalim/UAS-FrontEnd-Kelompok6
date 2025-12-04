@@ -7,6 +7,11 @@ import '../custom.css';
 export default function AboutPage() {
   const [visibleParagraphs, setVisibleParagraphs] = useState([]);
   const paragraphRefs = useRef([]);
+  
+  // Email untuk keluhan/saran - bisa diganti nanti
+  const supportEmail = 'fteatuntar@gmail.com';
+  const emailSubject = 'Keluhan/Saran untuk FTEAT';
+  const emailBody = 'Halo Tim FTEAT,\n\nSaya ingin menyampaikan:\n\n';
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -100,15 +105,25 @@ export default function AboutPage() {
         {/* Contact Section */}
         <div className="about-contact">
           <p className="about-contact-text">Ada kendala atau Saran? Hubungi kami</p>
-          <div className="about-email">
-            <Image 
-              src="/images/mail.png" 
-              alt="Email" 
-              width={60} 
-              height={60}
-            />
-            <span className="about-email-text">fteat@gmail.com</span>
-          </div>
+          <a 
+            href={`mailto:${supportEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`}
+            className="about-email-link"
+          >
+            <div className="about-email">
+              <div className="about-email-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M22 6L12 13L2 6" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <span className="about-email-text">{supportEmail}</span>
+              <div className="about-email-arrow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#0A4988" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          </a>
         </div>
 
         {/* Footer */}

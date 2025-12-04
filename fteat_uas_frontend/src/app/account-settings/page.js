@@ -260,18 +260,18 @@ export default function AccountSettingsPage() {
     <ProtectedRoute>
       <Navbar />
       <div className="account-settings-page">
-        <div class="account-settings-wrapper">
+        <div className="account-settings-wrapper">
 
-          {/* Background Logo
+          {/* Background Logo */}
           <div className="account-bg-logo">
             <Image 
               src="/images/logo.png" 
               alt="FTEat Logo" 
-              width={822}
-              height={822}
+              width={450}
+              height={450}
               unoptimized
             />
-          </div> */}
+          </div>
 
           {/* Back Button */}
           <button 
@@ -305,8 +305,8 @@ export default function AccountSettingsPage() {
               >
                 <img 
                   src={profileImage || "/images/navbar_icons/profile.png"}
-                  alt="Profile" 
-                  style={{ width: '180px', height: '179px', objectFit: 'cover', borderRadius: '50%' }}
+                  alt="Profile"
+                  className="account-profile-img"
                 />
 
               </div>
