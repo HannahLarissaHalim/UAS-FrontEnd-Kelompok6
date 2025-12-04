@@ -50,7 +50,7 @@ https://your-backend-xxx.up.railway.app
 
 ---
 
-## ▲ Step 2: Deploy Frontend to Vercel (5 minutes)
+## Step 2: Deploy Frontend to Vercel (5 minutes)
 
 ### 2.1 Deploy on Vercel
 1. Go to **https://vercel.com**
