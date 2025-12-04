@@ -95,7 +95,12 @@ export default function Navbar() {
             router.push("/login");
             return;
         }
-        router.push("/profile");
+        // Redirect vendor to vendor profile, customer to regular profile
+        if (userRole === "vendor") {
+            router.push("/vendor/profile");
+        } else {
+            router.push("/profile");
+        }
     };
 
     const handleCartClick = () => {
