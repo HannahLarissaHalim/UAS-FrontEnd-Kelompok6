@@ -5,11 +5,12 @@ exports.sendVerificationEmail = async (toEmail, token) => {
   const baseUrl = process.env.CLIENT_URL || "http://localhost:3000";
   const verificationLink = `${baseUrl}/verify?token=${token}`;
 
-  // Setup Gmail SMTP transporter
+  // Setup SMTP transporter (supports Gmail, Brevo, etc)
+  const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: parseInt(process.env.SMTP_PORT) || 465,
-    secure: true, // use SSL for port 465
+    port: smtpPort,
+    secure: smtpPort === 465, // true for 465, false for 587
     auth: {
       user: process.env.SMTP_USER, // sender email
       pass: process.env.SMTP_PASS  // app password
@@ -20,7 +21,7 @@ exports.sendVerificationEmail = async (toEmail, token) => {
   });
 
   const mailOptions = {
-    from: `${process.env.SMTP_USER}`, 
+    from: process.env.SMTP_FROM || "noreply.fteat@gmail.com", 
     to: toEmail,
     subject: "Verifikasi Akun FTEat",
     html: `
@@ -42,10 +43,11 @@ exports.sendResetPasswordEmail = async (toEmail, token) => {
   //reset password
   const resetLink = `${baseUrl}/change-password/${token}`;
 
+  const smtpPort2 = parseInt(process.env.SMTP_PORT) || 587;
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: parseInt(process.env.SMTP_PORT) || 465,
-    secure: true, // use SSL for port 465
+    port: smtpPort2,
+    secure: smtpPort2 === 465, // true for 465, false for 587
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
@@ -56,7 +58,7 @@ exports.sendResetPasswordEmail = async (toEmail, token) => {
   });
 
   const mailOptions = {
-    from: `${process.env.SMTP_USER}`,
+    from: process.env.SMTP_FROM || "noreply.fteat@gmail.com",
     to: toEmail,
     subject: "Reset Password Akun FTEat",
     html: `
