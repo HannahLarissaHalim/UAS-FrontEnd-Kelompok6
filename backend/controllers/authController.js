@@ -116,8 +116,15 @@ exports.register = async (req, res) => {
     user.verificationTokenExpires = Date.now() + 5 * 60 * 1000;
     await user.save();
     
-    // Send verification email via Resend
-    await sendVerificationEmail(user.email, verificationToken);
+    // Send verification email - if fails, delete user and throw error
+    try {
+      await sendVerificationEmail(user.email, verificationToken);
+    } catch (emailError) {
+      // Delete user if email fails to send
+      await User.findByIdAndDelete(user._id);
+      console.error('Email send failed, user deleted:', emailError);
+      throw new Error('Gagal mengirim email verifikasi. Silakan coba lagi.');
+    }
 
     // Generate JWT token (include role)
     const token = generateToken(user._id, user.role || 'customer');
