@@ -66,6 +66,8 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
   const handleAddToCart = () => {
     onAddToCart({
       ...menu,
+      _id: menu._id || menu.id, // Preserve menu ID for order creation
+      menuItem: menu._id || menu.id, // Explicit menuItem field
       selectedAdditionals: getSelectedAdditionalsList(),
       totalPrice: calculateTotal(),
     });
@@ -75,6 +77,8 @@ export default function MenuCard({ menu, onAddToCart, onBuyNow }) {
   const handleBuyNow = () => {
     onBuyNow({
       ...menu,
+      _id: menu._id || menu.id, // Preserve menu ID for order creation
+      menuItem: menu._id || menu.id, // Explicit menuItem field
       selectedAdditionals: getSelectedAdditionalsList(),
       totalPrice: calculateTotal(),
     });
