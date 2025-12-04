@@ -16,7 +16,8 @@ export default function CheckEmailClient() {
     try {
       if (!emailFromURL) throw new Error("Email tidak ditemukan di URL.");
 
-      const res = await fetch("http://localhost:5000/api/auth/resend-email", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/auth/resend-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailFromURL }),
